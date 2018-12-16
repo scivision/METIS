@@ -10,8 +10,8 @@ git:
 matrix:
   include:
   - os: linux
-  - os: osx
-    before_install: brew install gcc > /dev/null
+#  - os: osx
+#    before_install: brew install gcc > /dev/null
 
 
 install: $TRAVIS_BUILD_DIR/build_METIS.sh
