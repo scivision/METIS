@@ -43,3 +43,19 @@ Studio. If the configuration is not already "Release", set it to
 <BINARY_DIR>\programs\Release. (<BINARY_DIR> will be build\windows if
 you used the command line or whatever you choose if using the CMake
 GUI.)
+
+
+Using the Intel oneAPI framework
+--------------------------------
+
+It is possible to use the Intel oneAPI framework, which provides the 
+Intel C and C++ compilers as well as other development tools.
+
+Open the command prompt and cd to the METIS source directory. Run
+
+	> mkdir build\windows-intel
+	> cd build\windows-intel
+	> cmake -G "Ninja" -DCMAKE_C_COMPILER=icl.exe -DCMAKE_CXX_COMPILER=icl.exe ../..
+	> ninja.exe
+
+to generate the build files and compile the project
