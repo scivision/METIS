@@ -1,8 +1,14 @@
-cmake_minimum_required(VERSION 2.8)
-project(METIS)
+cmake_minimum_required(VERSION 3.12)
+project(METIS
+LANGUAGES C
+HOMEPAGE_URL http://glaros.dtc.umn.edu/gkhome/metis/metis/download)
 
-set(GKLIB_PATH "GKlib" CACHE PATH "path to GKlib")
-set(SHARED FALSE CACHE BOOL "build a shared library")
+include(CTest)
+
+set(GKLIB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src/GKlib CACHE PATH "path to GKlib")
+option(SHARED "build a shared library" false)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 
 if(MSVC)
   set(METIS_INSTALL FALSE)
@@ -20,8 +26,11 @@ endif(SHARED)
 include(${GKLIB_PATH}/GKlibSystem.cmake)
 # Add include directories.
 include_directories(${GKLIB_PATH})
-include_directories(include)
+include_directories(src/include)
 # Recursively look for CMakeLists.txt in subdirs.
-add_subdirectory("include")
-add_subdirectory("libmetis")
-add_subdirectory("programs")
+add_subdirectory(src/include)
+add_subdirectory(src/libmetis)
+add_subdirectory(src/programs)
+
+add_test(NAME GraphCheck
+COMMAND $<TARGET_FILE:graphchk> ${CMAKE_CURRENT_SOURCE_DIR}/src/tests/tiny_01.graph)
