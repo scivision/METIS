@@ -8,7 +8,7 @@ build system to work on Linux and MacOS and Windows Subsystem for Linux.
 
 ## Prereqs
 
-A C compiler.
+A C99 compiler, such as GCC, Clang, Visual Studio, Intel oneAPI
 
 ## Build
 
