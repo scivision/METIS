@@ -1,0 +1,29 @@
+name: ci
+
+on:
+  push:
+    paths:
+      - "**.c"
+      - "**.cmake"
+      - "**/CMakeLists.txt"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    paths:
+      - "**.c"
+      - "**.cmake"
+      - "**/CMakeLists.txt"
+      - ".github/workflows/ci.yml"
+
+jobs:
+
+  linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+    - uses: actions/checkout@v2
+
+    - run: cmake -B build
+    - run: cmake --build build
+
+    - run: ctest --output-on-failure
+      working-directory: build
