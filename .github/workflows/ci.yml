@@ -27,3 +27,17 @@ jobs:
 
     - run: ctest --output-on-failure
       working-directory: build
+
+
+  mac:
+    needs: linux
+    runs-on: macos-latest
+    timeout-minutes: 5
+    steps:
+    - uses: actions/checkout@v2
+
+    - run: cmake -B build
+    - run: cmake --build build
+
+    - run: ctest --output-on-failure
+      working-directory: build
