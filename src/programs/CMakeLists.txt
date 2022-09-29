@@ -13,10 +13,8 @@ foreach(prog gpmetis ndmetis mpmetis m2gmetis graphchk cmpfillin)
 #  target_link_libraries(${prog} metis profiler)
 endforeach(prog)
 
-if(METIS_INSTALL)
-  install(TARGETS gpmetis ndmetis mpmetis m2gmetis graphchk cmpfillin
+install(TARGETS gpmetis ndmetis mpmetis m2gmetis graphchk cmpfillin
     RUNTIME DESTINATION bin)
-endif()
 
 # Try to find subversion revision.
 set(SVNREV "")

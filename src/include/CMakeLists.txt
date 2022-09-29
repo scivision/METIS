@@ -1,3 +1,1 @@
-if(METIS_INSTALL)
-  install(FILES metis.h DESTINATION include)
-endif()
+install(FILES metis.h DESTINATION include)

@@ -10,20 +10,19 @@ HOMEPAGE_URL http://glaros.dtc.umn.edu/gkhome/metis/metis/download)
 
 include(CTest)
 
+# --- auto-ignore build directory
+if(NOT EXISTS ${PROJECT_BINARY_DIR}/.gitignore)
+  file(WRITE ${PROJECT_BINARY_DIR}/.gitignore "*")
+endif()
+
 set(GKLIB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src/GKlib CACHE PATH "path to GKlib")
-option(SHARED "build a shared library" false)
+option(SHARED "build a shared library" ${BUILD_SHARED_LIBS})
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 
 set(CMAKE_C_STANDARD 99)
-
-if(MSVC)
-  set(METIS_INSTALL FALSE)
-else()
-  set(METIS_INSTALL TRUE)
-endif()
 
 # Configure libmetis library.
 if(SHARED)
