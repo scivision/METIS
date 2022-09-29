@@ -16,7 +16,6 @@ if(NOT EXISTS ${PROJECT_BINARY_DIR}/.gitignore)
 endif()
 
 set(GKLIB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src/GKlib CACHE PATH "path to GKlib")
-option(SHARED "build a shared library" ${BUILD_SHARED_LIBS})
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
@@ -25,11 +24,11 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 set(CMAKE_C_STANDARD 99)
 
 # Configure libmetis library.
-if(SHARED)
+if(BUILD_SHARED_LIBS)
   set(METIS_LIBRARY_TYPE SHARED)
 else()
   set(METIS_LIBRARY_TYPE STATIC)
-endif(SHARED)
+endif()
 
 include(${GKLIB_PATH}/GKlibSystem.cmake)
 # Add include directories.
