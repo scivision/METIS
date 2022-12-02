@@ -19,3 +19,12 @@ cmake --build build --parallel
 ```
 
 which creates `build/libmetis.a`
+
+## integer size, real size
+
+By default, metis.h uses 32-bit integer and real. Each can be independently set to 32 or 64 bits like:
+
+```sh
+cmake -Bbuild -Dintsize=64 -Drealsize=64
+cmake --build build
+```
