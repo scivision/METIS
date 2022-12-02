@@ -15,7 +15,7 @@ which is used for code generation.
 \version\verbatim $Id: blas.c 11848 2012-04-20 13:47:37Z karypis $ \endverbatim
 */
 
-#include <GKlib.h>
+#include "GKlib.h"
 
 
 
@@ -30,7 +30,3 @@ GK_MKBLAS(gk_z,   ssize_t,  ssize_t)
 GK_MKBLAS(gk_f,   float,    float)
 GK_MKBLAS(gk_d,   double,   double)
 GK_MKBLAS(gk_idx, gk_idx_t, gk_idx_t)
-
-
-
-

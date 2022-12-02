@@ -1,18 +1,18 @@
 /*!
-\file 
+\file
 \brief Functions dealing with creating and allocating mcores
 
 \date Started 5/30/11
 \author George
-\author Copyright 1997-2011, Regents of the University of Minnesota 
+\author Copyright 1997-2011, Regents of the University of Minnesota
 \version $Id: mcore.c 13953 2013-03-30 16:20:07Z karypis $
 */
 
-#include <GKlib.h>
+#include "GKlib.h"
 
 
 /*************************************************************************/
-/*! This function creates an mcore 
+/*! This function creates an mcore
  */
 /*************************************************************************/
 gk_mcore_t *gk_mcoreCreate(size_t coresize)
@@ -72,7 +72,7 @@ void gk_mcoreDestroy(gk_mcore_t **r_mcore, int showstats)
     return;
 
   if (showstats)
-    printf("\n gk_mcore statistics\n" 
+    printf("\n gk_mcore statistics\n"
            "           coresize: %12zu         nmops: %12zu  cmop: %6zu\n"
            "        num_callocs: %12zu   num_hallocs: %12zu\n"
            "       size_callocs: %12zu  size_hallocs: %12zu\n"
@@ -108,7 +108,7 @@ void gk_gkmcoreDestroy(gk_mcore_t **r_mcore, int showstats)
     return;
 
   if (showstats)
-    printf("\n gk_mcore statistics\n" 
+    printf("\n gk_mcore statistics\n"
            "         nmops: %12zu  cmop: %6zu\n"
            "   num_hallocs: %12zu\n"
            "  size_hallocs: %12zu\n"
@@ -134,7 +134,7 @@ void gk_gkmcoreDestroy(gk_mcore_t **r_mcore, int showstats)
 
 
 /*************************************************************************/
-/*! This function allocate space from the core/heap 
+/*! This function allocate space from the core/heap
  */
 /*************************************************************************/
 void *gk_mcoreMalloc(gk_mcore_t *mcore, size_t nbytes)
@@ -159,7 +159,7 @@ void *gk_mcoreMalloc(gk_mcore_t *mcore, size_t nbytes)
   }
 
   /*
-  printf("MCMALLOC: %zu %d %8zu\n", mcore->cmop-1, 
+  printf("MCMALLOC: %zu %d %8zu\n", mcore->cmop-1,
       mcore->mops[mcore->cmop-1].type, mcore->mops[mcore->cmop-1].nbytes);
   */
 
@@ -169,7 +169,7 @@ void *gk_mcoreMalloc(gk_mcore_t *mcore, size_t nbytes)
 
 /*************************************************************************/
 /*! This function sets a marker in the stack of malloc ops to be used
-    subsequently for freeing purposes 
+    subsequently for freeing purposes
  */
 /*************************************************************************/
 void gk_mcorePush(gk_mcore_t *mcore)
@@ -192,7 +192,7 @@ void gk_gkmcorePush(gk_mcore_t *mcore)
 
 
 /*************************************************************************/
-/*! This function frees all mops since the last push 
+/*! This function frees all mops since the last push
  */
 /*************************************************************************/
 void gk_mcorePop(gk_mcore_t *mcore)
@@ -202,7 +202,7 @@ void gk_mcorePop(gk_mcore_t *mcore)
     switch (mcore->mops[mcore->cmop].type) {
       case GK_MOPT_MARK: /* push marker */
         goto DONE;
-        break; 
+        break;
 
       case GK_MOPT_CORE: /* core free */
         if (mcore->corecpos < mcore->mops[mcore->cmop].nbytes)
@@ -241,7 +241,7 @@ void gk_gkmcorePop(gk_mcore_t *mcore)
     switch (mcore->mops[mcore->cmop].type) {
       case GK_MOPT_MARK: /* push marker */
         goto DONE;
-        break; 
+        break;
 
       case GK_MOPT_HEAP: /* heap free */
         free(mcore->mops[mcore->cmop].ptr);
@@ -267,7 +267,7 @@ void gk_mcoreAdd(gk_mcore_t *mcore, int type, size_t nbytes, void *ptr)
   if (mcore->cmop == mcore->nmops) {
     mcore->nmops *= 2;
     mcore->mops = realloc(mcore->mops, mcore->nmops*sizeof(gk_mop_t));
-    if (mcore->mops == NULL) 
+    if (mcore->mops == NULL)
       gk_errexit(SIGMEM, "***Memory allocation for gkmcore failed.\n");
   }
 
@@ -311,7 +311,7 @@ void gk_gkmcoreAdd(gk_mcore_t *mcore, int type, size_t nbytes, void *ptr)
   if (mcore->cmop == mcore->nmops) {
     mcore->nmops *= 2;
     mcore->mops = realloc(mcore->mops, mcore->nmops*sizeof(gk_mop_t));
-    if (mcore->mops == NULL) 
+    if (mcore->mops == NULL)
       gk_errexit(SIGMEM, "***Memory allocation for gkmcore failed.\n");
   }
 
@@ -390,4 +390,3 @@ void gk_gkmcoreDel(gk_mcore_t *mcore, void *ptr)
 
   gk_errexit(SIGMEM, "gkmcoreDel should never have been here!\n");
 }
-

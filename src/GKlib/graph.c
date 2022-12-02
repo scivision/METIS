@@ -1,18 +1,18 @@
 /*!
- * \file 
+ * \file
  *
- * \brief Various routines with dealing with sparse graphs 
+ * \brief Various routines with dealing with sparse graphs
  *
  * \author George Karypis
  * \version\verbatim $Id: graph.c 13328 2012-12-31 14:57:40Z karypis $ \endverbatim
  */
 
-#include <GKlib.h>
+#include "GKlib.h"
 
 #define OMPMINOPS       50000
 
 /*************************************************************************/
-/*! Allocate memory for a graph and initializes it 
+/*! Allocate memory for a graph and initializes it
     \returns the allocated graph. The various fields are set to NULL.
 */
 /**************************************************************************/
@@ -58,21 +58,21 @@ void gk_graph_Free(gk_graph_t **graph)
 /*! Frees only the memory allocated for the graph's different fields and
     sets them to NULL.
     \param graph is the graph whose contents will be freed.
-*/    
+*/
 /*************************************************************************/
 void gk_graph_FreeContents(gk_graph_t *graph)
 {
-  gk_free((void *)&graph->xadj, &graph->adjncy, 
+  gk_free((void *)&graph->xadj, &graph->adjncy,
           &graph->iadjwgt, &graph->fadjwgt,
           &graph->ivwgts, &graph->fvwgts,
           &graph->ivsizes, &graph->fvsizes,
-          &graph->vlabels, 
+          &graph->vlabels,
           LTERM);
 }
 
 
 /**************************************************************************/
-/*! Reads a sparse graph from the supplied file 
+/*! Reads a sparse graph from the supplied file
     \param filename is the file that stores the data.
     \param format is the graph format. The supported values are:
            GK_GRAPH_FMT_METIS.
@@ -82,7 +82,7 @@ void gk_graph_FreeContents(gk_graph_t *graph)
     \returns the graph that was read.
 */
 /**************************************************************************/
-gk_graph_t *gk_graph_Read(char *filename, int format, int isfewgts, 
+gk_graph_t *gk_graph_Read(char *filename, int format, int isfewgts,
                 int isfvwgts, int isfvsizes)
 {
   ssize_t i, k, l;
@@ -95,7 +95,7 @@ gk_graph_t *gk_graph_Read(char *filename, int format, int isfewgts,
   gk_graph_t *graph=NULL;
 
 
-  if (!gk_fexists(filename)) 
+  if (!gk_fexists(filename))
     gk_errexit(SIGERR, "File %s does not exist!\n", filename);
 
   if (format == GK_GRAPH_FMT_METIS) {
@@ -217,14 +217,14 @@ gk_graph_t *gk_graph_Read(char *filename, int format, int isfewgts,
       }
     }
 
-   
+
     /* Read the rest of the row */
     while (1) {
       ival = (int)strtol(head, &tail, 0);
-      if (tail == head) 
+      if (tail == head)
         break;
       head = tail;
-      
+
       if ((graph->adjncy[k] = ival + numbering) < 0)
         gk_errexit(SIGERR, "Error: Invalid column number %d at row %zd.\n", ival, i);
 
@@ -286,7 +286,7 @@ void gk_graph_Write(gk_graph_t *graph, char *filename, int format)
   if (filename)
     fpout = gk_fopen(filename, "w", "gk_graph_Write: fpout");
   else
-    fpout = stdout; 
+    fpout = stdout;
 
 
   hasewgts  = (graph->iadjwgt || graph->fadjwgt);
@@ -295,7 +295,7 @@ void gk_graph_Write(gk_graph_t *graph, char *filename, int format)
 
   /* write the header line */
   fprintf(fpout, "%d %zd", graph->nvtxs, graph->xadj[graph->nvtxs]/2);
-  if (hasvwgts || hasvsizes || hasewgts) 
+  if (hasvwgts || hasvsizes || hasewgts)
     fprintf(fpout, " %d%d%d", hasvsizes, hasvwgts, hasewgts);
   fprintf(fpout, "\n");
 
@@ -320,7 +320,7 @@ void gk_graph_Write(gk_graph_t *graph, char *filename, int format)
       if (hasewgts) {
         if (graph->iadjwgt)
           fprintf(fpout, " %d", graph->iadjwgt[j]);
-        else 
+        else
           fprintf(fpout, " %f", graph->fadjwgt[j]);
       }
     }
@@ -347,33 +347,33 @@ gk_graph_t *gk_graph_Dup(gk_graph_t *graph)
 
   /* copy the adjacency structure */
   if (graph->xadj)
-    ngraph->xadj = gk_zcopy(graph->nvtxs+1, graph->xadj, 
+    ngraph->xadj = gk_zcopy(graph->nvtxs+1, graph->xadj,
                             gk_zmalloc(graph->nvtxs+1, "gk_graph_Dup: xadj"));
   if (graph->ivwgts)
-    ngraph->ivwgts = gk_i32copy(graph->nvtxs, graph->ivwgts, 
+    ngraph->ivwgts = gk_i32copy(graph->nvtxs, graph->ivwgts,
                             gk_i32malloc(graph->nvtxs, "gk_graph_Dup: ivwgts"));
   if (graph->ivsizes)
-    ngraph->ivsizes = gk_i32copy(graph->nvtxs, graph->ivsizes, 
+    ngraph->ivsizes = gk_i32copy(graph->nvtxs, graph->ivsizes,
                             gk_i32malloc(graph->nvtxs, "gk_graph_Dup: ivsizes"));
   if (graph->vlabels)
-    ngraph->vlabels = gk_i32copy(graph->nvtxs, graph->vlabels, 
+    ngraph->vlabels = gk_i32copy(graph->nvtxs, graph->vlabels,
                             gk_i32malloc(graph->nvtxs, "gk_graph_Dup: ivlabels"));
   if (graph->fvwgts)
-    ngraph->fvwgts = gk_fcopy(graph->nvtxs, graph->fvwgts, 
+    ngraph->fvwgts = gk_fcopy(graph->nvtxs, graph->fvwgts,
                             gk_fmalloc(graph->nvtxs, "gk_graph_Dup: fvwgts"));
   if (graph->fvsizes)
-    ngraph->fvsizes = gk_fcopy(graph->nvtxs, graph->fvsizes, 
+    ngraph->fvsizes = gk_fcopy(graph->nvtxs, graph->fvsizes,
                             gk_fmalloc(graph->nvtxs, "gk_graph_Dup: fvsizes"));
 
 
   if (graph->adjncy)
-    ngraph->adjncy = gk_i32copy(graph->xadj[graph->nvtxs], graph->adjncy, 
+    ngraph->adjncy = gk_i32copy(graph->xadj[graph->nvtxs], graph->adjncy,
                             gk_i32malloc(graph->xadj[graph->nvtxs], "gk_graph_Dup: adjncy"));
   if (graph->iadjwgt)
-    ngraph->iadjwgt = gk_i32copy(graph->xadj[graph->nvtxs], graph->iadjwgt, 
+    ngraph->iadjwgt = gk_i32copy(graph->xadj[graph->nvtxs], graph->iadjwgt,
                             gk_i32malloc(graph->xadj[graph->nvtxs], "gk_graph_Dup: iadjwgt"));
   if (graph->fadjwgt)
-    ngraph->fadjwgt = gk_fcopy(graph->xadj[graph->nvtxs], graph->fadjwgt, 
+    ngraph->fadjwgt = gk_fcopy(graph->xadj[graph->nvtxs], graph->fadjwgt,
                             gk_fmalloc(graph->xadj[graph->nvtxs], "gk_graph_Dup: fadjwgt"));
 
   return ngraph;
@@ -402,44 +402,44 @@ gk_graph_t *gk_graph_ExtractSubgraph(gk_graph_t *graph, int vstart, int nvtxs)
 
   /* copy the adjancy structure */
   if (graph->xadj)
-    ngraph->xadj = gk_zcopy(nvtxs+1, graph->xadj+vstart, 
+    ngraph->xadj = gk_zcopy(nvtxs+1, graph->xadj+vstart,
                               gk_zmalloc(nvtxs+1, "gk_graph_ExtractSubgraph: xadj"));
   for (i=nvtxs; i>=0; i--)
     ngraph->xadj[i] -= ngraph->xadj[0];
   ASSERT(ngraph->xadj[0] == 0);
 
   if (graph->ivwgts)
-    ngraph->ivwgts = gk_i32copy(nvtxs, graph->ivwgts+vstart, 
+    ngraph->ivwgts = gk_i32copy(nvtxs, graph->ivwgts+vstart,
                             gk_i32malloc(nvtxs, "gk_graph_ExtractSubgraph: ivwgts"));
   if (graph->ivsizes)
-    ngraph->ivsizes = gk_i32copy(nvtxs, graph->ivsizes+vstart, 
+    ngraph->ivsizes = gk_i32copy(nvtxs, graph->ivsizes+vstart,
                             gk_i32malloc(nvtxs, "gk_graph_ExtractSubgraph: ivsizes"));
   if (graph->vlabels)
-    ngraph->vlabels = gk_i32copy(nvtxs, graph->vlabels+vstart, 
+    ngraph->vlabels = gk_i32copy(nvtxs, graph->vlabels+vstart,
                             gk_i32malloc(nvtxs, "gk_graph_ExtractSubgraph: vlabels"));
 
   if (graph->fvwgts)
-    ngraph->fvwgts = gk_fcopy(nvtxs, graph->fvwgts+vstart, 
+    ngraph->fvwgts = gk_fcopy(nvtxs, graph->fvwgts+vstart,
                             gk_fmalloc(nvtxs, "gk_graph_ExtractSubgraph: fvwgts"));
   if (graph->fvsizes)
-    ngraph->fvsizes = gk_fcopy(nvtxs, graph->fvsizes+vstart, 
+    ngraph->fvsizes = gk_fcopy(nvtxs, graph->fvsizes+vstart,
                             gk_fmalloc(nvtxs, "gk_graph_ExtractSubgraph: fvsizes"));
 
 
   ASSERT(ngraph->xadj[nvtxs] == graph->xadj[vstart+nvtxs]-graph->xadj[vstart]);
   if (graph->adjncy)
-    ngraph->adjncy = gk_i32copy(graph->xadj[vstart+nvtxs]-graph->xadj[vstart], 
-                            graph->adjncy+graph->xadj[vstart], 
+    ngraph->adjncy = gk_i32copy(graph->xadj[vstart+nvtxs]-graph->xadj[vstart],
+                            graph->adjncy+graph->xadj[vstart],
                             gk_i32malloc(graph->xadj[vstart+nvtxs]-graph->xadj[vstart],
                                        "gk_graph_ExtractSubgraph: adjncy"));
   if (graph->iadjwgt)
-    ngraph->iadjwgt = gk_i32copy(graph->xadj[vstart+nvtxs]-graph->xadj[vstart], 
-                            graph->iadjwgt+graph->xadj[vstart], 
+    ngraph->iadjwgt = gk_i32copy(graph->xadj[vstart+nvtxs]-graph->xadj[vstart],
+                            graph->iadjwgt+graph->xadj[vstart],
                             gk_i32malloc(graph->xadj[vstart+nvtxs]-graph->xadj[vstart],
                                        "gk_graph_ExtractSubgraph: iadjwgt"));
   if (graph->fadjwgt)
-    ngraph->fadjwgt = gk_fcopy(graph->xadj[vstart+nvtxs]-graph->xadj[vstart], 
-                            graph->fadjwgt+graph->xadj[vstart], 
+    ngraph->fadjwgt = gk_fcopy(graph->xadj[vstart+nvtxs]-graph->xadj[vstart],
+                            graph->fadjwgt+graph->xadj[vstart],
                             gk_fmalloc(graph->xadj[vstart+nvtxs]-graph->xadj[vstart],
                                        "gk_graph_ExtractSubgraph: fadjwgt"));
 
@@ -507,13 +507,13 @@ gk_graph_t *gk_graph_Reorder(gk_graph_t *graph, int32_t *perm, int32_t *iperm)
   /* create perm/iperm if not provided */
   if (perm == NULL) {
     freeperm = 1;
-    perm = gk_i32malloc(nvtxs, "gk_graph_Reorder: perm"); 
+    perm = gk_i32malloc(nvtxs, "gk_graph_Reorder: perm");
     for (i=0; i<nvtxs; i++)
       perm[iperm[i]] = i;
   }
   if (iperm == NULL) {
     freeiperm = 1;
-    iperm = gk_i32malloc(nvtxs, "gk_graph_Reorder: iperm"); 
+    iperm = gk_i32malloc(nvtxs, "gk_graph_Reorder: iperm");
     for (i=0; i<nvtxs; i++)
       iperm[perm[i]] = i;
   }
@@ -558,9 +558,9 @@ gk_graph_t *gk_graph_Reorder(gk_graph_t *graph, int32_t *perm, int32_t *iperm)
 /*! This function finds the connected components in a graph.
 
     \param graph is the graph structure
-    \param cptr is the ptr structure of the CSR representation of the 
+    \param cptr is the ptr structure of the CSR representation of the
            components. The length of this vector must be graph->nvtxs+1.
-    \param cind is the indices structure of the CSR representation of 
+    \param cind is the indices structure of the CSR representation of
            the components. The length of this vector must be graph->nvtxs.
 
     \returns the number of components that it found.
@@ -587,12 +587,12 @@ int gk_graph_FindComponents(gk_graph_t *graph, int32_t *cptr, int32_t *cind)
     mustfree_ccsr = 1;
   }
 
-  /* The list of vertices that have not been touched yet. 
+  /* The list of vertices that have not been touched yet.
      The valid entries are from [0..ntodo). */
   todo = gk_i32incset(nvtxs, 0, gk_i32malloc(nvtxs, "gk_graph_FindComponents: todo"));
 
   /* For a vertex that has not been visited, pos[i] is the position in the
-     todo list that this vertex is stored. 
+     todo list that this vertex is stored.
      If a vertex has been visited, pos[i] = -1. */
   pos = gk_i32incset(nvtxs, 0, gk_i32malloc(nvtxs, "gk_graph_FindComponents: pos"));
 
@@ -601,7 +601,7 @@ int gk_graph_FindComponents(gk_graph_t *graph, int32_t *cptr, int32_t *cind)
   ncmps = -1;
   ntodo = nvtxs;     /* All vertices have not been visited */
   first = last = 0;  /* Point to the first and last vertices that have been touched
-                        but not explored. 
+                        but not explored.
                         These vertices are stored in cind[first]...cind[last-1]. */
   while (ntodo > 0) {
     if (first == last) { /* Find another starting vertex */
@@ -616,7 +616,7 @@ int gk_graph_FindComponents(gk_graph_t *graph, int32_t *cptr, int32_t *cind)
 
     i = cind[first++];  /* Get the first visited but unexplored vertex */
 
-    /* Remove i from the todo list and put the last item in the todo 
+    /* Remove i from the todo list and put the last item in the todo
        list at the position that i was so that the todo list will be
        consequtive. The pos[] array is updated accordingly to keep track
        the location of the vertices in the todo[] list. */
@@ -653,10 +653,10 @@ int gk_graph_FindComponents(gk_graph_t *graph, int32_t *cptr, int32_t *cind)
     \param[IN]  graph is the graph structure
     \param[IN]  v is the starting vertex of the BFS
     \param[OUT] perm[i] stores the ID of vertex i in the re-ordered graph.
-    \param[OUT] iperm[i] stores the ID of the vertex that corresponds to 
+    \param[OUT] iperm[i] stores the ID of the vertex that corresponds to
                 the ith vertex in the re-ordered graph.
 
-    \note The perm or iperm (but not both) can be NULL, at which point, 
+    \note The perm or iperm (but not both) can be NULL, at which point,
           the corresponding arrays are not returned. Though the program
           works fine when both are NULL, doing that is not smart.
           The returned arrays should be freed with gk_free().
@@ -679,8 +679,8 @@ void gk_graph_ComputeBFSOrdering(gk_graph_t *graph, int v, int32_t **r_perm,
   /* This array will function like pos + touched of the CC method */
   pos = gk_i32incset(nvtxs, 0, gk_i32malloc(nvtxs, "gk_graph_ComputeBFSOrdering: pos"));
 
-  /* This array ([C]losed[O]pen[T]odo => cot) serves three purposes. 
-     Positions from [0...first) is the current iperm[] vector of the explored vertices; 
+  /* This array ([C]losed[O]pen[T]odo => cot) serves three purposes.
+     Positions from [0...first) is the current iperm[] vector of the explored vertices;
      Positions from [first...last) is the OPEN list (i.e., visited vertices);
      Positions from [last...nvtxs) is the todo list. */
   cot = gk_i32incset(nvtxs, 0, gk_i32malloc(nvtxs, "gk_graph_ComputeBFSOrdering: cot"));
@@ -705,10 +705,10 @@ void gk_graph_ComputeBFSOrdering(gk_graph_t *graph, int v, int32_t **r_perm,
       k = adjncy[j];
       /* if a node has already been visited, its perm[] will be -1 */
       if (pos[k] != -1) {
-        /* pos[k] is the location within iperm of where k resides (it is in the 'todo' part); 
-           It is placed in that location cot[last] (end of OPEN list) that we 
+        /* pos[k] is the location within iperm of where k resides (it is in the 'todo' part);
+           It is placed in that location cot[last] (end of OPEN list) that we
            are about to overwrite and update pos[cot[last]] to reflect that. */
-        cot[pos[k]]    = cot[last]; /* put the head of the todo list to 
+        cot[pos[k]]    = cot[last]; /* put the head of the todo list to
                                        where k was in the todo list */
         pos[cot[last]] = pos[k];    /* update perm to reflect the move */
 
@@ -750,16 +750,16 @@ void gk_graph_ComputeBFSOrdering(gk_graph_t *graph, int v, int32_t **r_perm,
     \param[IN]  type indicates the criteria to use to measure the 'bestness'
                 of a vertex.
     \param[OUT] perm[i] stores the ID of vertex i in the re-ordered graph.
-    \param[OUT] iperm[i] stores the ID of the vertex that corresponds to 
+    \param[OUT] iperm[i] stores the ID of the vertex that corresponds to
                 the ith vertex in the re-ordered graph.
 
-    \note The perm or iperm (but not both) can be NULL, at which point, 
+    \note The perm or iperm (but not both) can be NULL, at which point,
           the corresponding arrays are not returned. Though the program
           works fine when both are NULL, doing that is not smart.
           The returned arrays should be freed with gk_free().
 */
 /*************************************************************************/
-void gk_graph_ComputeBestFOrdering0(gk_graph_t *graph, int v, int type, 
+void gk_graph_ComputeBestFOrdering0(gk_graph_t *graph, int v, int type,
           int32_t **r_perm, int32_t **r_iperm)
 {
   ssize_t j, jj, *xadj;
@@ -777,13 +777,13 @@ void gk_graph_ComputeBestFOrdering0(gk_graph_t *graph, int v, int type,
   /* the degree of the vertices in the closed list */
   degrees = gk_i32smalloc(nvtxs, 0, "gk_graph_ComputeBestFOrdering: degrees");
 
-  /* the minimum vertex ID of an open vertex to the closed list */ 
+  /* the minimum vertex ID of an open vertex to the closed list */
   minIDs  = gk_i32smalloc(nvtxs, nvtxs+1, "gk_graph_ComputeBestFOrdering: minIDs");
 
-  /* the open list */ 
+  /* the open list */
   open  = gk_i32malloc(nvtxs, "gk_graph_ComputeBestFOrdering: open");
 
-  /* if perm[i] >= 0, then perm[i] is the order of vertex i; 
+  /* if perm[i] >= 0, then perm[i] is the order of vertex i;
      otherwise perm[i] == -1.
   */
   perm = gk_i32smalloc(nvtxs, -1, "gk_graph_ComputeBestFOrdering: perm");
@@ -798,7 +798,7 @@ void gk_graph_ComputeBestFOrdering0(gk_graph_t *graph, int v, int type,
 
   /* start processing the nodes */
   for (i=0; i<nvtxs; i++) {
-    if ((v = gk_i32pqGetTop(queue)) == -1) 
+    if ((v = gk_i32pqGetTop(queue)) == -1)
       gk_errexit(SIGERR, "The priority queue got empty ahead of time [i=%d].\n", i);
     if (perm[v] != -1)
       gk_errexit(SIGERR, "The perm[%d] has already been set.\n", v);
@@ -825,7 +825,7 @@ void gk_graph_ComputeBestFOrdering0(gk_graph_t *graph, int v, int type,
             }
             gk_i32pqUpdate(queue, u, k);
             break;
-          case 4: /* Sum of order-differences (w.r.t. current number) in closed 
+          case 4: /* Sum of order-differences (w.r.t. current number) in closed
                      list (updated once in a while) */
             for (k=0, jj=xadj[u]; jj<xadj[u+1]; jj++) {
               if (perm[adjncy[jj]] != -1)
@@ -875,16 +875,16 @@ void gk_graph_ComputeBestFOrdering0(gk_graph_t *graph, int v, int type,
     \param[IN]  type indicates the criteria to use to measure the 'bestness'
                 of a vertex.
     \param[OUT] perm[i] stores the ID of vertex i in the re-ordered graph.
-    \param[OUT] iperm[i] stores the ID of the vertex that corresponds to 
+    \param[OUT] iperm[i] stores the ID of the vertex that corresponds to
                 the ith vertex in the re-ordered graph.
 
-    \note The perm or iperm (but not both) can be NULL, at which point, 
+    \note The perm or iperm (but not both) can be NULL, at which point,
           the corresponding arrays are not returned. Though the program
           works fine when both are NULL, doing that is not smart.
           The returned arrays should be freed with gk_free().
 */
 /*************************************************************************/
-void gk_graph_ComputeBestFOrdering(gk_graph_t *graph, int v, int type, 
+void gk_graph_ComputeBestFOrdering(gk_graph_t *graph, int v, int type,
           int32_t **r_perm, int32_t **r_iperm)
 {
   ssize_t j, jj, *xadj;
@@ -911,7 +911,7 @@ void gk_graph_ComputeBestFOrdering(gk_graph_t *graph, int v, int type,
   /* the encountering level of a vertex type==5 */
   level = gk_i32smalloc(nvtxs, 0, "gk_graph_ComputeBestFOrdering: level");
 
-  /* The open+todo list of vertices. 
+  /* The open+todo list of vertices.
      The vertices from [0..nopen] are the open vertices.
      The vertices from [nopen..ntodo) are the todo vertices.
      */
@@ -936,7 +936,7 @@ void gk_graph_ComputeBestFOrdering(gk_graph_t *graph, int v, int type,
   /* start processing the nodes */
   for (i=0; i<nvtxs; i++) {
     if (nopen == 0) { /* deal with non-connected graphs */
-      gk_i32pqInsert(queue, ot[0], 1);  
+      gk_i32pqInsert(queue, ot[0], 1);
       nopen++;
     }
 
@@ -975,7 +975,7 @@ void gk_graph_ComputeBestFOrdering(gk_graph_t *graph, int v, int type,
           nopen++;
 
           level[u] = level[v]+1;
-          gk_i32pqInsert(queue, u, 0);  
+          gk_i32pqInsert(queue, u, 0);
         }
 
 
@@ -1063,8 +1063,8 @@ void gk_graph_ComputeBestFOrdering(gk_graph_t *graph, int v, int type,
 
 /*************************************************************************/
 /*! This function computes the single-source shortest path lengths from the
-    root node to all the other nodes in the graph. If the graph is not 
-    connected then, the sortest part to the vertices in the other components 
+    root node to all the other nodes in the graph. If the graph is not
+    connected then, the sortest part to the vertices in the other components
     is -1.
 
     \param[IN]  graph is the graph structure.
@@ -1233,12 +1233,12 @@ void gk_graph_SortAdjacencies(gk_graph_t *graph)
     float *tval;
 
     #pragma omp single
-    for (i=0; i<n; i++) 
+    for (i=0; i<n; i++)
       nn = gk_max(nn, ptr[i+1]-ptr[i]);
-  
+
     cand = gk_ikvmalloc(nn, "gk_graph_SortIndices: cand");
     tval = gk_fmalloc(nn, "gk_graph_SortIndices: tval");
-  
+
     #pragma omp for schedule(static)
     for (i=0; i<n; i++) {
       for (k=0, j=ptr[i]; j<ptr[i+1]; j++) {
@@ -1281,7 +1281,7 @@ gk_graph_t *gk_graph_ExtractRows(gk_graph_t *graph, int nrows, int *rind)
   ngraph->nrows = nrows;
   ngraph->ncols = graph->ncols;
 
-  for (nnz=0, i=0; i<nrows; i++)  
+  for (nnz=0, i=0; i<nrows; i++)
     nnz += graph->rowptr[rind[i]+1]-graph->rowptr[rind[i]];
 
   ngraph->rowptr = gk_zmalloc(ngraph->nrows+1, "gk_graph_ExtractPartition: rowptr");
@@ -1378,19 +1378,19 @@ gk_graph_t **gk_graph_Split(gk_graph_t *graph, int *color)
     sgraphs[i] = gk_graph_Create();
     sgraphs[i]->nrows  = graph->nrows;
     sgraphs[i]->ncols  = graph->ncols;
-    sgraphs[i]->rowptr = gk_zsmalloc(nrows+1, 0, "gk_graph_Split: sgraphs[i]->rowptr"); 
+    sgraphs[i]->rowptr = gk_zsmalloc(nrows+1, 0, "gk_graph_Split: sgraphs[i]->rowptr");
   }
 
   for (i=0; i<nrows; i++) {
-    for (j=rowptr[i]; j<rowptr[i+1]; j++) 
+    for (j=rowptr[i]; j<rowptr[i+1]; j++)
       sgraphs[color[j]]->rowptr[i]++;
   }
-  for (i=0; i<ncolors; i++) 
+  for (i=0; i<ncolors; i++)
     MAKECSR(j, nrows, sgraphs[i]->rowptr);
 
   for (i=0; i<ncolors; i++) {
-    sgraphs[i]->rowind = gk_imalloc(sgraphs[i]->rowptr[nrows], "gk_graph_Split: sgraphs[i]->rowind"); 
-    sgraphs[i]->rowval = gk_fmalloc(sgraphs[i]->rowptr[nrows], "gk_graph_Split: sgraphs[i]->rowval"); 
+    sgraphs[i]->rowind = gk_imalloc(sgraphs[i]->rowptr[nrows], "gk_graph_Split: sgraphs[i]->rowind");
+    sgraphs[i]->rowval = gk_fmalloc(sgraphs[i]->rowptr[nrows], "gk_graph_Split: sgraphs[i]->rowval");
   }
 
   for (i=0; i<nrows; i++) {
@@ -1401,7 +1401,7 @@ gk_graph_t **gk_graph_Split(gk_graph_t *graph, int *color)
     }
   }
 
-  for (i=0; i<ncolors; i++) 
+  for (i=0; i<ncolors; i++)
     SHIFTCSR(j, nrows, sgraphs[i]->rowptr);
 
   return sgraphs;
@@ -1409,11 +1409,11 @@ gk_graph_t **gk_graph_Split(gk_graph_t *graph, int *color)
 
 
 /*************************************************************************/
-/*! Prunes certain rows/columns of the graphrix. The prunning takes place 
+/*! Prunes certain rows/columns of the graphrix. The prunning takes place
     by analyzing the row structure of the graphrix. The prunning takes place
     by removing rows/columns but it does not affect the numbering of the
     remaining rows/columns.
-   
+
     \param graph the graphrix to be prunned,
     \param what indicates if the rows (GK_CSR_ROW) or the columns (GK_CSR_COL)
            of the graphrix will be prunned,
@@ -1421,8 +1421,8 @@ gk_graph_t **gk_graph_Split(gk_graph_t *graph, int *color)
            be present in order to be kept,
     \param maxf is the maximum number of rows (columns) that a column (row) must
           be present at in order to be kept.
-    \returns the prunned graphrix consisting only of its row-based structure. 
-          The input graphrix is not modified. 
+    \returns the prunned graphrix consisting only of its row-based structure.
+          The input graphrix is not modified.
 */
 /**************************************************************************/
 gk_graph_t *gk_graph_Prune(gk_graph_t *graph, int what, int minf, int maxf)
@@ -1435,7 +1435,7 @@ gk_graph_t *gk_graph_Prune(gk_graph_t *graph, int what, int minf, int maxf)
   gk_graph_t *ngraph;
 
   ngraph = gk_graph_Create();
-  
+
   nrows = ngraph->nrows = graph->nrows;
   ncols = ngraph->ncols = graph->ncols;
 
@@ -1500,11 +1500,11 @@ gk_graph_t *gk_graph_Prune(gk_graph_t *graph, int what, int minf, int maxf)
 
 
 /*************************************************************************/
-/*! Normalizes the rows/columns of the graphrix to be unit 
+/*! Normalizes the rows/columns of the graphrix to be unit
     length.
     \param graph the graphrix itself,
     \param what indicates what will be normalized and is obtained by
-           specifying GK_CSR_ROW, GK_CSR_COL, GK_CSR_ROW|GK_CSR_COL. 
+           specifying GK_CSR_ROW, GK_CSR_COL, GK_CSR_ROW|GK_CSR_COL.
     \param norm indicates what norm is to normalize to, 1: 1-norm, 2: 2-norm
 */
 /**************************************************************************/
@@ -1520,7 +1520,7 @@ void gk_graph_Normalize(gk_graph_t *graph, int what, int norm)
     ptr = graph->rowptr;
     val = graph->rowval;
 
-    #pragma omp parallel if (ptr[n] > OMPMINOPS) 
+    #pragma omp parallel if (ptr[n] > OMPMINOPS)
     {
       #pragma omp for private(j,sum) schedule(static)
       for (i=0; i<n; i++) {
@@ -1528,16 +1528,16 @@ void gk_graph_Normalize(gk_graph_t *graph, int what, int norm)
   	if (norm == 2)
   	  sum += val[j]*val[j];
   	else if (norm == 1)
-  	  sum += val[j]; /* assume val[j] > 0 */ 
+  	  sum += val[j]; /* assume val[j] > 0 */
         }
         if (sum > 0) {
   	if (norm == 2)
-  	  sum=1.0/sqrt(sum); 
+  	  sum=1.0/sqrt(sum);
   	else if (norm == 1)
-  	  sum=1.0/sum; 
+  	  sum=1.0/sum;
           for (j=ptr[i]; j<ptr[i+1]; j++)
             val[j] *= sum;
-  	
+
         }
       }
     }
@@ -1556,12 +1556,12 @@ void gk_graph_Normalize(gk_graph_t *graph, int what, int norm)
   	if (norm == 2)
   	  sum += val[j]*val[j];
   	else if (norm == 1)
-  	  sum += val[j]; 
+  	  sum += val[j];
         if (sum > 0) {
   	if (norm == 2)
-  	  sum=1.0/sqrt(sum); 
+  	  sum=1.0/sqrt(sum);
   	else if (norm == 1)
-  	  sum=1.0/sum; 
+  	  sum=1.0/sum;
           for (j=ptr[i]; j<ptr[i+1]; j++)
             val[j] *= sum;
         }

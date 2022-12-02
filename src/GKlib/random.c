@@ -1,5 +1,5 @@
 /*!
-\file  
+\file
 \brief Various routines for providing portable 32 and 64 bit random number
        generators.
 
@@ -8,7 +8,7 @@
 \version\verbatim $Id: random.c 11793 2012-04-04 21:03:02Z karypis $ \endverbatim
 */
 
-#include <GKlib.h>
+#include "GKlib.h"
 
 
 /*************************************************************************/
@@ -24,22 +24,22 @@ GK_MKRANDOM(gk_z,   size_t, ssize_t)
 
 
 /*************************************************************************/
-/*! GKlib's built in random number generator for portability across 
+/*! GKlib's built in random number generator for portability across
     different architectures */
 /*************************************************************************/
 #ifdef USE_GKRAND
-/* 
+/*
    A C-program for MT19937-64 (2004/9/29 version).
    Coded by Takuji Nishimura and Makoto Matsumoto.
 
    This is a 64-bit version of Mersenne Twister pseudorandom number
    generator.
 
-   Before using, initialize the state by using init_genrand64(seed)  
+   Before using, initialize the state by using init_genrand64(seed)
    or init_by_array64(init_key, key_length).
 
    Copyright (C) 2004, Makoto Matsumoto and Takuji Nishimura,
-   All rights reserved.                          
+   All rights reserved.
 
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -62,9 +62,9 @@ GK_MKRANDOM(gk_z,   size_t, ssize_t)
 
 
 /* The array for the state vector */
-static uint64_t mt[NN]; 
+static uint64_t mt[NN];
 /* mti==NN+1 means mt[NN] is not initialized */
-static int mti=NN+1; 
+static int mti=NN+1;
 #endif /* USE_GKRAND */
 
 /* initializes mt[NN] with a seed */
@@ -72,7 +72,7 @@ void gk_randinit(uint64_t seed)
 {
 #ifdef USE_GKRAND
   mt[0] = seed;
-  for (mti=1; mti<NN; mti++) 
+  for (mti=1; mti<NN; mti++)
     mt[mti] = (6364136223846793005ULL * (mt[mti-1] ^ (mt[mti-1] >> 62)) + mti);
 #else
   srand((unsigned int) seed);
@@ -91,8 +91,8 @@ uint64_t gk_randint64(void)
   if (mti >= NN) { /* generate NN words at one time */
     /* if init_genrand64() has not been called, */
     /* a default initial seed is used     */
-    if (mti == NN+1) 
-      gk_randinit(5489ULL); 
+    if (mti == NN+1)
+      gk_randinit(5489ULL);
 
     for (i=0; i<NN-MM; i++) {
       x = (mt[i]&UM)|(mt[i+1]&LM);
@@ -130,5 +130,3 @@ uint32_t gk_randint32(void)
   return (uint32_t)rand();
 #endif
 }
-
-

@@ -3,7 +3,7 @@
 \brief String tokenization routines
 
 This file contains various routines for splitting an input string into
-tokens and returning them in form of a list. The goal is to mimic perl's 
+tokens and returning them in form of a list. The goal is to mimic perl's
 split function.
 
 \date   Started 11/23/04
@@ -12,7 +12,7 @@ split function.
 */
 
 
-#include <GKlib.h>
+#include "GKlib.h"
 
 
 /************************************************************************
@@ -31,7 +31,7 @@ void gk_strtokenize(char *str, char *delim, gk_Tokens_t *tokens)
   /* Scan once to determine the number of tokens */
   for (ntoks=0, i=0; i<slen;) {
     /* Consume all the consecutive characters from the delimiters list */
-    while (i<slen && strchr(delim, str[i])) 
+    while (i<slen && strchr(delim, str[i]))
       i++;
 
     if (i == slen)
@@ -40,7 +40,7 @@ void gk_strtokenize(char *str, char *delim, gk_Tokens_t *tokens)
     ntoks++;
 
     /* Consume all the consecutive characters from the token */
-    while (i<slen && !strchr(delim, str[i])) 
+    while (i<slen && !strchr(delim, str[i]))
       i++;
   }
 
@@ -52,7 +52,7 @@ void gk_strtokenize(char *str, char *delim, gk_Tokens_t *tokens)
   /* Scan a second time to mark and link the tokens */
   for (ntoks=0, i=0; i<slen;) {
     /* Consume all the consecutive characters from the delimiters list */
-    while (i<slen && strchr(delim, str[i])) 
+    while (i<slen && strchr(delim, str[i]))
       str[i++] = '\0';
 
     if (i == slen)
@@ -61,7 +61,7 @@ void gk_strtokenize(char *str, char *delim, gk_Tokens_t *tokens)
     tokens->list[ntoks++] = str+i;
 
     /* Consume all the consecutive characters from the token */
-    while (i<slen && !strchr(delim, str[i])) 
+    while (i<slen && !strchr(delim, str[i]))
       i++;
   }
 }
@@ -74,4 +74,3 @@ void gk_freetokenslist(gk_Tokens_t *tokens)
 {
   gk_free((void *)&tokens->list, &tokens->strbuf, LTERM);
 }
-

@@ -1,5 +1,5 @@
 /*!
- * \file 
+ * \file
  *
  * \brief Various routines with dealing with CSR matrices
  *
@@ -7,12 +7,12 @@
  * \version\verbatim $Id: csr.c 13437 2013-01-11 21:54:10Z karypis $ \endverbatim
  */
 
-#include <GKlib.h>
+#include "GKlib.h"
 
 #define OMPMINOPS       50000
 
 /*************************************************************************/
-/*! Allocate memory for a CSR matrix and initializes it 
+/*! Allocate memory for a CSR matrix and initializes it
     \returns the allocated matrix. The various fields are set to NULL.
 */
 /**************************************************************************/
@@ -29,7 +29,7 @@ gk_csr_t *gk_csr_Create()
 
 
 /*************************************************************************/
-/*! Initializes the matrix 
+/*! Initializes the matrix
     \param mat is the matrix to be initialized.
 */
 /*************************************************************************/
@@ -58,15 +58,15 @@ void gk_csr_Free(gk_csr_t **mat)
 /*! Frees only the memory allocated for the matrix's different fields and
     sets them to NULL.
     \param mat is the matrix whose contents will be freed.
-*/    
+*/
 /*************************************************************************/
 void gk_csr_FreeContents(gk_csr_t *mat)
 {
   gk_free((void *)&mat->rowptr, &mat->rowind, &mat->rowval, &mat->rowids,
-          &mat->colptr, &mat->colind, &mat->colval, &mat->colids, 
-          &mat->rnorms, &mat->cnorms, &mat->rsums, &mat->csums, 
-          &mat->rsizes, &mat->csizes, &mat->rvols, &mat->cvols, 
-          &mat->rwgts, &mat->cwgts, 
+          &mat->colptr, &mat->colind, &mat->colval, &mat->colids,
+          &mat->rnorms, &mat->cnorms, &mat->rsums, &mat->csums,
+          &mat->rsizes, &mat->csizes, &mat->rvols, &mat->cvols,
+          &mat->rwgts, &mat->cwgts,
           LTERM);
 }
 
@@ -88,36 +88,36 @@ gk_csr_t *gk_csr_Dup(gk_csr_t *mat)
 
   /* copy the row structure */
   if (mat->rowptr)
-    nmat->rowptr = gk_zcopy(mat->nrows+1, mat->rowptr, 
+    nmat->rowptr = gk_zcopy(mat->nrows+1, mat->rowptr,
                             gk_zmalloc(mat->nrows+1, "gk_csr_Dup: rowptr"));
   if (mat->rowids)
-    nmat->rowids = gk_icopy(mat->nrows, mat->rowids, 
+    nmat->rowids = gk_icopy(mat->nrows, mat->rowids,
                             gk_imalloc(mat->nrows, "gk_csr_Dup: rowids"));
   if (mat->rnorms)
-    nmat->rnorms = gk_fcopy(mat->nrows, mat->rnorms, 
+    nmat->rnorms = gk_fcopy(mat->nrows, mat->rnorms,
                             gk_fmalloc(mat->nrows, "gk_csr_Dup: rnorms"));
   if (mat->rowind)
-    nmat->rowind = gk_icopy(mat->rowptr[mat->nrows], mat->rowind, 
+    nmat->rowind = gk_icopy(mat->rowptr[mat->nrows], mat->rowind,
                             gk_imalloc(mat->rowptr[mat->nrows], "gk_csr_Dup: rowind"));
   if (mat->rowval)
-    nmat->rowval = gk_fcopy(mat->rowptr[mat->nrows], mat->rowval, 
+    nmat->rowval = gk_fcopy(mat->rowptr[mat->nrows], mat->rowval,
                             gk_fmalloc(mat->rowptr[mat->nrows], "gk_csr_Dup: rowval"));
 
   /* copy the col structure */
   if (mat->colptr)
-    nmat->colptr = gk_zcopy(mat->ncols+1, mat->colptr, 
+    nmat->colptr = gk_zcopy(mat->ncols+1, mat->colptr,
                             gk_zmalloc(mat->ncols+1, "gk_csr_Dup: colptr"));
   if (mat->colids)
-    nmat->colids = gk_icopy(mat->ncols, mat->colids, 
+    nmat->colids = gk_icopy(mat->ncols, mat->colids,
                             gk_imalloc(mat->ncols, "gk_csr_Dup: colids"));
   if (mat->cnorms)
-    nmat->cnorms = gk_fcopy(mat->ncols, mat->cnorms, 
+    nmat->cnorms = gk_fcopy(mat->ncols, mat->cnorms,
                             gk_fmalloc(mat->ncols, "gk_csr_Dup: cnorms"));
   if (mat->colind)
-    nmat->colind = gk_icopy(mat->colptr[mat->ncols], mat->colind, 
+    nmat->colind = gk_icopy(mat->colptr[mat->ncols], mat->colind,
                             gk_imalloc(mat->colptr[mat->ncols], "gk_csr_Dup: colind"));
   if (mat->colval)
-    nmat->colval = gk_fcopy(mat->colptr[mat->ncols], mat->colval, 
+    nmat->colval = gk_fcopy(mat->colptr[mat->ncols], mat->colval,
                             gk_fmalloc(mat->colptr[mat->ncols], "gk_csr_Dup: colval"));
 
   return nmat;
@@ -147,32 +147,32 @@ gk_csr_t *gk_csr_ExtractSubmatrix(gk_csr_t *mat, int rstart, int nrows)
 
   /* copy the row structure */
   if (mat->rowptr)
-    nmat->rowptr = gk_zcopy(nrows+1, mat->rowptr+rstart, 
+    nmat->rowptr = gk_zcopy(nrows+1, mat->rowptr+rstart,
                               gk_zmalloc(nrows+1, "gk_csr_ExtractSubmatrix: rowptr"));
   for (i=nrows; i>=0; i--)
     nmat->rowptr[i] -= nmat->rowptr[0];
   ASSERT(nmat->rowptr[0] == 0);
 
   if (mat->rowids)
-    nmat->rowids = gk_icopy(nrows, mat->rowids+rstart, 
+    nmat->rowids = gk_icopy(nrows, mat->rowids+rstart,
                             gk_imalloc(nrows, "gk_csr_ExtractSubmatrix: rowids"));
   if (mat->rnorms)
-    nmat->rnorms = gk_fcopy(nrows, mat->rnorms+rstart, 
+    nmat->rnorms = gk_fcopy(nrows, mat->rnorms+rstart,
                             gk_fmalloc(nrows, "gk_csr_ExtractSubmatrix: rnorms"));
 
   if (mat->rsums)
-    nmat->rsums = gk_fcopy(nrows, mat->rsums+rstart, 
+    nmat->rsums = gk_fcopy(nrows, mat->rsums+rstart,
                             gk_fmalloc(nrows, "gk_csr_ExtractSubmatrix: rsums"));
 
   ASSERT(nmat->rowptr[nrows] == mat->rowptr[rstart+nrows]-mat->rowptr[rstart]);
   if (mat->rowind)
-    nmat->rowind = gk_icopy(mat->rowptr[rstart+nrows]-mat->rowptr[rstart], 
-                            mat->rowind+mat->rowptr[rstart], 
+    nmat->rowind = gk_icopy(mat->rowptr[rstart+nrows]-mat->rowptr[rstart],
+                            mat->rowind+mat->rowptr[rstart],
                             gk_imalloc(mat->rowptr[rstart+nrows]-mat->rowptr[rstart],
                                        "gk_csr_ExtractSubmatrix: rowind"));
   if (mat->rowval)
-    nmat->rowval = gk_fcopy(mat->rowptr[rstart+nrows]-mat->rowptr[rstart], 
-                            mat->rowval+mat->rowptr[rstart], 
+    nmat->rowval = gk_fcopy(mat->rowptr[rstart+nrows]-mat->rowptr[rstart],
+                            mat->rowval+mat->rowptr[rstart],
                             gk_fmalloc(mat->rowptr[rstart+nrows]-mat->rowptr[rstart],
                                        "gk_csr_ExtractSubmatrix: rowval"));
 
@@ -198,7 +198,7 @@ gk_csr_t *gk_csr_ExtractRows(gk_csr_t *mat, int nrows, int *rind)
   nmat->nrows = nrows;
   nmat->ncols = mat->ncols;
 
-  for (nnz=0, i=0; i<nrows; i++)  
+  for (nnz=0, i=0; i<nrows; i++)
     nnz += mat->rowptr[rind[i]+1]-mat->rowptr[rind[i]];
 
   nmat->rowptr = gk_zmalloc(nmat->nrows+1, "gk_csr_ExtractPartition: rowptr");
@@ -295,19 +295,19 @@ gk_csr_t **gk_csr_Split(gk_csr_t *mat, int *color)
     smats[i] = gk_csr_Create();
     smats[i]->nrows  = mat->nrows;
     smats[i]->ncols  = mat->ncols;
-    smats[i]->rowptr = gk_zsmalloc(nrows+1, 0, "gk_csr_Split: smats[i]->rowptr"); 
+    smats[i]->rowptr = gk_zsmalloc(nrows+1, 0, "gk_csr_Split: smats[i]->rowptr");
   }
 
   for (i=0; i<nrows; i++) {
-    for (j=rowptr[i]; j<rowptr[i+1]; j++) 
+    for (j=rowptr[i]; j<rowptr[i+1]; j++)
       smats[color[j]]->rowptr[i]++;
   }
-  for (i=0; i<ncolors; i++) 
+  for (i=0; i<ncolors; i++)
     MAKECSR(j, nrows, smats[i]->rowptr);
 
   for (i=0; i<ncolors; i++) {
-    smats[i]->rowind = gk_imalloc(smats[i]->rowptr[nrows], "gk_csr_Split: smats[i]->rowind"); 
-    smats[i]->rowval = gk_fmalloc(smats[i]->rowptr[nrows], "gk_csr_Split: smats[i]->rowval"); 
+    smats[i]->rowind = gk_imalloc(smats[i]->rowptr[nrows], "gk_csr_Split: smats[i]->rowind");
+    smats[i]->rowval = gk_fmalloc(smats[i]->rowptr[nrows], "gk_csr_Split: smats[i]->rowval");
   }
 
   for (i=0; i<nrows; i++) {
@@ -318,7 +318,7 @@ gk_csr_t **gk_csr_Split(gk_csr_t *mat, int *color)
     }
   }
 
-  for (i=0; i<ncolors; i++) 
+  for (i=0; i<ncolors; i++)
     SHIFTCSR(j, nrows, smats[i]->rowptr);
 
   return smats;
@@ -326,20 +326,20 @@ gk_csr_t **gk_csr_Split(gk_csr_t *mat, int *color)
 
 
 /**************************************************************************/
-/*! Reads a CSR matrix from the supplied file and stores it the matrix's 
+/*! Reads a CSR matrix from the supplied file and stores it the matrix's
     forward structure.
     \param filename is the file that stores the data.
-    \param format is either GK_CSR_FMT_METIS, GK_CSR_FMT_CLUTO, 
-           GK_CSR_FMT_CSR, GK_CSR_FMT_BINROW, GK_CSR_FMT_BINCOL 
-           specifying the type of the input format. 
+    \param format is either GK_CSR_FMT_METIS, GK_CSR_FMT_CLUTO,
+           GK_CSR_FMT_CSR, GK_CSR_FMT_BINROW, GK_CSR_FMT_BINCOL
+           specifying the type of the input format.
            The GK_CSR_FMT_CSR does not contain a header
-           line, whereas the GK_CSR_FMT_BINROW is a binary format written 
+           line, whereas the GK_CSR_FMT_BINROW is a binary format written
            by gk_csr_Write() using the same format specifier.
     \param readvals is either 1 or 0, indicating if the CSR file contains
            values or it does not. It only applies when GK_CSR_FMT_CSR is
            used.
-    \param numbering is either 1 or 0, indicating if the numbering of the 
-           indices start from 1 or 0, respectively. If they start from 1, 
+    \param numbering is either 1 or 0, indicating if the numbering of the
+           indices start from 1 or 0, respectively. If they start from 1,
            they are automatically decreamented during input so that they
            will start from 0. It only applies when GK_CSR_FMT_CSR is
            used.
@@ -360,7 +360,7 @@ gk_csr_t *gk_csr_Read(char *filename, int format, int readvals, int numbering)
   gk_csr_t *mat=NULL;
 
 
-  if (!gk_fexists(filename)) 
+  if (!gk_fexists(filename))
     gk_errexit(SIGERR, "File %s does not exist!\n", filename);
 
   if (format == GK_CSR_FMT_BINROW) {
@@ -524,14 +524,14 @@ gk_csr_t *gk_csr_Read(char *filename, int format, int readvals, int numbering)
       }
     }
 
-   
+
     /* Read the rest of the row */
     while (1) {
       ival = (int)strtol(head, &tail, 0);
-      if (tail == head) 
+      if (tail == head)
         break;
       head = tail;
-      
+
       if ((rowind[k] = ival + numbering) < 0)
         gk_errexit(SIGERR, "Error: Invalid column number %d at row %zd.\n", ival, i);
 
@@ -578,13 +578,13 @@ gk_csr_t *gk_csr_Read(char *filename, int format, int readvals, int numbering)
 /*! Writes the row-based structure of a matrix into a file.
     \param mat is the matrix to be written,
     \param filename is the name of the output file.
-    \param format is one of: GK_CSR_FMT_CLUTO, GK_CSR_FMT_CSR, 
+    \param format is one of: GK_CSR_FMT_CLUTO, GK_CSR_FMT_CSR,
            GK_CSR_FMT_BINROW, GK_CSR_FMT_BINCOL.
-    \param writevals is either 1 or 0 indicating if the values will be 
+    \param writevals is either 1 or 0 indicating if the values will be
            written or not. This is only applicable when GK_CSR_FMT_CSR
            is used.
-    \param numbering is either 1 or 0 indicating if the internal 0-based 
-           numbering will be shifted by one or not during output. This 
+    \param numbering is either 1 or 0 indicating if the internal 0-based
+           numbering will be shifted by one or not during output. This
            is only applicable when GK_CSR_FMT_CSR is used.
 */
 /**************************************************************************/
@@ -598,12 +598,12 @@ void gk_csr_Write(gk_csr_t *mat, char *filename, int format, int writevals, int 
       gk_errexit(SIGERR, "The filename parameter cannot be NULL.\n");
     fpout = gk_fopen(filename, "wb", "gk_csr_Write: fpout");
 
-    fwrite(&(mat->nrows), sizeof(int32_t), 1, fpout); 
-    fwrite(&(mat->ncols), sizeof(int32_t), 1, fpout); 
-    fwrite(mat->rowptr, sizeof(ssize_t), mat->nrows+1, fpout); 
-    fwrite(mat->rowind, sizeof(int32_t), mat->rowptr[mat->nrows], fpout); 
+    fwrite(&(mat->nrows), sizeof(int32_t), 1, fpout);
+    fwrite(&(mat->ncols), sizeof(int32_t), 1, fpout);
+    fwrite(mat->rowptr, sizeof(ssize_t), mat->nrows+1, fpout);
+    fwrite(mat->rowind, sizeof(int32_t), mat->rowptr[mat->nrows], fpout);
     if (writevals)
-      fwrite(mat->rowval, sizeof(float), mat->rowptr[mat->nrows], fpout); 
+      fwrite(mat->rowval, sizeof(float), mat->rowptr[mat->nrows], fpout);
 
     gk_fclose(fpout);
     return;
@@ -614,12 +614,12 @@ void gk_csr_Write(gk_csr_t *mat, char *filename, int format, int writevals, int 
       gk_errexit(SIGERR, "The filename parameter cannot be NULL.\n");
     fpout = gk_fopen(filename, "wb", "gk_csr_Write: fpout");
 
-    fwrite(&(mat->nrows), sizeof(int32_t), 1, fpout); 
-    fwrite(&(mat->ncols), sizeof(int32_t), 1, fpout); 
-    fwrite(mat->colptr, sizeof(ssize_t), mat->ncols+1, fpout); 
-    fwrite(mat->colind, sizeof(int32_t), mat->colptr[mat->ncols], fpout); 
-    if (writevals) 
-      fwrite(mat->colval, sizeof(float), mat->colptr[mat->ncols], fpout); 
+    fwrite(&(mat->nrows), sizeof(int32_t), 1, fpout);
+    fwrite(&(mat->ncols), sizeof(int32_t), 1, fpout);
+    fwrite(mat->colptr, sizeof(ssize_t), mat->ncols+1, fpout);
+    fwrite(mat->colind, sizeof(int32_t), mat->colptr[mat->ncols], fpout);
+    if (writevals)
+      fwrite(mat->colval, sizeof(float), mat->colptr[mat->ncols], fpout);
 
     gk_fclose(fpout);
     return;
@@ -628,7 +628,7 @@ void gk_csr_Write(gk_csr_t *mat, char *filename, int format, int writevals, int 
   if (filename)
     fpout = gk_fopen(filename, "w", "gk_csr_Write: fpout");
   else
-    fpout = stdout; 
+    fpout = stdout;
 
   if (format == GK_CSR_FMT_CLUTO) {
     fprintf(fpout, "%d %d %zd\n", mat->nrows, mat->ncols, mat->rowptr[mat->nrows]);
@@ -639,7 +639,7 @@ void gk_csr_Write(gk_csr_t *mat, char *filename, int format, int writevals, int 
   for (i=0; i<mat->nrows; i++) {
     for (j=mat->rowptr[i]; j<mat->rowptr[i+1]; j++) {
       fprintf(fpout, " %d", mat->rowind[j]+(numbering ? 1 : 0));
-      if (writevals) 
+      if (writevals)
         fprintf(fpout, " %f", mat->rowval[j]);
     }
     fprintf(fpout, "\n");
@@ -650,11 +650,11 @@ void gk_csr_Write(gk_csr_t *mat, char *filename, int format, int writevals, int 
 
 
 /*************************************************************************/
-/*! Prunes certain rows/columns of the matrix. The prunning takes place 
+/*! Prunes certain rows/columns of the matrix. The prunning takes place
     by analyzing the row structure of the matrix. The prunning takes place
     by removing rows/columns but it does not affect the numbering of the
     remaining rows/columns.
-   
+
     \param mat the matrix to be prunned,
     \param what indicates if the rows (GK_CSR_ROW) or the columns (GK_CSR_COL)
            of the matrix will be prunned,
@@ -662,8 +662,8 @@ void gk_csr_Write(gk_csr_t *mat, char *filename, int format, int writevals, int 
            be present in order to be kept,
     \param maxf is the maximum number of rows (columns) that a column (row) must
           be present at in order to be kept.
-    \returns the prunned matrix consisting only of its row-based structure. 
-          The input matrix is not modified. 
+    \returns the prunned matrix consisting only of its row-based structure.
+          The input matrix is not modified.
 */
 /**************************************************************************/
 gk_csr_t *gk_csr_Prune(gk_csr_t *mat, int what, int minf, int maxf)
@@ -676,7 +676,7 @@ gk_csr_t *gk_csr_Prune(gk_csr_t *mat, int what, int minf, int maxf)
   gk_csr_t *nmat;
 
   nmat = gk_csr_Create();
-  
+
   nrows = nmat->nrows = mat->nrows;
   ncols = nmat->ncols = mat->ncols;
 
@@ -740,11 +740,11 @@ gk_csr_t *gk_csr_Prune(gk_csr_t *mat, int what, int minf, int maxf)
 
 
 /*************************************************************************/
-/*! Eliminates certain entries from the rows/columns of the matrix. The 
+/*! Eliminates certain entries from the rows/columns of the matrix. The
     filtering takes place by keeping only the highest weight entries whose
-    sum accounts for a certain fraction of the overall weight of the 
+    sum accounts for a certain fraction of the overall weight of the
     row/column.
-   
+
     \param mat the matrix to be prunned,
     \param what indicates if the rows (GK_CSR_ROW) or the columns (GK_CSR_COL)
            of the matrix will be prunned,
@@ -752,8 +752,8 @@ gk_csr_t *gk_csr_Prune(gk_csr_t *mat, int what, int minf, int maxf)
            and possible values are 1 or 2,
     \param fraction is the fraction of the overall norm that will be retained
            by the kept entries.
-    \returns the filtered matrix consisting only of its row-based structure. 
-           The input matrix is not modified. 
+    \returns the filtered matrix consisting only of its row-based structure.
+           The input matrix is not modified.
 */
 /**************************************************************************/
 gk_csr_t *gk_csr_LowFilter(gk_csr_t *mat, int what, int norm, float fraction)
@@ -767,7 +767,7 @@ gk_csr_t *gk_csr_LowFilter(gk_csr_t *mat, int what, int norm, float fraction)
   gk_fkv_t *cand;
 
   nmat = gk_csr_Create();
-  
+
   nrows = nmat->nrows = mat->nrows;
   ncols = nmat->ncols = mat->ncols;
 
@@ -785,12 +785,12 @@ gk_csr_t *gk_csr_LowFilter(gk_csr_t *mat, int what, int norm, float fraction)
 
   switch (what) {
     case GK_CSR_COL:
-      if (mat->colptr == NULL) 
+      if (mat->colptr == NULL)
         gk_errexit(SIGERR, "Cannot filter columns when column-based structure has not been created.\n");
 
       gk_zcopy(nrows+1, rowptr, nrowptr);
 
-      for (i=0; i<ncols; i++) 
+      for (i=0; i<ncols; i++)
         maxlen = gk_max(maxlen, colptr[i+1]-colptr[i]);
 
       #pragma omp parallel private(i, j, ncand, rsum, tsum, cand)
@@ -830,10 +830,10 @@ gk_csr_t *gk_csr_LowFilter(gk_csr_t *mat, int what, int norm, float fraction)
       break;
 
     case GK_CSR_ROW:
-      if (mat->rowptr == NULL) 
+      if (mat->rowptr == NULL)
         gk_errexit(SIGERR, "Cannot filter rows when row-based structure has not been created.\n");
 
-      for (i=0; i<nrows; i++) 
+      for (i=0; i<nrows; i++)
         maxlen = gk_max(maxlen, rowptr[i+1]-rowptr[i]);
 
       #pragma omp parallel private(i, j, ncand, rsum, tsum, cand)
@@ -883,19 +883,19 @@ gk_csr_t *gk_csr_LowFilter(gk_csr_t *mat, int what, int norm, float fraction)
 
 
 /*************************************************************************/
-/*! Eliminates certain entries from the rows/columns of the matrix. The 
-    filtering takes place by keeping only the highest weight top-K entries 
+/*! Eliminates certain entries from the rows/columns of the matrix. The
+    filtering takes place by keeping only the highest weight top-K entries
     along each row/column and those entries whose weight is greater than
     a specified value.
-   
+
     \param mat the matrix to be prunned,
     \param what indicates if the rows (GK_CSR_ROW) or the columns (GK_CSR_COL)
            of the matrix will be prunned,
     \param topk is the number of the highest weight entries to keep.
     \param keepval is the weight of a term above which will be kept. This
            is used to select additional terms past the first topk.
-    \returns the filtered matrix consisting only of its row-based structure. 
-           The input matrix is not modified. 
+    \returns the filtered matrix consisting only of its row-based structure.
+           The input matrix is not modified.
 */
 /**************************************************************************/
 gk_csr_t *gk_csr_TopKPlusFilter(gk_csr_t *mat, int what, int topk, float keepval)
@@ -909,7 +909,7 @@ gk_csr_t *gk_csr_TopKPlusFilter(gk_csr_t *mat, int what, int topk, float keepval
   gk_fkv_t *cand;
 
   nmat = gk_csr_Create();
-  
+
   nrows = nmat->nrows = mat->nrows;
   ncols = nmat->ncols = mat->ncols;
 
@@ -927,7 +927,7 @@ gk_csr_t *gk_csr_TopKPlusFilter(gk_csr_t *mat, int what, int topk, float keepval
 
   switch (what) {
     case GK_CSR_COL:
-      if (mat->colptr == NULL) 
+      if (mat->colptr == NULL)
         gk_errexit(SIGERR, "Cannot filter columns when column-based structure has not been created.\n");
 
       cand = gk_fkvmalloc(nrows, "gk_csr_LowFilter: cand");
@@ -947,7 +947,7 @@ gk_csr_t *gk_csr_TopKPlusFilter(gk_csr_t *mat, int what, int topk, float keepval
           nrowptr[cand[j].val]++;
         }
         for (; j<ncand; j++) {
-          if (cand[j].key < keepval) 
+          if (cand[j].key < keepval)
             break;
 
           nrowind[nrowptr[cand[j].val]] = i;
@@ -970,7 +970,7 @@ gk_csr_t *gk_csr_TopKPlusFilter(gk_csr_t *mat, int what, int topk, float keepval
       break;
 
     case GK_CSR_ROW:
-      if (mat->rowptr == NULL) 
+      if (mat->rowptr == NULL)
         gk_errexit(SIGERR, "Cannot filter rows when row-based structure has not been created.\n");
 
       cand = gk_fkvmalloc(ncols, "gk_csr_LowFilter: cand");
@@ -989,7 +989,7 @@ gk_csr_t *gk_csr_TopKPlusFilter(gk_csr_t *mat, int what, int topk, float keepval
           nrowval[nnz] = cand[j].key;
         }
         for (; j<ncand; j++, nnz++) {
-          if (cand[j].key < keepval) 
+          if (cand[j].key < keepval)
             break;
 
           nrowind[nnz] = cand[j].val;
@@ -1012,20 +1012,20 @@ gk_csr_t *gk_csr_TopKPlusFilter(gk_csr_t *mat, int what, int topk, float keepval
 
 
 /*************************************************************************/
-/*! Eliminates certain entries from the rows/columns of the matrix. The 
+/*! Eliminates certain entries from the rows/columns of the matrix. The
     filtering takes place by keeping only the terms whose contribution to
     the total length of the document is greater than a user-splied multiple
     over the average.
 
     This routine assumes that the vectors are normalized to be unit length.
-   
+
     \param mat the matrix to be prunned,
     \param what indicates if the rows (GK_CSR_ROW) or the columns (GK_CSR_COL)
            of the matrix will be prunned,
-    \param zscore is the multiplicative factor over the average contribution 
+    \param zscore is the multiplicative factor over the average contribution
            to the length of the document.
-    \returns the filtered matrix consisting only of its row-based structure. 
-           The input matrix is not modified. 
+    \returns the filtered matrix consisting only of its row-based structure.
+           The input matrix is not modified.
 */
 /**************************************************************************/
 gk_csr_t *gk_csr_ZScoreFilter(gk_csr_t *mat, int what, float zscore)
@@ -1038,11 +1038,11 @@ gk_csr_t *gk_csr_ZScoreFilter(gk_csr_t *mat, int what, float zscore)
   gk_csr_t *nmat;
 
   nmat = gk_csr_Create();
-  
+
   nmat->nrows = mat->nrows;
   nmat->ncols = mat->ncols;
 
-  nrows  = mat->nrows; 
+  nrows  = mat->nrows;
   rowptr = mat->rowptr;
   rowind = mat->rowind;
   rowval = mat->rowval;
@@ -1058,7 +1058,7 @@ gk_csr_t *gk_csr_ZScoreFilter(gk_csr_t *mat, int what, float zscore)
       break;
 
     case GK_CSR_ROW:
-      if (mat->rowptr == NULL) 
+      if (mat->rowptr == NULL)
         gk_errexit(SIGERR, "Cannot filter rows when row-based structure has not been created.\n");
 
       nrowptr[0] = 0;
@@ -1087,11 +1087,11 @@ gk_csr_t *gk_csr_ZScoreFilter(gk_csr_t *mat, int what, float zscore)
 
 /*************************************************************************/
 /*! Compacts the column-space of the matrix by removing empty columns.
-    As a result of the compaction, the column numbers are renumbered. 
+    As a result of the compaction, the column numbers are renumbered.
     The compaction operation is done in place and only affects the row-based
     representation of the matrix.
     The new columns are ordered in decreasing frequency.
-   
+
     \param mat the matrix whose empty columns will be removed.
 */
 /**************************************************************************/
@@ -1116,18 +1116,18 @@ void gk_csr_CompactColumns(gk_csr_t *mat)
     clens[i].val = i;
   }
 
-  for (i=0; i<rowptr[nrows]; i++) 
+  for (i=0; i<rowptr[nrows]; i++)
     clens[rowind[i]].key++;
   gk_ikvsortd(ncols, clens);
 
   for (nncols=0, i=0; i<ncols; i++) {
-    if (clens[i].key > 0) 
+    if (clens[i].key > 0)
       colmap[clens[i].val] = nncols++;
     else
       break;
   }
 
-  for (i=0; i<rowptr[nrows]; i++) 
+  for (i=0; i<rowptr[nrows]; i++)
     rowind[i] = colmap[rowind[i]];
 
   mat->ncols = nncols;
@@ -1183,12 +1183,12 @@ void gk_csr_SortIndices(gk_csr_t *mat, int what)
     float *tval;
 
     #pragma omp single
-    for (i=0; i<n; i++) 
+    for (i=0; i<n; i++)
       nn = gk_max(nn, ptr[i+1]-ptr[i]);
-  
+
     cand = gk_ikvmalloc(nn, "gk_csr_SortIndices: cand");
     tval = gk_fmalloc(nn, "gk_csr_SortIndices: tval");
-  
+
     #pragma omp for schedule(static)
     for (i=0; i<n; i++) {
       for (k=0, j=ptr[i]; j<ptr[i+1]; j++) {
@@ -1270,17 +1270,17 @@ void gk_csr_CreateIndex(gk_csr_t *mat, int what)
       rptr[find[j]]++;
   }
   MAKECSR(i, nr, rptr);
-  
+
   if (rptr[nr] > 6*nr) {
     for (i=0; i<nf; i++) {
-      for (j=fptr[i]; j<fptr[i+1]; j++) 
+      for (j=fptr[i]; j<fptr[i+1]; j++)
         rind[rptr[find[j]]++] = i;
     }
     SHIFTCSR(i, nr, rptr);
 
     if (fval) {
       for (i=0; i<nf; i++) {
-        for (j=fptr[i]; j<fptr[i+1]; j++) 
+        for (j=fptr[i]; j<fptr[i+1]; j++)
           rval[rptr[find[j]]++] = fval[j];
       }
       SHIFTCSR(i, nr, rptr);
@@ -1298,7 +1298,7 @@ void gk_csr_CreateIndex(gk_csr_t *mat, int what)
     }
     else {
       for (i=0; i<nf; i++) {
-        for (j=fptr[i]; j<fptr[i+1]; j++) 
+        for (j=fptr[i]; j<fptr[i+1]; j++)
           rind[rptr[find[j]]++] = i;
       }
     }
@@ -1308,11 +1308,11 @@ void gk_csr_CreateIndex(gk_csr_t *mat, int what)
 
 
 /*************************************************************************/
-/*! Normalizes the rows/columns of the matrix to be unit 
+/*! Normalizes the rows/columns of the matrix to be unit
     length.
     \param mat the matrix itself,
     \param what indicates what will be normalized and is obtained by
-           specifying GK_CSR_ROW, GK_CSR_COL, GK_CSR_ROW|GK_CSR_COL. 
+           specifying GK_CSR_ROW, GK_CSR_COL, GK_CSR_ROW|GK_CSR_COL.
     \param norm indicates what norm is to normalize to, 1: 1-norm, 2: 2-norm
 */
 /**************************************************************************/
@@ -1328,7 +1328,7 @@ void gk_csr_Normalize(gk_csr_t *mat, int what, int norm)
     ptr = mat->rowptr;
     val = mat->rowval;
 
-    #pragma omp parallel if (ptr[n] > OMPMINOPS) 
+    #pragma omp parallel if (ptr[n] > OMPMINOPS)
     {
       #pragma omp for private(j,sum) schedule(static)
       for (i=0; i<n; i++) {
@@ -1336,16 +1336,16 @@ void gk_csr_Normalize(gk_csr_t *mat, int what, int norm)
   	if (norm == 2)
   	  sum += val[j]*val[j];
   	else if (norm == 1)
-  	  sum += val[j]; /* assume val[j] > 0 */ 
+  	  sum += val[j]; /* assume val[j] > 0 */
         }
         if (sum > 0) {
   	if (norm == 2)
-  	  sum=1.0/sqrt(sum); 
+  	  sum=1.0/sqrt(sum);
   	else if (norm == 1)
-  	  sum=1.0/sum; 
+  	  sum=1.0/sum;
           for (j=ptr[i]; j<ptr[i+1]; j++)
             val[j] *= sum;
-  	
+
         }
       }
     }
@@ -1364,12 +1364,12 @@ void gk_csr_Normalize(gk_csr_t *mat, int what, int norm)
   	  if (norm == 2)
   	    sum += val[j]*val[j];
   	  else if (norm == 1)
-  	    sum += val[j]; 
+  	    sum += val[j];
         if (sum > 0) {
   	  if (norm == 2)
-  	    sum=1.0/sqrt(sum); 
+  	    sum=1.0/sqrt(sum);
   	  else if (norm == 1)
-  	    sum=1.0/sum; 
+  	    sum=1.0/sum;
           for (j=ptr[i]; j<ptr[i+1]; j++)
             val[j] *= sum;
         }
@@ -1406,9 +1406,9 @@ void gk_csr_Scale(gk_csr_t *mat, int type)
         #pragma omp for private(j, maxtf) schedule(static)
         for (i=0; i<nrows; i++) {
           maxtf = fabs(rowval[rowptr[i]]);
-          for (j=rowptr[i]; j<rowptr[i+1]; j++) 
+          for (j=rowptr[i]; j<rowptr[i+1]; j++)
             maxtf = (maxtf < fabs(rowval[j]) ? fabs(rowval[j]) : maxtf);
-  
+
           for (j=rowptr[i]; j<rowptr[i+1]; j++)
             rowval[j] = .5 + .5*rowval[j]/maxtf;
         }
@@ -1421,9 +1421,9 @@ void gk_csr_Scale(gk_csr_t *mat, int type)
         #pragma omp for private(j, maxtf) schedule(static)
         for (i=0; i<nrows; i++) {
           maxtf = fabs(rowval[rowptr[i]]);
-          for (j=rowptr[i]; j<rowptr[i+1]; j++) 
+          for (j=rowptr[i]; j<rowptr[i+1]; j++)
             maxtf = (maxtf < fabs(rowval[j]) ? fabs(rowval[j]) : maxtf);
-  
+
           for (j=rowptr[i]; j<rowptr[i+1]; j++)
             rowval[j] = .1 + .9*rowval[j]/maxtf;
         }
@@ -1435,7 +1435,7 @@ void gk_csr_Scale(gk_csr_t *mat, int type)
       {
         #pragma omp for private(j) schedule(static)
         for (i=0; i<nrows; i++) {
-          for (j=rowptr[i]; j<rowptr[i+1]; j++) { 
+          for (j=rowptr[i]; j<rowptr[i+1]; j++) {
             if (rowval[j] != 0.0)
               rowval[j] = .1+sign(rowval[j], sqrt(fabs(rowval[j])));
           }
@@ -1448,7 +1448,7 @@ void gk_csr_Scale(gk_csr_t *mat, int type)
       {
         #pragma omp for private(j) schedule(static)
         for (i=0; i<nrows; i++) {
-          for (j=rowptr[i]; j<rowptr[i+1]; j++) { 
+          for (j=rowptr[i]; j<rowptr[i+1]; j++) {
             if (rowval[j] != 0.0)
               rowval[j] = .1+sign(rowval[j], sqrt(sqrt(fabs(rowval[j]))));
           }
@@ -1461,7 +1461,7 @@ void gk_csr_Scale(gk_csr_t *mat, int type)
       {
         #pragma omp for private(j) schedule(static)
         for (i=0; i<nrows; i++) {
-          for (j=rowptr[i]; j<rowptr[i+1]; j++) { 
+          for (j=rowptr[i]; j<rowptr[i+1]; j++) {
             if (rowval[j] != 0.0)
               rowval[j] = .1+sign(rowval[j], powf(fabs(rowval[j]), .65));
           }
@@ -1474,7 +1474,7 @@ void gk_csr_Scale(gk_csr_t *mat, int type)
       {
         #pragma omp for private(j) schedule(static)
         for (i=0; i<nrows; i++) {
-          for (j=rowptr[i]; j<rowptr[i+1]; j++) { 
+          for (j=rowptr[i]; j<rowptr[i+1]; j++) {
             if (rowval[j] != 0.0)
               rowval[j] = .1+sign(rowval[j], powf(fabs(rowval[j]), .75));
           }
@@ -1487,7 +1487,7 @@ void gk_csr_Scale(gk_csr_t *mat, int type)
       {
         #pragma omp for private(j) schedule(static)
         for (i=0; i<nrows; i++) {
-          for (j=rowptr[i]; j<rowptr[i+1]; j++) { 
+          for (j=rowptr[i]; j<rowptr[i+1]; j++) {
             if (rowval[j] != 0.0)
               rowval[j] = .1+sign(rowval[j], powf(fabs(rowval[j]), .85));
           }
@@ -1507,7 +1507,7 @@ void gk_csr_Scale(gk_csr_t *mat, int type)
 #ifdef XXX
         #pragma omp for private(j) schedule(static)
         for (i=0; i<nrows; i++) {
-          for (j=rowptr[i]; j<rowptr[i+1]; j++) { 
+          for (j=rowptr[i]; j<rowptr[i+1]; j++) {
             if (rowval[j] != 0.0)
               rowval[j] = 1+(rowval[j]>0.0 ? log(rowval[j]) : -log(-rowval[j]))*logscale;
               //rowval[j] = 1+sign(rowval[j], log(fabs(rowval[j]))*logscale);
@@ -1527,14 +1527,14 @@ void gk_csr_Scale(gk_csr_t *mat, int type)
           collen[rowind[j]]++;
       }
 
-      #pragma omp parallel if (ncols > OMPMINOPS) 
+      #pragma omp parallel if (ncols > OMPMINOPS)
       {
         #pragma omp for schedule(static)
         for (i=0; i<ncols; i++)
           cscale[i] = (collen[i] > 0 ? log(1.0*nrows/collen[i]) : 0.0);
       }
 
-      #pragma omp parallel if (rowptr[nrows] > OMPMINOPS) 
+      #pragma omp parallel if (rowptr[nrows] > OMPMINOPS)
       {
         #pragma omp for private(j) schedule(static)
         for (i=0; i<nrows; i++) {
@@ -1557,7 +1557,7 @@ void gk_csr_Scale(gk_csr_t *mat, int type)
       }
 
       nnzcols = 0;
-      #pragma omp parallel if (ncols > OMPMINOPS) 
+      #pragma omp parallel if (ncols > OMPMINOPS)
       {
         #pragma omp for schedule(static) reduction(+:nnzcols)
         for (i=0; i<ncols; i++)
@@ -1571,7 +1571,7 @@ void gk_csr_Scale(gk_csr_t *mat, int type)
           cscale[i] = (collen[i] > 0 ? log(1.0*(nrows+2*bgfreq)/(bgfreq+collen[i])) : 0.0);
       }
 
-      #pragma omp parallel if (rowptr[nrows] > OMPMINOPS) 
+      #pragma omp parallel if (rowptr[nrows] > OMPMINOPS)
       {
         #pragma omp for private(j) schedule(static)
         for (i=0; i<nrows; i++) {
@@ -1593,7 +1593,7 @@ void gk_csr_Scale(gk_csr_t *mat, int type)
 /*************************************************************************/
 /*! Computes the sums of the rows/columns
     \param mat the matrix itself,
-    \param what is either GK_CSR_ROW or GK_CSR_COL indicating which 
+    \param what is either GK_CSR_ROW or GK_CSR_COL indicating which
            sums to compute.
 */
 /**************************************************************************/
@@ -1610,7 +1610,7 @@ void gk_csr_ComputeSums(gk_csr_t *mat, int what)
       ptr = mat->rowptr;
       val = mat->rowval;
 
-      if (mat->rsums) 
+      if (mat->rsums)
         gk_free((void **)&mat->rsums, LTERM);
 
       sums = mat->rsums = gk_fsmalloc(n, 0, "gk_csr_ComputeSums: sums");
@@ -1620,7 +1620,7 @@ void gk_csr_ComputeSums(gk_csr_t *mat, int what)
       ptr = mat->colptr;
       val = mat->colval;
 
-      if (mat->csums) 
+      if (mat->csums)
         gk_free((void **)&mat->csums, LTERM);
 
       sums = mat->csums = gk_fsmalloc(n, 0, "gk_csr_ComputeSums: sums");
@@ -1631,7 +1631,7 @@ void gk_csr_ComputeSums(gk_csr_t *mat, int what)
   }
 
   #pragma omp parallel for if (ptr[n] > OMPMINOPS) schedule(static)
-  for (i=0; i<n; i++) 
+  for (i=0; i<n; i++)
     sums[i] = gk_fsum(ptr[i+1]-ptr[i], val+ptr[i], 1);
 }
 
@@ -1639,7 +1639,7 @@ void gk_csr_ComputeSums(gk_csr_t *mat, int what)
 /*************************************************************************/
 /*! Computes the squared of the norms of the rows/columns
     \param mat the matrix itself,
-    \param what is either GK_CSR_ROW or GK_CSR_COL indicating which 
+    \param what is either GK_CSR_ROW or GK_CSR_COL indicating which
            squared norms to compute.
 */
 /**************************************************************************/
@@ -1675,7 +1675,7 @@ void gk_csr_ComputeSquaredNorms(gk_csr_t *mat, int what)
   }
 
   #pragma omp parallel for if (ptr[n] > OMPMINOPS) schedule(static)
-  for (i=0; i<n; i++) 
+  for (i=0; i<n; i++)
     norms[i] = gk_fdot(ptr[i+1]-ptr[i], val+ptr[i], 1, val+ptr[i], 1);
 }
 
@@ -1761,7 +1761,7 @@ float gk_csr_ComputeSimilarity(gk_csr_t *mat, int i1, int i2, int what, int simt
       }
       if (simtype == GK_CSR_COS)
         sim = (stat1*stat2 > 0.0 ? sim/sqrt(stat1*stat2) : 0.0);
-      else 
+      else
         sim = (stat1+stat2-sim > 0.0 ? sim/(stat1+stat2-sim) : 0.0);
       break;
 
@@ -1851,7 +1851,7 @@ float gk_csr_ComputeSimilarity(gk_csr_t *mat, int i1, int i2, int what, int simt
            GK_CSR_JAC, GK_CSR_MIN, GK_CSR_AMIN
     \param nsim is the maximum number of requested most similar rows.
            If -1 is provided, then everything is returned unsorted.
-    \param minsim is the minimum similarity of the requested most 
+    \param minsim is the minimum similarity of the requested most
            similar rows
     \param hits is the result set. This array should be at least
            of length nsim.
@@ -1859,15 +1859,15 @@ float gk_csr_ComputeSimilarity(gk_csr_t *mat, int i1, int i2, int what, int simt
            whose values are initialized to -1. If NULL is provided
            then this array is allocated and freed internally.
     \param i_cand is an array of size equal to the number of rows.
-           If NULL is provided then this array is allocated and freed 
+           If NULL is provided then this array is allocated and freed
            internally.
     \returns the number of identified most similar rows, which can be
              smaller than the requested number of nnbrs in those cases
              in which there are no sufficiently many neighbors.
 */
 /**************************************************************************/
-int gk_csr_GetSimilarRows(gk_csr_t *mat, int nqterms, int *qind, 
-        float *qval, int simtype, int nsim, float minsim, gk_fkv_t *hits, 
+int gk_csr_GetSimilarRows(gk_csr_t *mat, int nqterms, int *qind,
+        float *qval, int simtype, int nsim, float minsim, gk_fkv_t *hits,
         int *i_marker, gk_fkv_t *i_cand)
 {
   ssize_t i, ii, j, k;
@@ -1984,7 +1984,7 @@ int gk_csr_GetSimilarRows(gk_csr_t *mat, int nqterms, int *qind,
   /* go and prune the hits that are bellow minsim */
   for (j=0, i=0; i<ncand; i++) {
     marker[cand[i].val] = -1;
-    if (cand[i].key >= minsim) 
+    if (cand[i].key >= minsim)
       cand[j++] = cand[i];
   }
   ncand = j;
@@ -2007,4 +2007,3 @@ int gk_csr_GetSimilarRows(gk_csr_t *mat, int nqterms, int *qind,
 
   return nsim;
 }
-

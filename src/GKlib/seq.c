@@ -8,7 +8,7 @@
  */
 
 
-#include <GKlib.h>
+#include "GKlib.h"
 
 
 
@@ -26,15 +26,15 @@
 
 void gk_seq_init(gk_seq_t *seq)
 {
-    
+
     seq->len = 0;
     seq->sequence = NULL;
-        
+
     seq->pssm = NULL;
     seq->psfm = NULL;
-    
+
     seq->name = NULL;
-    
+
 }
 
 /***********************************************************************/
@@ -47,8 +47,8 @@ void gk_seq_init(gk_seq_t *seq)
 
 gk_i2cc2i_t *gk_i2cc2i_create_common(char *alphabet)
 {
-    
-    
+
+
     int nsymbols;
     gk_idx_t i;
     gk_i2cc2i_t *t;
@@ -58,11 +58,11 @@ gk_i2cc2i_t *gk_i2cc2i_create_common(char *alphabet)
     t->n     = nsymbols;
     t->i2c   = gk_cmalloc(256, "gk_i2c_create_common");
     t->c2i   = gk_imalloc(256, "gk_i2c_create_common");
-    
+
 
     gk_cset(256, -1, t->i2c);
     gk_iset(256, -1, t->c2i);
-    
+
     for(i=0;i<nsymbols;i++){
 	t->i2c[i] = alphabet[i];
 	t->c2i[(int)alphabet[i]] = i;
@@ -86,8 +86,8 @@ gk_seq_t *gk_seq_ReadGKMODPSSM(char *filename)
     gk_idx_t i, j, ii;
     size_t ntokens, nbytes, len;
     FILE *fpin;
-    
-    
+
+
     gk_Tokens_t tokens;
     static char *AAORDER = "ARNDCQEGHILKMFPSTWYVBZX*";
     static int PSSMWIDTH = 20;
@@ -95,23 +95,23 @@ gk_seq_t *gk_seq_ReadGKMODPSSM(char *filename)
     gk_i2cc2i_t *converter;
 
     header = gk_cmalloc(PSSMWIDTH, "gk_seq_ReadGKMODPSSM: header");
-    
+
     converter = gk_i2cc2i_create_common(AAORDER);
-    
+
     gk_getfilestats(filename, &len, &ntokens, NULL, &nbytes);
     len --;
 
     seq = gk_malloc(sizeof(gk_seq_t),"gk_seq_ReadGKMODPSSM");
     gk_seq_init(seq);
-    
+
     seq->len = len;
     seq->sequence = gk_imalloc(len, "gk_seq_ReadGKMODPSSM");
     seq->pssm     = gk_iAllocMatrix(len, PSSMWIDTH, 0, "gk_seq_ReadGKMODPSSM");
     seq->psfm     = gk_iAllocMatrix(len, PSSMWIDTH, 0, "gk_seq_ReadGKMODPSSM");
-    
+
     seq->nsymbols = PSSMWIDTH;
     seq->name     = gk_getbasename(filename);
-    
+
     fpin = gk_fopen(filename,"r","gk_seq_ReadGKMODPSSM");
 
 
@@ -123,9 +123,9 @@ gk_seq_t *gk_seq_ReadGKMODPSSM(char *filename)
 
     for (i=0; i<PSSMWIDTH; i++)
 	header[i] = tokens.list[i][0];
-    
+
     gk_freetokenslist(&tokens);
-    
+
 
     /* Read the rest of the lines */
     for (i=0, ii=0; ii<len; ii++) {
@@ -133,22 +133,22 @@ gk_seq_t *gk_seq_ReadGKMODPSSM(char *filename)
           errexit("Unexpected end of file: %s\n", filename);
 	gk_strtoupper(line);
 	gk_strtokenize(line, " \t\n", &tokens);
-	
+
 	seq->sequence[i] = converter->c2i[(int)tokens.list[1][0]];
-	
+
 	for (j=0; j<PSSMWIDTH; j++) {
 	    seq->pssm[i][converter->c2i[(int)header[j]]] = atoi(tokens.list[2+j]);
 	    seq->psfm[i][converter->c2i[(int)header[j]]] = atoi(tokens.list[2+PSSMWIDTH+j]);
 	}
-	
-      
-	
+
+
+
 	gk_freetokenslist(&tokens);
 	i++;
     }
-    
+
     seq->len = i; /* Reset the length if certain characters were skipped */
-    
+
     gk_free((void **)&header, LTERM);
     gk_fclose(fpin);
 
@@ -158,7 +158,7 @@ gk_seq_t *gk_seq_ReadGKMODPSSM(char *filename)
 
 /**************************************************************************/
 /*! \brief This function frees the memory allocated to the seq structure.
- 
+
 \param   gk_seq_t
 \returns nothing
 */

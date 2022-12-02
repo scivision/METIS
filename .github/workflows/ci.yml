@@ -15,6 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
+        intsize: [32, 64]
 
     runs-on: ${{ matrix.os }}
     timeout-minutes: 5
@@ -22,7 +23,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - run: cmake -B build
+    - run: cmake -B build -Dintsize=${{ matrix.intsize }}
     - run: cmake --build build --parallel
 
     - run: ctest --test-dir build -V

@@ -6,14 +6,13 @@ set(GKLIB_PATH ${abs})
 unset(abs)
 include(GKlibSystem.cmake)
 
-include_directories(".")
 add_library(GKlib STATIC ${GKlib_sources})
-if(UNIX)
-  target_link_libraries(GKlib m)
-endif(UNIX)
+target_link_libraries(GKlib PRIVATE $<$<BOOL:${UNIX}>:m>)
+target_include_directories(GKlib PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-include_directories("test")
-add_subdirectory("test")
+if(BUILD_TESTING)
+  add_subdirectory(test)
+endif()
 
 install(TARGETS GKlib
   ARCHIVE DESTINATION lib

@@ -2,7 +2,7 @@
 \file  fs.c
 \brief Various file-system functions.
 
-This file contains various functions that deal with interfacing with 
+This file contains various functions that deal with interfacing with
 the filesystem in a portable way.
 
 \date Started 4/10/95
@@ -11,7 +11,7 @@ the filesystem in a portable way.
 */
 
 
-#include <GKlib.h>
+#include "GKlib.h"
 
 
 
@@ -46,7 +46,7 @@ int gk_dexists(char *dirname)
 /*************************************************************************/
 /*! \brief Returns the size of the file in bytes
 
-This function returns the size of a file as a 64 bit integer. If there 
+This function returns the size of a file as a 64 bit integer. If there
 were any errors in stat'ing the file, -1 is returned.
 \note That due to the -1 return code, the maximum file size is limited to
       63 bits (which I guess is okay for now).
@@ -64,7 +64,7 @@ intmax_t gk_getfsize(char *filename)
 
 
 /*************************************************************************/
-/*! This function gets some basic statistics about the file. 
+/*! This function gets some basic statistics about the file.
     \param fname is the name of the file
     \param r_nlines is the number of lines in the file. If it is NULL,
            this information is not returned.
@@ -76,7 +76,7 @@ intmax_t gk_getfsize(char *filename)
            this information is not returned.
 */
 /*************************************************************************/
-void gk_getfilestats(char *fname, size_t *r_nlines, size_t *r_ntokens, 
+void gk_getfilestats(char *fname, size_t *r_nlines, size_t *r_ntokens,
         size_t *r_max_nlntokens, size_t *r_nbytes)
 {
   size_t nlines=0, ntokens=0, max_nlntokens=0, nbytes=0, oldntokens=0, nread;
@@ -137,14 +137,14 @@ char *gk_getbasename(char *path)
   char *startptr, *endptr;
   char *basename;
 
-  if ((startptr = strrchr(path, '/')) == NULL) 
+  if ((startptr = strrchr(path, '/')) == NULL)
     startptr = path;
-  else 
+  else
     startptr = startptr+1;
 
   basename = gk_strdup(startptr);
 
-  if ((endptr = strrchr(basename, '.')) != NULL) 
+  if ((endptr = strrchr(basename, '.')) != NULL)
     *endptr = '\0';
 
   return basename;
@@ -153,16 +153,16 @@ char *gk_getbasename(char *path)
 /*************************************************************************
 * This function takes in a potentially full path specification of a file
 * and just returns a string corresponding to its file extension. The
-* extension of a file is considered to be the string right after the 
+* extension of a file is considered to be the string right after the
 * last '.' character.
 **************************************************************************/
 char *gk_getextname(char *path)
 {
   char *startptr;
 
-  if ((startptr = strrchr(path, '.')) == NULL) 
+  if ((startptr = strrchr(path, '.')) == NULL)
     return gk_strdup(path);
-  else 
+  else
     return gk_strdup(startptr+1);
 }
 
@@ -174,9 +174,9 @@ char *gk_getfilename(char *path)
 {
   char *startptr;
 
-  if ((startptr = strrchr(path, '/')) == NULL) 
+  if ((startptr = strrchr(path, '/')) == NULL)
     return gk_strdup(path);
-  else 
+  else
     return gk_strdup(startptr+1);
 }
 

@@ -1,5 +1,5 @@
 /*!
- * \file 
+ * \file
  *
  * \brief Various routines that perform random-walk based operations
           on graphs stored as gk_csr_t matrices.
@@ -8,7 +8,7 @@
  * \version\verbatim $Id: rw.c 11078 2011-11-12 00:20:44Z karypis $ \endverbatim
  */
 
-#include <GKlib.h>
+#include "GKlib.h"
 
 
 /*************************************************************************/
@@ -18,11 +18,11 @@
   \param lamda is the restart probability.
   \param eps is the error tolerance for convergance.
   \param max_niter is the maximum number of allowed iterations.
-  \param pr on entry stores the restart distribution of the vertices. 
-         This allows for the computation of personalized page-rank scores 
-         by appropriately setting that parameter. 
+  \param pr on entry stores the restart distribution of the vertices.
+         This allows for the computation of personalized page-rank scores
+         by appropriately setting that parameter.
          On return, pr stores the computed page ranks.
- 
+
   \returns the number of iterations that were performed.
 */
 /**************************************************************************/
@@ -44,7 +44,7 @@ int gk_rw_PageRank(gk_csr_t *mat, float lamda, float eps, int max_niter, float *
   prnew  = gk_dsmalloc(nrows, 0, "gk_rw_PageRank: prold");
   rscale = gk_dsmalloc(nrows, 0, "gk_rw_PageRank: rscale");
 
-  /* compute the scaling factors to get adjacency weights into transition 
+  /* compute the scaling factors to get adjacency weights into transition
      probabilities */
   for (i=0; i<nrows; i++) {
     for (j=rowptr[i]; j<rowptr[i+1]; j++)
@@ -62,11 +62,11 @@ int gk_rw_PageRank(gk_csr_t *mat, float lamda, float eps, int max_niter, float *
     gk_SWAP(prnew, prold, prtmp);
     gk_dset(nrows, 0.0, prnew);
 
-    /* determine the total current PR score of the sinks so that you 
-       can distribute them to all nodes according to the restart 
+    /* determine the total current PR score of the sinks so that you
+       can distribute them to all nodes according to the restart
        distribution. */
     for (fromsinks=0.0, i=0; i<nrows; i++) {
-      if (rscale[i] == 0) 
+      if (rscale[i] == 0)
         fromsinks += prold[i];
     }
 
@@ -82,7 +82,7 @@ int gk_rw_PageRank(gk_csr_t *mat, float lamda, float eps, int max_niter, float *
     }
 
     /* compute the error */
-    for (error=0.0, i=0; i<nrows; i++) 
+    for (error=0.0, i=0; i<nrows; i++)
       error = (fabs(prnew[i]-prold[i]) > error ? fabs(prnew[i]-prold[i]) : error);
 
     //printf("nrm1: %le  maxfabserr: %le\n", gk_dsum(nrows, prnew, 1), error);
@@ -96,8 +96,7 @@ int gk_rw_PageRank(gk_csr_t *mat, float lamda, float eps, int max_niter, float *
     pr[i] = prnew[i];
 
   gk_free((void **)&prnew, &prold, &rscale, LTERM);
-  
+
   return (int)(iter+1);
 
 }
-

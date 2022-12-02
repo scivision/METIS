@@ -1,12 +1,12 @@
 /*************************************************************************/
 /*! \file getopt.c
-\brief Command line parsing 
+\brief Command line parsing
 
 This file contains a implementation of GNU's Getopt facility. The purpose
 for including it here is to ensure portability across different unix- and
 windows-based systems.
 
-\warning 
+\warning
 The implementation provided here uses the \c gk_ prefix for all variables
 used by the standard Getopt facility to communicate with the program.
 So, do read the documentation here.
@@ -28,20 +28,20 @@ So, do read the documentation here.
    You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  
+   02111-1307 USA.
 \endverbatim
 */
 /*************************************************************************/
 
 
-#include <GKlib.h>
+#include "GKlib.h"
 
 /*************************************************************************/
 /* Local function prototypes */
 /*************************************************************************/
 static void exchange (char **);
 static char *gk_getopt_initialize (int, char **, char *);
-static int gk_getopt_internal(int argc, char **argv, char *optstring, 
+static int gk_getopt_internal(int argc, char **argv, char *optstring,
         struct gk_option *longopts, int *longind, int long_only);
 
 
@@ -49,7 +49,7 @@ static int gk_getopt_internal(int argc, char **argv, char *optstring,
 /*************************************************************************/
 /*! \brief For communication arguments to the caller.
 
-This variable is set by getopt to point at the value of the option argument, 
+This variable is set by getopt to point at the value of the option argument,
 for those options that accept arguments.
 */
 /*************************************************************************/
@@ -57,23 +57,23 @@ char *gk_optarg;
 
 
 /*************************************************************************/
-/*! \brief Index in ARGV of the next element to be scanned. 
+/*! \brief Index in ARGV of the next element to be scanned.
 
-This variable is set by getopt to the index of the next element of the argv 
-array to be processed. Once getopt has found all of the option arguments, 
-you can use this variable to determine where the remaining non-option arguments 
-begin. 
+This variable is set by getopt to the index of the next element of the argv
+array to be processed. Once getopt has found all of the option arguments,
+you can use this variable to determine where the remaining non-option arguments
+begin.
 */
 /*************************************************************************/
-int gk_optind = 1; 
+int gk_optind = 1;
 
 
 /*************************************************************************/
-/*! \brief Controls error reporting for unrecognized options.  
+/*! \brief Controls error reporting for unrecognized options.
 
-If the value of this variable is nonzero, then getopt prints an error 
-message to the standard error stream if it encounters an unknown option 
-character or an option with a missing required argument. This is the default 
+If the value of this variable is nonzero, then getopt prints an error
+message to the standard error stream if it encounters an unknown option
+character or an option with a missing required argument. This is the default
 behavior. If you set this variable to zero, getopt does not print any messages,
 but it still returns the character ? to indicate an error.
 */
@@ -84,8 +84,8 @@ int gk_opterr = 1;
 /*************************************************************************/
 /*! \brief Stores unknown option characters
 
-When getopt encounters an unknown option character or an option with a 
-missing required argument, it stores that option character in this 
+When getopt encounters an unknown option character or an option with a
+missing required argument, it stores that option character in this
 variable. You can use this for providing your own diagnostic messages.
 */
 /*************************************************************************/
@@ -102,12 +102,12 @@ int gk_getopt_initialized;
 
 /*************************************************************************/
 /*
-The next char to be scanned in the option-element in which the last option 
-character we returned was found.  This allows us to pick up the scan where 
+The next char to be scanned in the option-element in which the last option
+character we returned was found.  This allows us to pick up the scan where
 we left off.
 
-If this is zero, or a null string, it means resume the scan by advancing 
-to the next ARGV-element.  
+If this is zero, or a null string, it means resume the scan by advancing
+to the next ARGV-element.
 */
 /*************************************************************************/
 static char *nextchar;
@@ -115,7 +115,7 @@ static char *nextchar;
 
 /*************************************************************************/
 /*
-Value of POSIXLY_CORRECT environment variable.  
+Value of POSIXLY_CORRECT environment variable.
 */
 /*************************************************************************/
 static char *posixly_correct;
@@ -125,22 +125,22 @@ static char *posixly_correct;
 /*
 Describe how to deal with options that follow non-option ARGV-elements.
 
-If the caller did not specify anything, the default is REQUIRE_ORDER if 
+If the caller did not specify anything, the default is REQUIRE_ORDER if
 the environment variable POSIXLY_CORRECT is defined, PERMUTE otherwise.
 
-REQUIRE_ORDER means don't recognize them as options; stop option processing 
-when the first non-option is seen.  This is what Unix does.  This mode of 
-operation is selected by either setting the environment variable 
-POSIXLY_CORRECT, or using `+' as the first character of the list of 
+REQUIRE_ORDER means don't recognize them as options; stop option processing
+when the first non-option is seen.  This is what Unix does.  This mode of
+operation is selected by either setting the environment variable
+POSIXLY_CORRECT, or using `+' as the first character of the list of
 option characters.
 
-PERMUTE is the default.  We permute the contents of ARGV as we scan, so 
+PERMUTE is the default.  We permute the contents of ARGV as we scan, so
 that eventually all the non-options are at the end.  This allows options
 to be given in any order, even with programs that were not written to
 expect this.
 
 RETURN_IN_ORDER is an option available to programs that were written
-to expect options and other ARGV-elements in any order and that care 
+to expect options and other ARGV-elements in any order and that care
 about the ordering of the two.  We describe each non-option ARGV-element
 as if it were the argument of an option with character code 1.
 Using `-' as the first character of the list of option characters
@@ -148,7 +148,7 @@ selects this mode of operation.
 
 The special argument `--' forces an end of option-scanning regardless
 of the value of `ordering'.  In the case of RETURN_IN_ORDER, only
-`--' can cause `getopt' to return -1 with `gk_optind' != ARGC.  
+`--' can cause `getopt' to return -1 with `gk_optind' != ARGC.
 */
 /*************************************************************************/
 static enum
@@ -159,10 +159,10 @@ static enum
 
 
 /*************************************************************************/
-/* 
+/*
 Describe the part of ARGV that contains non-options that have
 been skipped.  `first_nonopt' is the index in ARGV of the first of them;
-`last_nonopt' is the index after the last of them.  
+`last_nonopt' is the index after the last of them.
 */
 /*************************************************************************/
 static int first_nonopt;
@@ -174,16 +174,16 @@ static int last_nonopt;
 
 /*************************************************************************/
 /*
-Handle permutation of arguments.  
+Handle permutation of arguments.
 
-Exchange two adjacent subsequences of ARGV. 
+Exchange two adjacent subsequences of ARGV.
 One subsequence is elements [first_nonopt,last_nonopt)
 which contains all the non-options that have been skipped so far.
 The other is elements [last_nonopt,gk_optind), which contains all
 the options processed since those non-options were skipped.
 
 `first_nonopt' and `last_nonopt' are relocated so that they describe
-the new indices of the non-options in ARGV after they are moved.  
+the new indices of the non-options in ARGV after they are moved.
 */
 /*************************************************************************/
 static void exchange (char **argv)
@@ -239,7 +239,7 @@ static void exchange (char **argv)
 
 /*************************************************************************/
 /*
-Initialize the internal data when the first call is made.  
+Initialize the internal data when the first call is made.
 */
 /*************************************************************************/
 static char *gk_getopt_initialize (int argc, char **argv, char *optstring)
@@ -324,10 +324,10 @@ static char *gk_getopt_initialize (int argc, char **argv, char *optstring)
    recent call.
 
    If LONG_ONLY is nonzero, '-' as well as '--' can introduce
-   long-named options.  
+   long-named options.
 */
 /*************************************************************************/
-static int gk_getopt_internal(int argc, char **argv, char *optstring, 
+static int gk_getopt_internal(int argc, char **argv, char *optstring,
         struct gk_option *longopts, int *longind, int long_only)
 {
   int print_errors = gk_opterr;
@@ -712,57 +712,57 @@ static int gk_getopt_internal(int argc, char **argv, char *optstring,
 /*************************************************************************/
 /*! \brief Parse command-line arguments
 
-The gk_getopt() function gets the next option argument from the argument 
-list specified by the \c argv and \c argc arguments. Normally these values 
+The gk_getopt() function gets the next option argument from the argument
+list specified by the \c argv and \c argc arguments. Normally these values
 come directly from the arguments received by main().
 
 \param argc is the number of command line arguments passed to main().
-\param argv is an array of strings storing the above command line 
+\param argv is an array of strings storing the above command line
        arguments.
-\param options is a string that specifies the option characters that 
-       are valid for this program. An option character in this string 
-       can be followed by a colon (`:') to indicate that it takes a 
-       required argument. If an option character is followed by two 
+\param options is a string that specifies the option characters that
+       are valid for this program. An option character in this string
+       can be followed by a colon (`:') to indicate that it takes a
+       required argument. If an option character is followed by two
        colons (`::'), its argument is optional; this is a GNU extension.
 
-\return  
-It returns the option character for the next command line option. When no 
-more option arguments are available, it returns -1. There may still be 
-more non-option arguments; you must compare the external variable 
+\return
+It returns the option character for the next command line option. When no
+more option arguments are available, it returns -1. There may still be
+more non-option arguments; you must compare the external variable
 #gk_optind against the \c argc parameter to check this.
 
-\return  
-If the option has an argument, gk_getopt() returns the argument by storing 
-it in the variable #gk_optarg. You don't ordinarily need to copy the 
-#gk_optarg string, since it is a pointer into the original \c argv array, 
+\return
+If the option has an argument, gk_getopt() returns the argument by storing
+it in the variable #gk_optarg. You don't ordinarily need to copy the
+#gk_optarg string, since it is a pointer into the original \c argv array,
 not into a static area that might be overwritten.
 
-\return  
-If gk_getopt() finds an option character in \c argv that was not included 
-in options, or a missing option argument, it returns `?' and sets the 
-external variable #gk_optopt to the actual option character. 
-If the first character of options is a colon (`:'), then gk_getopt() 
-returns `:' instead of `?' to indicate a missing option argument. 
-In addition, if the external variable #gk_opterr is nonzero (which is 
-the default), gk_getopt() prints an error message.  This variable is 
-set by gk_getopt() to point at the value of the option argument, 
+\return
+If gk_getopt() finds an option character in \c argv that was not included
+in options, or a missing option argument, it returns `?' and sets the
+external variable #gk_optopt to the actual option character.
+If the first character of options is a colon (`:'), then gk_getopt()
+returns `:' instead of `?' to indicate a missing option argument.
+In addition, if the external variable #gk_opterr is nonzero (which is
+the default), gk_getopt() prints an error message.  This variable is
+set by gk_getopt() to point at the value of the option argument,
 for those options that accept arguments.
 
 
-gk_getopt() has three ways to deal with options that follow non-options 
-\c argv elements. The special argument <tt>`--'</tt> forces in all cases 
+gk_getopt() has three ways to deal with options that follow non-options
+\c argv elements. The special argument <tt>`--'</tt> forces in all cases
 the end of option scanning.
-  - The default is to permute the contents of \c argv while scanning it 
-    so that eventually all the non-options are at the end. This allows 
-    options to be given in any order, even with programs that were not 
+  - The default is to permute the contents of \c argv while scanning it
+    so that eventually all the non-options are at the end. This allows
+    options to be given in any order, even with programs that were not
     written to expect this.
-  - If the options argument string begins with a hyphen (`-'), this is 
-    treated specially. It permits arguments that are not options to be 
+  - If the options argument string begins with a hyphen (`-'), this is
+    treated specially. It permits arguments that are not options to be
     returned as if they were associated with option character `\\1'.
-  - POSIX demands the following behavior: The first non-option stops 
-    option processing. This mode is selected by either setting the 
+  - POSIX demands the following behavior: The first non-option stops
+    option processing. This mode is selected by either setting the
     environment variable POSIXLY_CORRECT or beginning the options
-    argument string with a plus sign (`+'). 
+    argument string with a plus sign (`+').
 
 */
 /*************************************************************************/
@@ -775,62 +775,62 @@ int gk_getopt(int argc, char **argv, char *options)
 /*************************************************************************/
 /*! \brief Parse command-line arguments with long options
 
-This function accepts GNU-style long options as well as single-character 
-options. 
+This function accepts GNU-style long options as well as single-character
+options.
 
 \param argc is the number of command line arguments passed to main().
-\param argv is an array of strings storing the above command line 
+\param argv is an array of strings storing the above command line
        arguments.
-\param options describes the short options to accept, just as it does 
-       in gk_getopt(). 
-\param long_options describes the long options to accept. See the 
+\param options describes the short options to accept, just as it does
+       in gk_getopt().
+\param long_options describes the long options to accept. See the
        defintion of ::gk_option for more information.
-\param opt_index this is a returned variable.  For any long option, 
-       gk_getopt_long() tells you the index in the array \c long_options 
-       of the options definition, by storing it into <tt>*opt_index</tt>. 
-       You can get the name of the option with <tt>longopts[*opt_index].name</tt>. 
-       So you can distinguish among long options either by the values 
-       in their val fields or by their indices. You can also distinguish 
+\param opt_index this is a returned variable.  For any long option,
+       gk_getopt_long() tells you the index in the array \c long_options
+       of the options definition, by storing it into <tt>*opt_index</tt>.
+       You can get the name of the option with <tt>longopts[*opt_index].name</tt>.
+       So you can distinguish among long options either by the values
+       in their val fields or by their indices. You can also distinguish
        in this way among long options that set flags.
 
 
 \return
-When gk_getopt_long() encounters a short option, it does the same thing 
-that gk_getopt() would do: it returns the character code for the option, 
+When gk_getopt_long() encounters a short option, it does the same thing
+that gk_getopt() would do: it returns the character code for the option,
 and stores the options argument (if it has one) in #gk_optarg.
 
 \return
-When gk_getopt_long() encounters a long option, it takes actions based 
+When gk_getopt_long() encounters a long option, it takes actions based
 on the flag and val fields of the definition of that option.
 
 \return
-If flag is a null pointer, then gk_getopt_long() returns the contents 
-of val to indicate which option it found. You should arrange distinct 
-values in the val field for options with different meanings, so you 
-can decode these values after gk_getopt_long() returns. If the long 
-option is equivalent to a short option, you can use the short option's 
+If flag is a null pointer, then gk_getopt_long() returns the contents
+of val to indicate which option it found. You should arrange distinct
+values in the val field for options with different meanings, so you
+can decode these values after gk_getopt_long() returns. If the long
+option is equivalent to a short option, you can use the short option's
 character code in val.
 
 \return
-If flag is not a null pointer, that means this option should just set 
-a flag in the program. The flag is a variable of type int that you 
-define. Put the address of the flag in the flag field. Put in the 
-val field the value you would like this option to store in the flag. 
+If flag is not a null pointer, that means this option should just set
+a flag in the program. The flag is a variable of type int that you
+define. Put the address of the flag in the flag field. Put in the
+val field the value you would like this option to store in the flag.
 In this case, gk_getopt_long() returns 0.
 
 \return
-When a long option has an argument, gk_getopt_long() puts the argument 
-value in the variable #gk_optarg before returning. When the option has 
+When a long option has an argument, gk_getopt_long() puts the argument
+value in the variable #gk_optarg before returning. When the option has
 no argument, the value in #gk_optarg is a null pointer. This is
 how you can tell whether an optional argument was supplied.
 
 \return
-When gk_getopt_long() has no more options to handle, it returns -1, 
-and leaves in the variable #gk_optind the index in argv of the next 
-remaining argument. 
+When gk_getopt_long() has no more options to handle, it returns -1,
+and leaves in the variable #gk_optind the index in argv of the next
+remaining argument.
 */
 /*************************************************************************/
-int gk_getopt_long( int argc, char **argv, char *options, 
+int gk_getopt_long( int argc, char **argv, char *options,
        struct gk_option *long_options, int *opt_index)
 {
   return gk_getopt_internal (argc, argv, options, long_options, opt_index, 0);
@@ -843,12 +843,11 @@ int gk_getopt_long( int argc, char **argv, char *options,
 
 Like gk_getopt_long(), but '-' as well as '--' can indicate a long option.
 If an option that starts with '-' (not '--') doesn't match a long option,
-but does match a short option, it is parsed as a short option instead.  
+but does match a short option, it is parsed as a short option instead.
 */
 /*************************************************************************/
-int gk_getopt_long_only(int argc, char **argv, char *options, 
+int gk_getopt_long_only(int argc, char **argv, char *options,
        struct gk_option *long_options, int *opt_index)
 {
   return gk_getopt_internal(argc, argv, options, long_options, opt_index, 1);
 }
-

@@ -1,14 +1,14 @@
 /*!
 \file  dfkvkselect.c
 \brief Sorts only the largest k values
- 
+
 \date   Started 7/14/00
 \author George
 \version\verbatim $Id: fkvkselect.c 10711 2011-08-31 22:23:04Z karypis $\endverbatim
 */
 
 
-#include <GKlib.h>
+#include "GKlib.h"
 
 /* Byte-wise swap two items of size SIZE. */
 #define QSSWAP(a, b, stmp) do { stmp = (a); (a) = (b); (b) = stmp; } while (0)
@@ -34,7 +34,7 @@ int gk_dfkvkselect(size_t n, int topk, gk_fkv_t *cand)
       mid = lo;
     if (cand[hi].key > cand[mid].key)
       mid = hi;
-    else 
+    else
       goto jump_over;
     if (cand[lo].key < cand[mid].key)
       mid = lo;
@@ -54,7 +54,7 @@ jump_over:
     QSSWAP(cand[i], cand[hi], stmp);
 
 
-    if (i > topk) 
+    if (i > topk)
       hi = i-1;
     else if (i < topk)
       lo = i+1;
@@ -98,7 +98,7 @@ int gk_ifkvkselect(size_t n, int topk, gk_fkv_t *cand)
       mid = lo;
     if (cand[hi].key < cand[mid].key)
       mid = hi;
-    else 
+    else
       goto jump_over;
     if (cand[lo].key > cand[mid].key)
       mid = lo;
@@ -118,7 +118,7 @@ jump_over:
     QSSWAP(cand[i], cand[hi], stmp);
 
 
-    if (i > topk) 
+    if (i > topk)
       hi = i-1;
     else if (i < topk)
       lo = i+1;

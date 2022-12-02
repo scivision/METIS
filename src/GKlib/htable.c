@@ -8,7 +8,7 @@
  *
  */
 
-#include <GKlib.h>
+#include "GKlib.h"
 
 /******************************************************************************
 * This function creates the hash-table
@@ -139,14 +139,14 @@ int HTable_Search(gk_HTable_t *htable, int key)
   first = HTable_HFunction(htable->nelements, key);
 
   for (i=first; i<htable->nelements; i++) {
-    if (htable->harray[i].key == key) 
+    if (htable->harray[i].key == key)
       return htable->harray[i].val;
     else if (htable->harray[i].key == HTABLE_EMPTY)
       return -1;
   }
 
   for (i=0; i<first; i++) {
-    if (htable->harray[i].key == key) 
+    if (htable->harray[i].key == key)
       return htable->harray[i].val;
     else if (htable->harray[i].key == HTABLE_EMPTY)
       return -1;

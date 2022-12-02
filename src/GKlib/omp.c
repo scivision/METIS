@@ -7,7 +7,7 @@
  *
  */
 
-#include <GKlib.h>
+#include "GKlib.h"
 
 #ifdef GK_NOOPENMP  /* remove those for now */
 #if !defined(_OPENMP)
@@ -23,5 +23,3 @@ void omp_set_nested(int nested) { return; }
 int omp_get_nested(void) { return 0; }
 #endif
 #endif
-
-

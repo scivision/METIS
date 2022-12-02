@@ -8,14 +8,14 @@
 */
 
 
-#include <GKlib.h>
+#include "GKlib.h"
 
 
 
 /*************************************************************************
 * This file randomly permutes the contents of an array.
 * flag == 0, don't initialize perm
-* flag == 1, set p[i] = i 
+* flag == 1, set p[i] = i
 **************************************************************************/
 void gk_RandomPermute(size_t n, int *p, int flag)
 {
@@ -40,13 +40,13 @@ void gk_RandomPermute(size_t n, int *p, int flag)
 \brief Converts an element-based set membership into a CSR-format set-based
        membership.
 
-For example, it takes an array such as part[] that stores where each 
-element belongs to and returns a pair of arrays (pptr[], pind[]) that 
+For example, it takes an array such as part[] that stores where each
+element belongs to and returns a pair of arrays (pptr[], pind[]) that
 store in CSF format the list of elements belonging in each partition.
 
-\param n      
+\param n
   the number of elements in the array (e.g., # of vertices)
-\param range  
+\param range
   the cardinality of the set (e.g., # of partitions)
 \param array
   the array that stores the per-element set membership
@@ -65,7 +65,7 @@ void gk_array2csr(size_t n, size_t range, int *array, int *ptr, int *ind)
 
   gk_iset(range+1, 0, ptr);
 
-  for (i=0; i<n; i++) 
+  for (i=0; i<n; i++)
     ptr[array[i]]++;
 
   /* Compute the ptr, ind structure */
@@ -105,4 +105,3 @@ float gk_flog2(float a)
 {
   return log(a)/log(2.0);
 }
-

@@ -1,6 +1,6 @@
 /*!
  * \file
- * \brief Frequent/Closed itemset discovery routines 
+ * \brief Frequent/Closed itemset discovery routines
  *
  * This file contains the code for finding frequent/closed itemests. These routines
  * are implemented using a call-back mechanism to deal with the discovered itemsets.
@@ -10,7 +10,7 @@
  * \version\verbatim $Id: itemsets.c 11075 2011-11-11 22:31:52Z karypis $ \endverbatim
  */
 
-#include <GKlib.h>
+#include "GKlib.h"
 
 /*-------------------------------------------------------------*/
 /*! Data structures for use within this module */
@@ -23,7 +23,7 @@ typedef struct {
   int tnitems;  /* the initial range of the item space */
 
   /* the call-back function */
-  void (*callback)(void *stateptr, int nitems, int *itemids, int ntrans, int *transids); 
+  void (*callback)(void *stateptr, int nitems, int *itemids, int ntrans, int *transids);
   void *stateptr;   /* the user-supplied pointer to pass to the callback */
 
   /* workspace variables */
@@ -35,7 +35,7 @@ typedef struct {
 /*-------------------------------------------------------------*/
 /*! Prototypes for this module */
 /*-------------------------------------------------------------*/
-void itemsets_find_frequent_itemsets(isparams_t *params, gk_csr_t *mat, 
+void itemsets_find_frequent_itemsets(isparams_t *params, gk_csr_t *mat,
          int preflen, int *prefix);
 gk_csr_t *itemsets_project_matrix(isparams_t *param, gk_csr_t *mat, int cid);
 
@@ -44,9 +44,9 @@ gk_csr_t *itemsets_project_matrix(isparams_t *param, gk_csr_t *mat, int cid);
 /*************************************************************************/
 /*! The entry point of the frequent itemset discovery code */
 /*************************************************************************/
-void gk_find_frequent_itemsets(int ntrans, ssize_t *tranptr, int *tranind, 
-        int minfreq, int maxfreq, int minlen, int maxlen, 
-        void (*process_itemset)(void *stateptr, int nitems, int *itemids, 
+void gk_find_frequent_itemsets(int ntrans, ssize_t *tranptr, int *tranind,
+        int minfreq, int maxfreq, int minlen, int maxlen,
+        void (*process_itemset)(void *stateptr, int nitems, int *itemids,
                                 int ntrans, int *transids),
         void *stateptr)
 {
@@ -80,7 +80,7 @@ void gk_find_frequent_itemsets(int ntrans, ssize_t *tranptr, int *tranind,
   gk_csr_Free(&mat);
 
   pattern = gk_imalloc(pmat->ncols, "gk_find_frequent_itemsets: pattern");
-  itemsets_find_frequent_itemsets(&params, pmat, 0, pattern); 
+  itemsets_find_frequent_itemsets(&params, pmat, 0, pattern);
 
   gk_csr_Free(&pmat);
   gk_free((void **)&pattern, &params.rmarker, &params.cand, LTERM);
@@ -92,7 +92,7 @@ void gk_find_frequent_itemsets(int ntrans, ssize_t *tranptr, int *tranind,
 /*************************************************************************/
 /*! The recursive routine for DFS-based frequent pattern discovery */
 /*************************************************************************/
-void itemsets_find_frequent_itemsets(isparams_t *params, gk_csr_t *mat, 
+void itemsets_find_frequent_itemsets(isparams_t *params, gk_csr_t *mat,
          int preflen, int *prefix)
 {
   ssize_t i;
@@ -103,7 +103,7 @@ void itemsets_find_frequent_itemsets(isparams_t *params, gk_csr_t *mat,
     prefix[preflen] = mat->colids[i];
 
     if (preflen+1 >= params->minlen)
-      (*params->callback)(params->stateptr, preflen+1, prefix, 
+      (*params->callback)(params->stateptr, preflen+1, prefix,
            mat->colptr[i+1]-mat->colptr[i], mat->colind+mat->colptr[i]);
 
     if (preflen+1 < params->maxlen) {
@@ -117,7 +117,7 @@ void itemsets_find_frequent_itemsets(isparams_t *params, gk_csr_t *mat,
 
 
 /******************************************************************************/
-/*! This function projects a matrix w.r.t. to a particular column. 
+/*! This function projects a matrix w.r.t. to a particular column.
     It performs the following steps:
     - Determines the length of each column that is remaining
     - Sorts the columns in increasing length
@@ -154,7 +154,7 @@ gk_csr_t *itemsets_project_matrix(isparams_t *params, gk_csr_t *mat, int cid)
     gk_iset(nrows, 1, rmarker);
   }
   else { /* The other projections */
-    for (i=colptr[cid]; i<colptr[cid+1]; i++) 
+    for (i=colptr[cid]; i<colptr[cid+1]; i++)
       rmarker[colind[i]] = 1;
   }
 
@@ -187,7 +187,7 @@ gk_csr_t *itemsets_project_matrix(isparams_t *params, gk_csr_t *mat, int cid)
   for (pnnz=0, ii=0; ii<pncols; ii++) {
     i = cand[ii].val;
     for (j=colptr[i]; j<colptr[i+1]; j++) {
-      if (rmarker[colind[j]]) 
+      if (rmarker[colind[j]])
         pcolind[pnnz++] = colind[j];
     }
 
@@ -201,7 +201,7 @@ gk_csr_t *itemsets_project_matrix(isparams_t *params, gk_csr_t *mat, int cid)
     gk_iset(nrows, 0, rmarker);
   }
   else { /* The other projections */
-    for (i=colptr[cid]; i<colptr[cid+1]; i++) 
+    for (i=colptr[cid]; i<colptr[cid+1]; i++)
       rmarker[colind[i]] = 0;
   }
 

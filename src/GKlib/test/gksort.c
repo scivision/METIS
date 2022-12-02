@@ -7,7 +7,7 @@
 \version\verbatim $Id: gksort.c 11058 2011-11-10 00:02:50Z karypis $ \endverbatim
 */
 
-#include <GKlib.h>
+#include "GKlib.h"
 
 #define N       10000
 
@@ -304,8 +304,8 @@ void test_idxkvsort()
 
   for (i=0; i<N-1; i++) {
     if (array[i].key > array[i+1].key)
-      printf("gk_idxkvsorti error at index %zd [%zd %zd] [%zd %zd]\n", 
-          (ssize_t)i, (ssize_t)array[i].key, (ssize_t)array[i+1].key, 
+      printf("gk_idxkvsorti error at index %zd [%zd %zd] [%zd %zd]\n",
+          (ssize_t)i, (ssize_t)array[i].key, (ssize_t)array[i+1].key,
           (ssize_t)array[i].val, (ssize_t)array[i+1].val);
   }
 
@@ -321,8 +321,8 @@ void test_idxkvsort()
 
   for (i=0; i<N-1; i++) {
     if (array[i].key < array[i+1].key)
-      printf("gk_idxkvsortd error at index %zd [%zd %zd] [%zd %zd]\n", 
-          (ssize_t)i, (ssize_t)array[i].key, (ssize_t)array[i+1].key, 
+      printf("gk_idxkvsortd error at index %zd [%zd %zd] [%zd %zd]\n",
+          (ssize_t)i, (ssize_t)array[i].key, (ssize_t)array[i+1].key,
           (ssize_t)array[i].val, (ssize_t)array[i+1].val);
   }
 
@@ -343,4 +343,3 @@ int main()
   test_skvsort();
   test_idxkvsort();
 }
-

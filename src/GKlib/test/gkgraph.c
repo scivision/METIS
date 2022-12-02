@@ -1,5 +1,5 @@
 /*!
-\file  
+\file
 \brief A simple frequent itemset discovery program to test GKlib's routines
 
 \date 6/12/2008
@@ -7,7 +7,7 @@
 \version \verbatim $Id: gkgraph.c 11408 2012-01-25 15:05:58Z karypis $ \endverbatim
 */
 
-#include <GKlib.h>
+#include "GKlib.h"
 
 /*************************************************************************/
 /*! Data structures for the code */
@@ -78,7 +78,7 @@ static char shorthelpstr[][100] = {
 "          use 'gkgraph -help' for a summary of the options.",
 ""
 };
- 
+
 
 
 /*************************************************************************/
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
   params_t *params;
   gk_graph_t *graph, *pgraph;
   int32_t *perm;
- 
+
   /* get command-line options */
   params = parse_cmdline(argc, argv);
 
@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
   for (i=0; i<1; i++) {
     v = RandomInRange(graph->nvtxs);
     gk_graph_ComputeBFSOrdering(graph, v, &perm, NULL);
-    printf("BFS from %8d. Compactness: %le\n", 
+    printf("BFS from %8d. Compactness: %le\n",
         (int) v, compute_compactness(params, graph, perm));
 
     pgraph = gk_graph_Reorder(graph, perm, NULL);
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
     gk_graph_Free(&pgraph);
 
     gk_graph_ComputeBestFOrdering(graph, v, params->type, &perm, NULL);
-    printf("BestF from %8d. Compactness: %le\n", 
+    printf("BestF from %8d. Compactness: %le\n",
         (int) v, compute_compactness(params, graph, perm));
 
     pgraph = gk_graph_Reorder(graph, perm, NULL);
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
 #ifdef XXX
     for (j=0; j<params->niter; j++) {
       reorder_centroid(params, graph, perm);
-      printf("\tAfter centroid; Compactness: %le\n", 
+      printf("\tAfter centroid; Compactness: %le\n",
           compute_compactness(params, graph, perm));
     }
 
@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
 double compute_compactness(params_t *params, gk_graph_t *graph, int32_t *perm)
 {
   int i, v, u, nvtxs;
-  ssize_t j, *xadj; 
+  ssize_t j, *xadj;
   int32_t *adjncy;
   double compactness=0.0;
   int *freq;
@@ -185,7 +185,7 @@ double compute_compactness(params_t *params, gk_graph_t *graph, int32_t *perm)
 
   /*
   for (i=0; i<nvtxs; i++) {
-    if (freq[i] > 0) 
+    if (freq[i] > 0)
       printf("%7d %6d\n", i, freq[i]);
   }
   */
@@ -201,7 +201,7 @@ double compute_compactness(params_t *params, gk_graph_t *graph, int32_t *perm)
 void reorder_centroid(params_t *params, gk_graph_t *graph, int32_t *perm)
 {
   int i, v, u, nvtxs;
-  ssize_t j, *xadj; 
+  ssize_t j, *xadj;
   int32_t *adjncy;
   gk_fkv_t *cand;
   double displacement;
@@ -256,7 +256,7 @@ void print_init_info(params_t *params, gk_graph_t *graph)
   printf("*******************************************************************************\n");
   printf(" gkgraph\n\n");
   printf("Graph Information ----------------------------------------------------------\n");
-  printf(" input file=%s, [%d, %zd]\n", 
+  printf(" input file=%s, [%d, %zd]\n",
       params->infile, graph->nvtxs, graph->xadj[graph->nvtxs]);
 
   printf("\n");
@@ -338,7 +338,7 @@ params_t *parse_cmdline(int argc, char *argv[])
 
   params->infile  = gk_strdup(argv[gk_optind++]);
 
-  if (argc-gk_optind > 0) 
+  if (argc-gk_optind > 0)
     params->outfile = gk_strdup(argv[gk_optind++]);
   else
     params->outfile   = gk_strdup("gkgraph.out");
@@ -348,4 +348,3 @@ params_t *parse_cmdline(int argc, char *argv[])
 
   return params;
 }
-

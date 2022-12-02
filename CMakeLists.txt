@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.12...3.25)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Debug or Release")
@@ -6,9 +6,19 @@ endif()
 
 project(METIS
 LANGUAGES C
-HOMEPAGE_URL http://glaros.dtc.umn.edu/gkhome/metis/metis/download)
+VERSION 5.1.0.3
+)
 
-include(CTest)
+enable_testing()
+
+option(BUILD_TESTING "Build METIS self-tests" ON)
+
+if(NOT intsize)
+  set(intsize 32)
+endif()
+if(NOT realsize)
+  set(realsize 32)
+endif()
 
 # --- auto-ignore build directory
 if(NOT EXISTS ${PROJECT_BINARY_DIR}/.gitignore)
@@ -32,8 +42,7 @@ endif()
 
 include(${GKLIB_PATH}/GKlibSystem.cmake)
 # Add include directories.
-include_directories(${GKLIB_PATH})
-include_directories(src/include)
+#include_directories(${GKLIB_PATH})
 # Recursively look for CMakeLists.txt in subdirs.
 add_subdirectory(src/include)
 add_subdirectory(src/libmetis)

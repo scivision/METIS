@@ -1,6 +1,6 @@
 /*!
 \file  timers.c
-\brief Various timing functions 
+\brief Various timing functions
 
 \date   Started 4/12/2007
 \author George
@@ -8,7 +8,7 @@
 */
 
 
-#include <GKlib.h>
+#include "GKlib.h"
 
 
 
@@ -49,4 +49,3 @@ double gk_CPUSeconds(void)
   #endif
 #endif
 }
-

@@ -1,5 +1,5 @@
 /*!
-\file  
+\file
 \brief A simple frequent itemset discovery program to test GKlib's routines
 
 \date 6/12/2008
@@ -7,7 +7,7 @@
 \version \verbatim $Id: fis.c 11075 2011-11-11 22:31:52Z karypis $ \endverbatim
 */
 
-#include <GKlib.h>
+#include "GKlib.h"
 
 /*************************************************************************/
 /*! Data structures for the code */
@@ -91,7 +91,7 @@ static char shorthelpstr[][100] = {
 "          use 'fis -help' for a summary of the options.",
 ""
 };
- 
+
 
 
 /*************************************************************************/
@@ -100,7 +100,7 @@ static char shorthelpstr[][100] = {
 void print_init_info(params_t *params, gk_csr_t *mat);
 void print_final_info(params_t *params);
 params_t *parse_cmdline(int argc, char *argv[]);
-void print_an_itemset(void *stateptr, int nitems, int *itemind, 
+void print_an_itemset(void *stateptr, int nitems, int *itemind,
                       int ntrans, int *tranind);
 
 
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
   FILE *fpin;
   params_t *params;
   gk_csr_t *mat;
- 
+
   params = parse_cmdline(argc, argv);
   params->nitemsets = 0;
 
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
   printf("Total itemsets found: %zd\n", params->nitemsets);
 
   print_final_info(params);
-}  
+}
 
 
 
@@ -162,7 +162,7 @@ void print_init_info(params_t *params, gk_csr_t *mat)
   printf("*******************************************************************************\n");
   printf(" fis\n\n");
   printf("Matrix Information ---------------------------------------------------------\n");
-  printf(" input file=%s, [%d, %d, %zd]\n", 
+  printf(" input file=%s, [%d, %d, %zd]\n",
       params->filename, mat->nrows, mat->ncols, mat->rowptr[mat->nrows]);
 
   printf("\n");
@@ -265,7 +265,7 @@ params_t *parse_cmdline(int argc, char *argv[])
 /*************************************************************************/
 /*! This is the callback function for the itemset discovery routine */
 /*************************************************************************/
-void print_an_itemset(void *stateptr, int nitems, int *itemids, int ntrans, 
+void print_an_itemset(void *stateptr, int nitems, int *itemids, int ntrans,
          int *transids)
 {
   ssize_t i;
