@@ -1,0 +1,9 @@
+@PACKAGE_INIT@
+
+include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@-targets.cmake)
+
+set(METIS_UPSTREAM_VERSION @METIS_UPSTREAM_VERSION@)
+set(METIS_intsize @intsize@)
+set(METIS_realsize @realsize@)
+
+check_required_components(@PROJECT_NAME@)
