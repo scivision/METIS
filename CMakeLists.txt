@@ -18,6 +18,7 @@ if(NOT ${PROJECT_NAME}_UPSTREAM_VERSION)
   set(${PROJECT_NAME}_UPSTREAM_VERSION 5.2.1)
 endif()
 
+option(BUILD_SHARED_LIBS "Build shared libraries")
 option(BUILD_TESTING "Build METIS self-tests" ON)
 
 if(NOT intsize)
@@ -37,6 +38,7 @@ DESTINATION cmake
 )
 
 # --- download source
+include(cmake/gklib.cmake)
 include(cmake/metis.cmake)
 
 # --- inject CMakeLists.txt into downloaded source

@@ -4,5 +4,9 @@
       "tag": "v5.2.1",
       "url": "https://github.com/KarypisLab/METIS.git"
     }
+  },
+  "gklib":{
+    "url": "https://github.com/KarypisLab/GKlib.git",
+    "tag": "08b72b2c41f0ac2a825438649ee7361bf0b488c3"
   }
 }
