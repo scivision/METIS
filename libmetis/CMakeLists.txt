@@ -9,6 +9,7 @@ compress.c      gklib_defs.h    mcutil.c      options.c   srefine.c
 contig.c        gklib_rename.h  mesh.c        parmetis.c  stat.c
 )
 target_link_libraries(metis PRIVATE gklib::gklib)
+target_include_directories(metis PRIVATE ${gklib_INCLUDE_DIRS})
 
 install(TARGETS metis
 EXPORT ${PROJECT_NAME}-targets

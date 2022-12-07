@@ -6,7 +6,7 @@
     }
   },
   "gklib":{
-    "url": "https://github.com/KarypisLab/GKlib.git",
-    "tag": "08b72b2c41f0ac2a825438649ee7361bf0b488c3"
+    "url": "https://github.com/scivision/GKlib.git",
+    "tag": "effac2b7fc3cacc858d728f98df5999faf78904f"
   }
 }
