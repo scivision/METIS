@@ -122,7 +122,7 @@ else()
 endif()
 
 # Finally set the official C flags.
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GKlib_COPTIONS} ${GKlib_COPTS}")
+add_compile_options("$<$<COMPILE_LANGUAGE:C>:${GKlib_COPTIONS};${GKlib_COPTS}>")
 
 # Find GKlib sources.
 file(GLOB GKlib_sources ${GKLIB_PATH}/*.c)
