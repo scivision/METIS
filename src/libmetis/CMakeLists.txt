@@ -9,7 +9,4 @@ PRIVATE ${PROJECT_SOURCE_DIR}/src/GKlib ${PROJECT_BINARY_DIR}/src/include
 )
 target_link_libraries(metis PRIVATE $<$<BOOL:${UNIX}>:m>)
 
-install(TARGETS metis
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION lib
-    ARCHIVE DESTINATION lib)
+install(TARGETS metis)

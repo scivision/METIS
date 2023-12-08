@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12...3.25)
+cmake_minimum_required(VERSION 3.14...3.28)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Debug or Release")
@@ -6,7 +6,7 @@ endif()
 
 project(METIS
 LANGUAGES C
-VERSION 5.1.0.3
+VERSION 5.1.0.4
 )
 
 enable_testing()
@@ -20,10 +20,6 @@ if(NOT realsize)
   set(realsize 32)
 endif()
 
-# --- auto-ignore build directory
-if(NOT EXISTS ${PROJECT_BINARY_DIR}/.gitignore)
-  file(WRITE ${PROJECT_BINARY_DIR}/.gitignore "*")
-endif()
 
 set(GKLIB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src/GKlib CACHE PATH "path to GKlib")
 
@@ -50,3 +46,5 @@ add_subdirectory(src/programs)
 
 add_test(NAME GraphCheck
 COMMAND $<TARGET_FILE:graphchk> ${CMAKE_CURRENT_SOURCE_DIR}/src/tests/tiny_01.graph)
+
+file(GENERATE OUTPUT .gitignore CONTENT "*")
