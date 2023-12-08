@@ -40,9 +40,9 @@ include(${GKLIB_PATH}/GKlibSystem.cmake)
 # Add include directories.
 #include_directories(${GKLIB_PATH})
 # Recursively look for CMakeLists.txt in subdirs.
-add_subdirectory(src/include)
-add_subdirectory(src/libmetis)
-add_subdirectory(src/programs)
+add_subdirectory(include)
+add_subdirectory(libmetis)
+add_subdirectory(programs)
 
 add_test(NAME GraphCheck
 COMMAND $<TARGET_FILE:graphchk> ${CMAKE_CURRENT_SOURCE_DIR}/src/tests/tiny_01.graph)
