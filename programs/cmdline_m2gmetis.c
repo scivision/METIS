@@ -12,7 +12,7 @@
 
 
 /*-------------------------------------------------------------------
- * Command-line options
+ * Command-line options 
  *-------------------------------------------------------------------*/
 static struct gk_option long_options[] = {
   {"gtype",          1,      0,      METIS_OPTION_GTYPE},
@@ -73,7 +73,7 @@ static char shorthelpstr[][100] = {
 "          use 'm2gmetis -help' for a summary of the options.",
 ""
 };
-
+ 
 
 
 /*************************************************************************
@@ -112,7 +112,7 @@ params_t *parse_cmdline(int argc, char *argv[])
 
       case METIS_OPTION_NCOMMON:
         if (gk_optarg) params->ncommon = (idx_t)atoi(gk_optarg);
-        if (params->ncommon < 1)
+        if (params->ncommon < 1) 
            errexit("The -ncommon option should specify a number >= 1.\n");
         break;
 
@@ -141,6 +141,8 @@ params_t *parse_cmdline(int argc, char *argv[])
 
   params->filename = gk_strdup(argv[gk_optind++]);
   params->outfile  = gk_strdup(argv[gk_optind++]);
-
+    
   return params;
 }
+
+

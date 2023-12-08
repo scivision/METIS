@@ -22,14 +22,14 @@
 #define OR(a, b) ((a) < 0 ? -((-(a))|(b)) : ((a)|(b)))
 #define XOR(a, b) ((a) < 0 ? -((-(a))^(b)) : ((a)^(b)))
 
-//#define icopy(n, a, b) (idx_t *)memcpy((void *)(b), (void *)(a), sizeof(idx_t)*(n))
+//#define icopy(n, a, b) (idx_t *)memcpy((void *)(b), (void *)(a), sizeof(idx_t)*(n)) 
 
 #define HASHFCT(key, size) ((key)%(size))
 #define SWAP gk_SWAP
 
 /* gets the appropriate option value */
 #define GETOPTION(options, idx, defval) \
-            ((options) == NULL || (options)[idx] == -1 ? defval : (options)[idx])
+            ((options) == NULL || (options)[idx] == -1 ? defval : (options)[idx]) 
 
 /* converts a user provided ufactor into a real ubfactor */
 #define I2RUBFACTOR(ufactor) (1.0+0.001*(ufactor))
@@ -41,14 +41,14 @@
 
 
 /*************************************************************************
-* These macros insert and remove nodes from a Direct Access list
+* These macros insert and remove nodes from a Direct Access list 
 **************************************************************************/
 #define ListInsert(n, lind, lptr, i) \
    do { \
      ASSERT(lptr[i] == -1); \
      lind[n] = i; \
      lptr[i] = (n)++;\
-   } while(0)
+   } while(0) 
 
 #define ListDelete(n, lind, lptr, i) \
    do { \
@@ -56,7 +56,7 @@
      lind[lptr[i]] = lind[--(n)]; \
      lptr[lind[n]] = lptr[i]; \
      lptr[i] = -1; \
-   } while(0)
+   } while(0) 
 
 
 /*************************************************************************
@@ -97,7 +97,7 @@
        if (bndptr[i] == -1 && myrinfo->ed > 0) \
          BNDInsert(nbnd, bndind, bndptr, i); \
      } \
-   } while(0)
+   } while(0) 
 
 
 #define UpdateAdjacentVertexInfoAndBND(ctrl, vid, adjlen, me, from, to, \
@@ -107,7 +107,7 @@
      cnbr_t *mynbrs; \
      \
      if (myrinfo->inbr == -1) { \
-       myrinfo->inbr  = cnbrpoolGetNext(ctrl, adjlen+1); \
+       myrinfo->inbr  = cnbrpoolGetNext(ctrl, adjlen); \
        myrinfo->nnbrs = 0; \
      } \
      ASSERT(CheckRInfo(ctrl, myrinfo)); \
@@ -167,7 +167,7 @@
      } \
      \
      ASSERT(CheckRInfo(ctrl, myrinfo));\
-   } while(0)
+   } while(0) 
 
 
 #define UpdateQueueInfo(queue, vstatus, vid, me, from, to, myrinfo, oldnnbrs, \
@@ -212,7 +212,7 @@
          } \
        } \
      } \
-   } while(0)
+   } while(0) 
 
 
 

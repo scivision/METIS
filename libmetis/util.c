@@ -15,26 +15,26 @@
 
 
 /*************************************************************************/
-/*! This function initializes the random number generator
+/*! This function initializes the random number generator 
   */
 /*************************************************************************/
 void InitRandom(idx_t seed)
 {
-  isrand((seed == -1 ? 4321 : seed));
+  isrand((seed == -1 ? 4321 : seed)); 
 }
 
 
 /*************************************************************************/
-/*! Returns the highest weight index of x[i]*y[i]
+/*! Returns the highest weight index of x[i]*y[i] 
  */
 /*************************************************************************/
 idx_t iargmax_nrm(size_t n, idx_t *x, real_t *y)
 {
   idx_t i, max=0;
-
+      
   for (i=1; i<n; i++)
      max = (x[i]*y[i] > x[max]*y[max] ? i : max);
-
+                
   return max;
 }
 
@@ -56,7 +56,7 @@ idx_t iargmax_strd(size_t n, idx_t *x, idx_t incx)
 
 
 /*************************************************************************/
-/*! These functions return the index of the almost maximum element in a
+/*! These functions return the index of the almost maximum element in a 
     vector
  */
 /*************************************************************************/
@@ -117,7 +117,7 @@ idx_t iargmax2_nrm(size_t n, idx_t *x, real_t *y)
 
 
 /*************************************************************************/
-/*! converts a signal code into a Metis return code
+/*! converts a signal code into a Metis return code 
  */
 /*************************************************************************/
 int metis_rcode(int sigrval)
@@ -134,3 +134,5 @@ int metis_rcode(int sigrval)
       break;
   }
 }
+
+

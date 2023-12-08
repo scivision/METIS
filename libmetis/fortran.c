@@ -45,6 +45,7 @@ void Change2FNumbering(idx_t nvtxs, idx_t *xadj, idx_t *adjncy, idx_t *vector)
     xadj[i]++;
 }
 
+
 /*************************************************************************/
 /*! This function changes the numbering to start from 1 instead of 0 */
 /*************************************************************************/
@@ -61,11 +62,10 @@ void Change2FNumbering2(idx_t nvtxs, idx_t *xadj, idx_t *adjncy)
 }
 
 
-
 /*************************************************************************/
 /*! This function changes the numbering to start from 1 instead of 0 */
 /*************************************************************************/
-void Change2FNumberingOrder(idx_t nvtxs, idx_t *xadj, idx_t *adjncy,
+void Change2FNumberingOrder(idx_t nvtxs, idx_t *xadj, idx_t *adjncy, 
          idx_t *v1, idx_t *v2)
 {
   idx_t i, nedges;
@@ -85,7 +85,6 @@ void Change2FNumberingOrder(idx_t nvtxs, idx_t *xadj, idx_t *adjncy,
 }
 
 
-
 /*************************************************************************/
 /*! This function changes the numbering to start from 0 instead of 1 */
 /*************************************************************************/
@@ -103,7 +102,7 @@ void ChangeMesh2CNumbering(idx_t n, idx_t *ptr, idx_t *ind)
 /*************************************************************************/
 /*! This function changes the numbering to start from 1 instead of 0 */
 /*************************************************************************/
-void ChangeMesh2FNumbering(idx_t n, idx_t *ptr, idx_t *ind, idx_t nvtxs,
+void ChangeMesh2FNumbering(idx_t n, idx_t *ptr, idx_t *ind, idx_t nvtxs, 
          idx_t *xadj, idx_t *adjncy)
 {
   idx_t i;
@@ -123,7 +122,7 @@ void ChangeMesh2FNumbering(idx_t n, idx_t *ptr, idx_t *ind, idx_t nvtxs,
 /*************************************************************************/
 /*! This function changes the numbering to start from 1 instead of 0 */
 /*************************************************************************/
-void ChangeMesh2FNumbering2(idx_t ne, idx_t nn, idx_t *ptr, idx_t *ind,
+void ChangeMesh2FNumbering2(idx_t ne, idx_t nn, idx_t *ptr, idx_t *ind, 
          idx_t *epart, idx_t *npart)
 {
   idx_t i;
@@ -139,3 +138,4 @@ void ChangeMesh2FNumbering2(idx_t ne, idx_t nn, idx_t *ptr, idx_t *ind,
   for (i=0; i<nn; i++)
     npart[i]++;
 }
+

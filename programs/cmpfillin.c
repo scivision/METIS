@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     printf("Usage: %s <GraphFile> <PermFile\n", argv[0]);
     exit(0);
   }
-
+    
   params.filename = gk_strdup(argv[1]);
   graph = ReadGraph(&params);
   if (graph->nvtxs <= 0) {
@@ -56,16 +56,18 @@ int main(int argc, char *argv[])
   printf("**********************************************************************\n");
   printf("%s", METISTITLE);
   printf("Graph Information ---------------------------------------------------\n");
-  printf("  Name: %s, #Vertices: %"PRIDX", #Edges: %"PRIDX"\n\n", argv[1],
+  printf("  Name: %s, #Vertices: %"PRIDX", #Edges: %"PRIDX"\n\n", argv[1], 
       graph->nvtxs, graph->nedges/2);
   printf("Fillin... -----------------------------------------------------------\n");
 
   ComputeFillIn(graph, perm, iperm, &maxlnz, &opc);
-
+  
   printf("  Nonzeros: %6.3le \tOperation Count: %6.3le\n", (double)maxlnz, (double)opc);
 
 
   printf("**********************************************************************\n");
 
   FreeGraph(&graph);
-}
+}  
+
+

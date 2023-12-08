@@ -7,7 +7,7 @@
  * George
  */
 
-#include "GKlib.h"
+#include <GKlib.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -27,7 +27,7 @@
 #endif
 
 
-#include "metis.h"
+#include <metis.h>
 #include "../libmetis/rename.h"
 #include "../libmetis/gklib_defs.h"
 #include "../libmetis/defs.h"
@@ -42,6 +42,8 @@
 #if defined(COMPILER_GCC)
 extern char* strdup (const char *);
 #endif
+
+#define SVNINFO "unknown"
 
 #if defined(COMPILER_MSC)
 #if defined(rint)

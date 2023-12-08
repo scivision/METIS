@@ -3,7 +3,7 @@
  *
  * debug.c
  *
- * This file contains code that performs self debuging
+ * This file contains code that performs self debugging
  *
  * Started 7/24/97
  * George
@@ -15,7 +15,7 @@
 
 
 /*************************************************************************/
-/*! This function computes the total edgecut
+/*! This function computes the total edgecut 
  */
 /*************************************************************************/
 idx_t ComputeCut(graph_t *graph, idx_t *where)
@@ -42,7 +42,7 @@ idx_t ComputeCut(graph_t *graph, idx_t *where)
 
 
 /*************************************************************************/
-/*! This function computes the total volume
+/*! This function computes the total volume 
  */
 /*************************************************************************/
 idx_t ComputeVolume(graph_t *graph, idx_t *where)
@@ -56,7 +56,7 @@ idx_t ComputeVolume(graph_t *graph, idx_t *where)
   adjncy = graph->adjncy;
   vsize  = graph->vsize;
 
-  nparts = where[iargmax(nvtxs, where)]+1;
+  nparts = where[iargmax(nvtxs, where,1)]+1;
   marker = ismalloc(nparts, -1, "ComputeVolume: marker");
 
   totalv = 0;
@@ -79,7 +79,7 @@ idx_t ComputeVolume(graph_t *graph, idx_t *where)
 
 
 /*************************************************************************/
-/*! This function computes the cut given the graph and a where vector
+/*! This function computes the cut given the graph and a where vector 
  */
 /*************************************************************************/
 idx_t ComputeMaxCut(graph_t *graph, idx_t nparts, idx_t *where)
@@ -92,7 +92,7 @@ idx_t ComputeMaxCut(graph_t *graph, idx_t nparts, idx_t *where)
   if (graph->adjwgt == NULL) {
     for (i=0; i<graph->nvtxs; i++) {
       for (j=graph->xadj[i]; j<graph->xadj[i+1]; j++)
-        if (where[i] != where[graph->adjncy[j]])
+        if (where[i] != where[graph->adjncy[j]]) 
           cuts[where[i]]++;
     }
   }
@@ -104,9 +104,9 @@ idx_t ComputeMaxCut(graph_t *graph, idx_t nparts, idx_t *where)
     }
   }
 
-  maxcut = cuts[iargmax(nparts, cuts)];
+  maxcut = cuts[iargmax(nparts, cuts,1)];
 
-  printf("%zu => %"PRIDX"\n", iargmax(nparts, cuts), maxcut);
+  printf("%zu => %"PRIDX"\n", iargmax(nparts, cuts,1), maxcut);
 
   gk_free((void **)&cuts, LTERM);
 
@@ -115,10 +115,10 @@ idx_t ComputeMaxCut(graph_t *graph, idx_t nparts, idx_t *where)
 
 
 /*************************************************************************/
-/*! This function checks whether or not the boundary information is correct
+/*! This function checks whether or not the boundary information is correct 
  */
 /*************************************************************************/
-idx_t CheckBnd(graph_t *graph)
+idx_t CheckBnd(graph_t *graph) 
 {
   idx_t i, j, nvtxs, nbnd;
   idx_t *xadj, *adjncy, *where, *bndptr, *bndind;
@@ -152,10 +152,10 @@ idx_t CheckBnd(graph_t *graph)
 
 
 /*************************************************************************/
-/*! This function checks whether or not the boundary information is correct
+/*! This function checks whether or not the boundary information is correct 
  */
 /*************************************************************************/
-idx_t CheckBnd2(graph_t *graph)
+idx_t CheckBnd2(graph_t *graph) 
 {
   idx_t i, j, nvtxs, nbnd, id, ed;
   idx_t *xadj, *adjncy, *where, *bndptr, *bndind;
@@ -170,7 +170,7 @@ idx_t CheckBnd2(graph_t *graph)
   for (nbnd=0, i=0; i<nvtxs; i++) {
     id = ed = 0;
     for (j=xadj[i]; j<xadj[i+1]; j++) {
-      if (where[i] != where[adjncy[j]])
+      if (where[i] != where[adjncy[j]]) 
         ed += graph->adjwgt[j];
       else
         id += graph->adjwgt[j];
@@ -189,10 +189,10 @@ idx_t CheckBnd2(graph_t *graph)
 
 
 /*************************************************************************/
-/*! This function checks whether or not the boundary information is correct
+/*! This function checks whether or not the boundary information is correct 
  */
 /*************************************************************************/
-idx_t CheckNodeBnd(graph_t *graph, idx_t onbnd)
+idx_t CheckNodeBnd(graph_t *graph, idx_t onbnd) 
 {
   idx_t i, j, nvtxs, nbnd;
   idx_t *xadj, *adjncy, *where, *bndptr, *bndind;
@@ -205,8 +205,8 @@ idx_t CheckNodeBnd(graph_t *graph, idx_t onbnd)
   bndind = graph->bndind;
 
   for (nbnd=0, i=0; i<nvtxs; i++) {
-    if (where[i] == 2)
-      nbnd++;
+    if (where[i] == 2) 
+      nbnd++;   
   }
 
   ASSERTP(nbnd == onbnd, ("%"PRIDX" %"PRIDX"\n", nbnd, onbnd));
@@ -226,7 +226,7 @@ idx_t CheckNodeBnd(graph_t *graph, idx_t onbnd)
 
 
 /*************************************************************************/
-/*! This function checks whether or not the rinfo of a vertex is consistent
+/*! This function checks whether or not the rinfo of a vertex is consistent 
  */
 /*************************************************************************/
 idx_t CheckRInfo(ctrl_t *ctrl, ckrinfo_t *rinfo)
@@ -234,12 +234,15 @@ idx_t CheckRInfo(ctrl_t *ctrl, ckrinfo_t *rinfo)
   idx_t i, j;
   cnbr_t *nbrs;
 
+  ASSERT(ctrl->nbrpoolcpos >= 0);
+  ASSERT(rinfo->nnbrs < ctrl->nparts);
+
   nbrs = ctrl->cnbrpool + rinfo->inbr;
 
   for (i=0; i<rinfo->nnbrs; i++) {
     for (j=i+1; j<rinfo->nnbrs; j++)
-      ASSERTP(nbrs[i].pid != nbrs[j].pid,
-          ("%"PRIDX" %"PRIDX" %"PRIDX" %"PRIDX"\n",
+      ASSERTP(nbrs[i].pid != nbrs[j].pid, 
+          ("%"PRIDX" %"PRIDX" %"PRIDX" %"PRIDX"\n", 
            i, j, nbrs[i].pid, nbrs[j].pid));
   }
 
@@ -249,7 +252,7 @@ idx_t CheckRInfo(ctrl_t *ctrl, ckrinfo_t *rinfo)
 
 
 /*************************************************************************/
-/*! This function checks the correctness of the NodeFM data structures
+/*! This function checks the correctness of the NodeFM data structures 
  */
 /*************************************************************************/
 idx_t CheckNodePartitionParams(graph_t *graph)
@@ -281,18 +284,18 @@ idx_t CheckNodePartitionParams(graph_t *graph)
         if (other != 2)
           edegrees[other] += vwgt[adjncy[j]];
       }
-      if (edegrees[0] != graph->nrinfo[i].edegrees[0] ||
+      if (edegrees[0] != graph->nrinfo[i].edegrees[0] || 
           edegrees[1] != graph->nrinfo[i].edegrees[1]) {
-        printf("Something wrong with edegrees: %"PRIDX" %"PRIDX" %"PRIDX" %"PRIDX" %"PRIDX"\n",
-            i, edegrees[0], edegrees[1],
+        printf("Something wrong with edegrees: %"PRIDX" %"PRIDX" %"PRIDX" %"PRIDX" %"PRIDX"\n", 
+            i, edegrees[0], edegrees[1], 
             graph->nrinfo[i].edegrees[0], graph->nrinfo[i].edegrees[1]);
         return 0;
       }
     }
   }
 
-  if (pwgts[0] != graph->pwgts[0] ||
-      pwgts[1] != graph->pwgts[1] ||
+  if (pwgts[0] != graph->pwgts[0] || 
+      pwgts[1] != graph->pwgts[1] || 
       pwgts[2] != graph->pwgts[2]) {
     printf("Something wrong with part-weights: %"PRIDX" %"PRIDX" %"PRIDX" %"PRIDX" %"PRIDX" %"PRIDX"\n", pwgts[0], pwgts[1], pwgts[2], graph->pwgts[0], graph->pwgts[1], graph->pwgts[2]);
     return 0;
@@ -303,7 +306,7 @@ idx_t CheckNodePartitionParams(graph_t *graph)
 
 
 /*************************************************************************/
-/*! This function checks if the separator is indeed a separator
+/*! This function checks if the separator is indeed a separator 
  */
 /*************************************************************************/
 idx_t IsSeparable(graph_t *graph)
@@ -321,9 +324,9 @@ idx_t IsSeparable(graph_t *graph)
       continue;
     other = (where[i]+1)%2;
     for (j=xadj[i]; j<xadj[i+1]; j++) {
-      ASSERTP(where[adjncy[j]] != other,
-          ("%"PRIDX" %"PRIDX" %"PRIDX" %"PRIDX" %"PRIDX" %"PRIDX"\n",
-           i, where[i], adjncy[j], where[adjncy[j]], xadj[i+1]-xadj[i],
+      ASSERTP(where[adjncy[j]] != other, 
+          ("%"PRIDX" %"PRIDX" %"PRIDX" %"PRIDX" %"PRIDX" %"PRIDX"\n", 
+           i, where[i], adjncy[j], where[adjncy[j]], xadj[i+1]-xadj[i], 
            xadj[adjncy[j]+1]-xadj[adjncy[j]]));
     }
   }
@@ -390,7 +393,7 @@ void CheckKWayVolPartitionParams(ctrl_t *ctrl, graph_t *graph)
             if (onbrs[kk].pid == pid)
               break;
           }
-          if (kk == orinfo->nnbrs)
+          if (kk == orinfo->nnbrs) 
             mynbrs[k].gv -= vsize[ii];
         }
       }
@@ -431,7 +434,7 @@ void CheckKWayVolPartitionParams(ctrl_t *ctrl, graph_t *graph)
               if (onbrs[kk].pid == pid)
                 break;
             }
-            if (kk == orinfo->nnbrs)
+            if (kk == orinfo->nnbrs) 
               mynbrs[k].gv -= vsize[ii];
           }
         }
@@ -446,7 +449,7 @@ void CheckKWayVolPartitionParams(ctrl_t *ctrl, graph_t *graph)
       for (kk=0; kk<tmprinfo.nnbrs; kk++) {
         if (tmpnbrs[kk].pid == pid) {
           if (tmpnbrs[kk].gv != mynbrs[k].gv)
-            printf("[%8"PRIDX" %8"PRIDX" %8"PRIDX" %+8"PRIDX" %+8"PRIDX"]\n",
+            printf("[%8"PRIDX" %8"PRIDX" %8"PRIDX" %+8"PRIDX" %+8"PRIDX"]\n", 
                 i, where[i], pid, mynbrs[k].gv, tmpnbrs[kk].gv);
           break;
         }
@@ -457,3 +460,5 @@ void CheckKWayVolPartitionParams(ctrl_t *ctrl, graph_t *graph)
 
   WCOREPOP;
 }
+
+

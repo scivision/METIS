@@ -18,7 +18,7 @@
 /*************************************************************************/
 /*! This function sets up data structures for fill-in computations */
 /*************************************************************************/
-void ComputeFillIn(graph_t *graph, idx_t *perm, idx_t *iperm,
+void ComputeFillIn(graph_t *graph, idx_t *perm, idx_t *iperm, 
          size_t *r_maxlnz, size_t *r_opc)
 {
   idx_t i, j, k, nvtxs, maxlnz, maxsub;
@@ -51,7 +51,7 @@ void ComputeFillIn(graph_t *graph, idx_t *perm, idx_t *iperm,
   xnzsub = imalloc(nvtxs+2, "ComputeFillIn: xnzsub");
   nzsub  = imalloc(maxsub+1, "ComputeFillIn: nzsub");
 
-
+  
   /* Call sparspak's routine. */
   if (smbfct(nvtxs, xadj, adjncy, perm, iperm, xlnz, &maxlnz, xnzsub, nzsub, &maxsub)) {
     printf("Realocating nzsub...\n");
@@ -59,7 +59,7 @@ void ComputeFillIn(graph_t *graph, idx_t *perm, idx_t *iperm,
 
     maxsub *= 2;
     nzsub  = imalloc(maxsub+1, "ComputeFillIn: nzsub");
-    if (smbfct(nvtxs, xadj, adjncy, perm, iperm, xlnz, &maxlnz, xnzsub, nzsub, &maxsub))
+    if (smbfct(nvtxs, xadj, adjncy, perm, iperm, xlnz, &maxlnz, xnzsub, nzsub, &maxsub)) 
       errexit("MAXSUB is too small!");
   }
 
@@ -89,27 +89,27 @@ void ComputeFillIn(graph_t *graph, idx_t *perm, idx_t *iperm,
 
 /*************************************************************************/
 /*!
-  PURPOSE - THIS ROUTINE PERFORMS SYMBOLIC FACTORIZATION
-  ON A PERMUTED LINEAR SYSTEM AND IT ALSO SETS UP THE
-  COMPRESSED DATA STRUCTURE FOR THE SYSTEM.
+  PURPOSE - THIS ROUTINE PERFORMS SYMBOLIC FACTORIZATION               
+  ON A PERMUTED LINEAR SYSTEM AND IT ALSO SETS UP THE               
+  COMPRESSED DATA STRUCTURE FOR THE SYSTEM.                         
 
-  INPUT PARAMETERS -
-     NEQNS - NUMBER OF EQUATIONS.
-     (XADJ, ADJNCY) - THE ADJACENCY STRUCTURE.
-     (PERM, INVP) - THE PERMUTATION VECTOR AND ITS INVERSE.
+  INPUT PARAMETERS -                                               
+     NEQNS - NUMBER OF EQUATIONS.                                 
+     (XADJ, ADJNCY) - THE ADJACENCY STRUCTURE.                   
+     (PERM, INVP) - THE PERMUTATION VECTOR AND ITS INVERSE.     
 
-  UPDATED PARAMETERS -
-     MAXSUB - SIZE OF THE SUBSCRIPT ARRAY NZSUB.  ON RETURN,
-            IT CONTAINS THE NUMBER OF SUBSCRIPTS USED
+  UPDATED PARAMETERS -                                         
+     MAXSUB - SIZE OF THE SUBSCRIPT ARRAY NZSUB.  ON RETURN,  
+            IT CONTAINS THE NUMBER OF SUBSCRIPTS USED        
 
-  OUTPUT PARAMETERS -
-     XLNZ - INDEX INTO THE NONZERO STORAGE VECTOR LNZ.
-     (XNZSUB, NZSUB) - THE COMPRESSED SUBSCRIPT VECTORS.
-     MAXLNZ - THE NUMBER OF NONZEROS FOUND.
+  OUTPUT PARAMETERS -                                       
+     XLNZ - INDEX INTO THE NONZERO STORAGE VECTOR LNZ.   
+     (XNZSUB, NZSUB) - THE COMPRESSED SUBSCRIPT VECTORS. 
+     MAXLNZ - THE NUMBER OF NONZEROS FOUND.             
 */
 /*************************************************************************/
-idx_t smbfct(idx_t neqns, idx_t *xadj, idx_t *adjncy, idx_t *perm, idx_t *invp,
-	       idx_t *xlnz, idx_t *maxlnz, idx_t *xnzsub, idx_t *nzsub,
+idx_t smbfct(idx_t neqns, idx_t *xadj, idx_t *adjncy, idx_t *perm, idx_t *invp, 
+	       idx_t *xlnz, idx_t *maxlnz, idx_t *xnzsub, idx_t *nzsub, 
                idx_t *maxsub)
 {
   /* Local variables */
@@ -162,7 +162,7 @@ idx_t smbfct(idx_t neqns, idx_t *xadj, idx_t *adjncy, idx_t *perm, idx_t *invp,
     rchlnk[k] = neqns+1;
     for (j=xadj[node]; j<xadj[node+1]; j++) {
       nabor = invp[adjncy[j]];
-      if (nabor <= k)
+      if (nabor <= k) 
         continue;
       rchm = k;
 
@@ -170,7 +170,7 @@ idx_t smbfct(idx_t neqns, idx_t *xadj, idx_t *adjncy, idx_t *perm, idx_t *invp,
         m    = rchm;
         assert(m > 0 && m <= neqns);
         rchm = rchlnk[m];
-      } while (rchm <= nabor);
+      } while (rchm <= nabor); 
 
       knz++;
       assert(m > 0 && m <= neqns);
@@ -178,7 +178,7 @@ idx_t smbfct(idx_t neqns, idx_t *xadj, idx_t *adjncy, idx_t *perm, idx_t *invp,
       assert(nabor > 0 && nabor <= neqns);
       rchlnk[nabor] = rchm;
       assert(k > 0 && k <= neqns);
-      if (marker[nabor] != marker[k])
+      if (marker[nabor] != marker[k]) 
         mrkflg = 1;
     }
 
@@ -186,7 +186,7 @@ idx_t smbfct(idx_t neqns, idx_t *xadj, idx_t *adjncy, idx_t *perm, idx_t *invp,
     /* TEST FOR MASS SYMBOLIC ELIMINATION */
     lmax = 0;
     assert(mrgk >= 0 && mrgk <= neqns);
-    if (mrkflg != 0 || mrgk == 0 || mrglnk[mrgk] != 0)
+    if (mrkflg != 0 || mrgk == 0 || mrglnk[mrgk] != 0) 
       goto L350;
     xnzsub[k] = xnzsub[mrgk] + 1;
     knz = xlnz[mrgk + 1] - (xlnz[mrgk] + 1);
@@ -203,12 +203,12 @@ L350:
       jstrt = xnzsub[i] + 1;
       jstop = xnzsub[i] + inz;
 
-      if (inz > lmax) {
+      if (inz > lmax) { 
         lmax      = inz;
         xnzsub[k] = jstrt;
       }
 
-      /* MERGE STRUCTURE OF L(*,I) IN NZSUB INTO RCHLNK. */
+      /* MERGE STRUCTURE OF L(*,I) IN NZSUB INTO RCHLNK. */ 
       rchm = k;
       for (j=jstrt; j<=jstop; j++) {
         nabor = nzsub[j];
@@ -231,22 +231,22 @@ L350:
 
 
     /* CHECK IF SUBSCRIPTS DUPLICATE THOSE OF ANOTHER COLUMN */
-    if (knz == lmax)
+    if (knz == lmax) 
       goto L1400;
 
     /* OR IF TAIL OF K-1ST COLUMN MATCHES HEAD OF KTH */
-    if (nzbeg > nzend)
+    if (nzbeg > nzend) 
       goto L1200;
 
     assert(k > 0 && k <= neqns);
     i = rchlnk[k];
     for (jstrt = nzbeg; jstrt <= nzend; ++jstrt) {
-      if (nzsub[jstrt] < i)
+      if (nzsub[jstrt] < i) 
         continue;
 
-      if (nzsub[jstrt] == i)
+      if (nzsub[jstrt] == i) 
         goto L1000;
-      else
+      else 
         goto L1200;
     }
     goto L1200;
@@ -255,12 +255,12 @@ L350:
 L1000:
     xnzsub[k] = jstrt;
     for (j = jstrt; j <= nzend; ++j) {
-      if (nzsub[j] != i)
+      if (nzsub[j] != i) 
         goto L1200;
-
+      
       assert(i > 0 && i <= neqns);
       i = rchlnk[i];
-      if (i > neqns)
+      if (i > neqns) 
         goto L1400;
     }
     nzend = jstrt - 1;
@@ -289,12 +289,12 @@ L1200:
     marker[k] = k;
 
     /*
-     * UPDATE THE VECTOR MRGLNK.  NOTE COLUMN L(*,K) JUST FOUND
-     * IS REQUIRED TO DETERMINE COLUMN L(*,J), WHERE
-     * L(J,K) IS THE FIRST NONZERO IN L(*,K) BELOW DIAGONAL.
+     * UPDATE THE VECTOR MRGLNK.  NOTE COLUMN L(*,K) JUST FOUND   
+     * IS REQUIRED TO DETERMINE COLUMN L(*,J), WHERE              
+     * L(J,K) IS THE FIRST NONZERO IN L(*,K) BELOW DIAGONAL.      
      */
 L1400:
-    if (knz > 1) {
+    if (knz > 1) { 
       kxsub = xnzsub[k];
       i = nzsub[kxsub];
       assert(i > 0 && i <= neqns);
@@ -327,5 +327,6 @@ L1400:
   gk_free((void **)&rchlnk, &mrglnk, &marker, LTERM);
 
   return flag;
+  
+} 
 
-}

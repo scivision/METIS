@@ -3,7 +3,7 @@
  *
  * m2gmetis.c
  *
- * Drivers for the mesh-to-graph coversion routines
+ * Drivers for the mesh-to-graph conversion routines
  *
  * Started 5/28/11
  * George
@@ -47,23 +47,23 @@ int main(int argc, char *argv[])
 
   switch (params->gtype) {
     case METIS_GTYPE_DUAL:
-      status = METIS_MeshToDual(&mesh->ne, &mesh->nn, mesh->eptr, mesh->eind,
+      status = METIS_MeshToDual(&mesh->ne, &mesh->nn, mesh->eptr, mesh->eind, 
                    &params->ncommon, &params->numflag, &graph->xadj, &graph->adjncy);
 
       if (status == METIS_OK) {
         graph->nvtxs  = mesh->ne;
-        graph->nedges = graph->xadj[graph->nvtxs];
+        graph->nedges = graph->xadj[graph->nvtxs]; 
         graph->ncon   = 1;
       }
       break;
 
     case METIS_GTYPE_NODAL:
-      status = METIS_MeshToNodal(&mesh->ne, &mesh->nn, mesh->eptr, mesh->eind,
+      status = METIS_MeshToNodal(&mesh->ne, &mesh->nn, mesh->eptr, mesh->eind, 
                    &params->numflag, &graph->xadj, &graph->adjncy);
 
       if (status == METIS_OK) {
         graph->nvtxs  = mesh->nn;
-        graph->nedges = graph->xadj[graph->nvtxs];
+        graph->nedges = graph->xadj[graph->nvtxs]; 
         graph->ncon   = 1;
       }
       break;
@@ -97,19 +97,19 @@ int main(int argc, char *argv[])
 /*! This function prints run parameters */
 /*************************************************************************/
 void M2GPrintInfo(params_t *params, mesh_t *mesh)
-{
+{ 
   printf("******************************************************************************\n");
   printf("%s", METISTITLE);
   printf(" (HEAD: %s, Built on: %s, %s)\n", SVNINFO, __DATE__, __TIME__);
-  printf(" size of idx_t: %zubits, real_t: %zubits, idx_t *: %zubits\n",
+  printf(" size of idx_t: %zubits, real_t: %zubits, idx_t *: %zubits\n", 
       8*sizeof(idx_t), 8*sizeof(real_t), 8*sizeof(idx_t *));
   printf("\n");
   printf("Mesh Information ------------------------------------------------------------\n");
-  printf(" Name: %s, #Elements: %"PRIDX", #Nodes: %"PRIDX"\n",
-      params->filename, mesh->ne, mesh->nn);
-
+  printf(" Name: %s, #Elements: %"PRIDX", #Nodes: %"PRIDX"\n", 
+      params->filename, mesh->ne, mesh->nn); 
+  
   printf("Options ---------------------------------------------------------------------\n");
-  printf(" gtype=%s, ncommon=%"PRIDX", outfile=%s\n",
+  printf(" gtype=%s, ncommon=%"PRIDX", outfile=%s\n", 
       gtypenames[params->gtype], params->ncommon, params->outfile);
 
   printf("\n");
@@ -120,7 +120,7 @@ void M2GPrintInfo(params_t *params, mesh_t *mesh)
 /*! This function does any post-metis reporting */
 /*************************************************************************/
 void M2GReportResults(params_t *params, mesh_t *mesh, graph_t *graph)
-{
+{ 
 
   gk_startcputimer(params->reporttimer);
 

@@ -2,20 +2,10 @@
 
 ![ci](https://github.com/scivision/METIS/workflows/ci/badge.svg)
 
-Modernizes
-[METIS 5.1.0](http://glaros.dtc.umn.edu/gkhome/metis/metis/download)
-build system to work on Linux and MacOS and Windows Subsystem for Linux.
-
-## Prereqs
-
-A C99 compiler, such as GCC, Clang, Visual Studio, Intel oneAPI
-
-## Build
+Modernizes CMakeLists.txt to work across operating systems and compilers.
 
 ```sh
-cmake -B build
-
-cmake --build build --parallel
+cmake --workflow --preset default
 ```
 
 which creates `build/libmetis.a`
@@ -25,6 +15,6 @@ which creates `build/libmetis.a`
 By default, metis.h uses 32-bit integer and real. Each can be independently set to 32 or 64 bits like:
 
 ```sh
-cmake -Bbuild -Dintsize=64 -Drealsize=64
+cmake -Bbuild -DIDXTYPEWIDTH=64 -DREALTYPEWIDTH=64
 cmake --build build
 ```

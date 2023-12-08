@@ -17,21 +17,21 @@
 
 
 /*************************************************************************/
-/*! This function is the entry point for the multilevel nested dissection
+/*! This function is the entry point for the multilevel nested dissection 
     ordering code. At each bisection, a node-separator is computed using
     a node-based refinement approach.
 
     \param nvtxs is the number of vertices in the graph.
-    \param xadj is of length nvtxs+1 marking the start of the adjancy
+    \param xadj is of length nvtxs+1 marking the start of the adjancy 
            list of each vertex in adjncy.
     \param adjncy stores the adjacency lists of the vertices. The adjnacy
            list of a vertex should not contain the vertex itself.
-    \param vwgt is an array of size nvtxs storing the weight of each
-           vertex. If vwgt is NULL, then the vertices are considered
+    \param vwgt is an array of size nvtxs storing the weight of each 
+           vertex. If vwgt is NULL, then the vertices are considered 
            to have unit weight.
-    \param numflag is either 0 or 1 indicating that the numbering of
+    \param numflag is either 0 or 1 indicating that the numbering of 
            the vertices starts from 0 or 1, respectively.
-    \param options is an array of size METIS_NOPTIONS used to pass
+    \param options is an array of size METIS_NOPTIONS used to pass 
            various options impacting the of the algorithm. A NULL
            value indicates use of default options.
     \param perm is an array of size nvtxs such that if A and A' are
@@ -41,7 +41,7 @@
 */
 /*************************************************************************/
 int METIS_NodeND(idx_t *nvtxs, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
-          idx_t *options, idx_t *perm, idx_t *iperm)
+          idx_t *options, idx_t *perm, idx_t *iperm) 
 {
   int sigrval=0, renumber=0;
   idx_t i, ii, j, l, nnvtxs=0;
@@ -51,12 +51,12 @@ int METIS_NodeND(idx_t *nvtxs, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
   int numflag = 0;
 
   /* set up malloc cleaning code and signal catchers */
-  if (!gk_malloc_init())
+  if (!gk_malloc_init()) 
     return METIS_ERROR_MEMORY;
 
   gk_sigtrap();
 
-  if ((sigrval = gk_sigcatch()) != 0)
+  if ((sigrval = gk_sigcatch()) != 0) 
     goto SIGTHROW;
 
 
@@ -77,7 +77,7 @@ int METIS_NodeND(idx_t *nvtxs, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
   IFSET(ctrl->dbglvl, METIS_DBG_TIME, gk_startcputimer(ctrl->TotalTmr));
 
   /* prune the dense columns */
-  if (ctrl->pfactor > 0.0) {
+  if (ctrl->pfactor > 0.0) { 
     piperm = imalloc(*nvtxs, "OMETIS: piperm");
 
     graph = PruneGraph(ctrl, *nvtxs, xadj, adjncy, vwgt, piperm, ctrl->pfactor);
@@ -92,9 +92,9 @@ int METIS_NodeND(idx_t *nvtxs, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
     }
   }
 
-  /* compress the graph; note that compression only happens if not prunning
+  /* compress the graph; note that compression only happens if not prunning 
      has taken place. */
-  if (ctrl->compress) {
+  if (ctrl->compress) { 
     cptr = imalloc(*nvtxs+1, "OMETIS: cptr");
     cind = imalloc(*nvtxs, "OMETIS: cind");
 
@@ -102,7 +102,7 @@ int METIS_NodeND(idx_t *nvtxs, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
     if (graph == NULL) {
       /* if there was no compression, cleanup the compress flag */
       gk_free((void **)&cptr, &cind, LTERM);
-      ctrl->compress = 0;
+      ctrl->compress = 0; 
     }
     else {
       nnvtxs = graph->nvtxs;
@@ -114,7 +114,7 @@ int METIS_NodeND(idx_t *nvtxs, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
   }
 
   /* if no prunning and no compression, setup the graph in the normal way. */
-  if (ctrl->pfactor == 0.0 && ctrl->compress == 0)
+  if (ctrl->pfactor == 0.0 && ctrl->compress == 0) 
     graph = SetupGraph(ctrl, *nvtxs, 1, xadj, adjncy, vwgt, NULL, NULL);
 
   ASSERT(CheckGraph(graph, ctrl->numflag, 1));
@@ -123,7 +123,7 @@ int METIS_NodeND(idx_t *nvtxs, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
   AllocateWorkSpace(ctrl, graph);
 
   /* do the nested dissection ordering  */
-  if (ctrl->ccorder)
+  if (ctrl->ccorder) 
     MlevelNestedDissectionCC(ctrl, graph, iperm, graph->nvtxs);
   else
     MlevelNestedDissection(ctrl, graph, iperm, graph->nvtxs);
@@ -141,7 +141,7 @@ int METIS_NodeND(idx_t *nvtxs, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
   else if (ctrl->compress) { /* Uncompress the ordering */
     /* construct perm from iperm */
     for (i=0; i<nnvtxs; i++)
-      perm[iperm[i]] = i;
+      perm[iperm[i]] = i; 
     for (l=ii=0; ii<nnvtxs; ii++) {
       i = perm[ii];
       for (j=cptr[i]; j<cptr[i+1]; j++)
@@ -174,13 +174,13 @@ SIGTHROW:
 
 /*************************************************************************/
 /*! This is the driver for the recursive tri-section of a graph into the
-    left, separator, and right partitions. The graphs correspond to the
+    left, separator, and right partitions. The graphs correspond to the 
     left and right parts are further tri-sected in a recursive fashion.
     The nodes in the separator are ordered at the end of the left & right
     nodes.
  */
 /*************************************************************************/
-void MlevelNestedDissection(ctrl_t *ctrl, graph_t *graph, idx_t *order,
+void MlevelNestedDissection(ctrl_t *ctrl, graph_t *graph, idx_t *order, 
          idx_t lastvtx)
 {
   idx_t i, j, nvtxs, nbnd;
@@ -191,8 +191,8 @@ void MlevelNestedDissection(ctrl_t *ctrl, graph_t *graph, idx_t *order,
 
   MlevelNodeBisectionMultiple(ctrl, graph);
 
-  IFSET(ctrl->dbglvl, METIS_DBG_SEPINFO,
-      printf("Nvtxs: %6"PRIDX", [%6"PRIDX" %6"PRIDX" %6"PRIDX"]\n",
+  IFSET(ctrl->dbglvl, METIS_DBG_SEPINFO, 
+      printf("Nvtxs: %6"PRIDX", [%6"PRIDX" %6"PRIDX" %6"PRIDX"]\n", 
         graph->nvtxs, graph->pwgts[0], graph->pwgts[1], graph->pwgts[2]));
 
 
@@ -200,7 +200,7 @@ void MlevelNestedDissection(ctrl_t *ctrl, graph_t *graph, idx_t *order,
   nbnd   = graph->nbnd;
   bndind = graph->bndind;
   label  = graph->label;
-  for (i=0; i<nbnd; i++)
+  for (i=0; i<nbnd; i++) 
     order[label[bndind[i]]] = --lastvtx;
 
   SplitGraphOrder(ctrl, graph, &lgraph, &rgraph);
@@ -210,16 +210,16 @@ void MlevelNestedDissection(ctrl_t *ctrl, graph_t *graph, idx_t *order,
 
   /* Recurse on lgraph first, as its lastvtx depends on rgraph->nvtxs, which
      will not be defined upon return from MlevelNestedDissection. */
-  if (lgraph->nvtxs > MMDSWITCH && lgraph->nedges > 0)
+  if (lgraph->nvtxs > MMDSWITCH && lgraph->nedges > 0) 
     MlevelNestedDissection(ctrl, lgraph, order, lastvtx-rgraph->nvtxs);
   else {
-    MMDOrder(ctrl, lgraph, order, lastvtx-rgraph->nvtxs);
+    MMDOrder(ctrl, lgraph, order, lastvtx-rgraph->nvtxs); 
     FreeGraph(&lgraph);
   }
-  if (rgraph->nvtxs > MMDSWITCH && rgraph->nedges > 0)
+  if (rgraph->nvtxs > MMDSWITCH && rgraph->nedges > 0) 
     MlevelNestedDissection(ctrl, rgraph, order, lastvtx);
   else {
-    MMDOrder(ctrl, rgraph, order, lastvtx);
+    MMDOrder(ctrl, rgraph, order, lastvtx); 
     FreeGraph(&rgraph);
   }
 }
@@ -229,11 +229,11 @@ void MlevelNestedDissection(ctrl_t *ctrl, graph_t *graph, idx_t *order,
 /*! This routine is similar to its non 'CC' counterpart. The difference is
     that after each tri-section, the connected components of the original
     graph that result after removing the separator vertises are ordered
-    independently (i.e., this may lead to more than just the left and
+    independently (i.e., this may lead to more than just the left and 
     the right subgraphs).
 */
 /*************************************************************************/
-void MlevelNestedDissectionCC(ctrl_t *ctrl, graph_t *graph, idx_t *order,
+void MlevelNestedDissectionCC(ctrl_t *ctrl, graph_t *graph, idx_t *order, 
          idx_t lastvtx)
 {
   idx_t i, j, nvtxs, nbnd, ncmps, rnvtxs, snvtxs;
@@ -245,15 +245,15 @@ void MlevelNestedDissectionCC(ctrl_t *ctrl, graph_t *graph, idx_t *order,
 
   MlevelNodeBisectionMultiple(ctrl, graph);
 
-  IFSET(ctrl->dbglvl, METIS_DBG_SEPINFO,
-      printf("Nvtxs: %6"PRIDX", [%6"PRIDX" %6"PRIDX" %6"PRIDX"]\n",
+  IFSET(ctrl->dbglvl, METIS_DBG_SEPINFO, 
+      printf("Nvtxs: %6"PRIDX", [%6"PRIDX" %6"PRIDX" %6"PRIDX"]\n", 
         graph->nvtxs, graph->pwgts[0], graph->pwgts[1], graph->pwgts[2]));
 
   /* Order the nodes in the separator */
   nbnd   = graph->nbnd;
   bndind = graph->bndind;
   label  = graph->label;
-  for (i=0; i<nbnd; i++)
+  for (i=0; i<nbnd; i++) 
     order[label[bndind[i]]] = --lastvtx;
 
   WCOREPUSH;
@@ -265,7 +265,7 @@ void MlevelNestedDissectionCC(ctrl_t *ctrl, graph_t *graph, idx_t *order,
     if (ncmps > 2)
       printf("  Bisection resulted in %"PRIDX" connected components\n", ncmps);
   }
-
+  
   sgraphs = SplitGraphOrderCC(ctrl, graph, ncmps, cptr, cind);
 
   WCOREPOP;
@@ -275,7 +275,7 @@ void MlevelNestedDissectionCC(ctrl_t *ctrl, graph_t *graph, idx_t *order,
 
   /* Go and process the subgraphs */
   for (rnvtxs=i=0; i<ncmps; i++) {
-    /* Save the number of vertices in sgraphs[i] because sgraphs[i] is freed
+    /* Save the number of vertices in sgraphs[i] because sgraphs[i] is freed 
        inside MlevelNestedDissectionCC, and as such it will be undefined. */
     snvtxs = sgraphs[i]->nvtxs;
 
@@ -325,7 +325,7 @@ void MlevelNodeBisectionMultiple(ctrl_t *ctrl, graph_t *graph)
     if (mincut == 0)
       break;
 
-    if (i < ctrl->nseps-1)
+    if (i < ctrl->nseps-1) 
       FreeRData(graph);
   }
 
@@ -345,7 +345,7 @@ void MlevelNodeBisectionMultiple(ctrl_t *ctrl, graph_t *graph)
 void MlevelNodeBisectionL2(ctrl_t *ctrl, graph_t *graph, idx_t niparts)
 {
   idx_t i, mincut, nruns=5;
-  graph_t *cgraph;
+  graph_t *cgraph; 
   idx_t *bestwhere;
 
   /* if the graph is small, just find a single vertex separator */
@@ -375,11 +375,11 @@ void MlevelNodeBisectionL2(ctrl_t *ctrl, graph_t *graph, idx_t niparts)
     if (mincut == 0)
       break;
 
-    if (i < nruns-1)
+    if (i < nruns-1) 
       FreeRData(cgraph);
   }
 
-  if (mincut != cgraph->mincut)
+  if (mincut != cgraph->mincut) 
     icopy(cgraph->nvtxs, bestwhere, cgraph->where);
 
   WCOREPOP;
@@ -414,12 +414,12 @@ void MlevelNodeBisectionL1(ctrl_t *ctrl, graph_t *graph, idx_t niparts)
 
 /*************************************************************************/
 /*! This function takes a graph and a tri-section (left, right, separator)
-    and splits it into two graphs.
-
+    and splits it into two graphs. 
+    
     This function relies on the fact that adjwgt is all equal to 1.
 */
 /*************************************************************************/
-void SplitGraphOrder(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph,
+void SplitGraphOrder(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph, 
          graph_t **r_rgraph)
 {
   idx_t i, ii, j, k, l, istart, iend, mypart, nvtxs, snvtxs[3], snedges[3];
@@ -445,7 +445,7 @@ void SplitGraphOrder(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph,
   ASSERT(bndptr != NULL);
 
   rename = iwspacemalloc(ctrl, nvtxs);
-
+  
   snvtxs[0] = snvtxs[1] = snvtxs[2] = snedges[0] = snedges[1] = snedges[2] = 0;
   for (i=0; i<nvtxs; i++) {
     k = where[i];
@@ -456,15 +456,15 @@ void SplitGraphOrder(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph,
   lgraph      = SetupSplitGraph(graph, snvtxs[0], snedges[0]);
   sxadj[0]    = lgraph->xadj;
   svwgt[0]    = lgraph->vwgt;
-  sadjncy[0]  = lgraph->adjncy;
-  sadjwgt[0]  = lgraph->adjwgt;
+  sadjncy[0]  = lgraph->adjncy; 
+  sadjwgt[0]  = lgraph->adjwgt; 
   slabel[0]   = lgraph->label;
 
   rgraph      = SetupSplitGraph(graph, snvtxs[1], snedges[1]);
   sxadj[1]    = rgraph->xadj;
   svwgt[1]    = rgraph->vwgt;
-  sadjncy[1]  = rgraph->adjncy;
-  sadjwgt[1]  = rgraph->adjwgt;
+  sadjncy[1]  = rgraph->adjncy; 
+  sadjwgt[1]  = rgraph->adjwgt; 
   slabel[1]   = rgraph->label;
 
   /* Go and use bndptr to also mark the boundary nodes in the two partitions */
@@ -484,7 +484,7 @@ void SplitGraphOrder(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph,
     iend   = xadj[i+1];
     if (bndptr[i] == -1) { /* This is an interior vertex */
       auxadjncy = sadjncy[mypart] + snedges[mypart] - istart;
-      for(j=istart; j<iend; j++)
+      for(j=istart; j<iend; j++) 
         auxadjncy[j] = adjncy[j];
       snedges[mypart] += iend-istart;
     }
@@ -493,7 +493,7 @@ void SplitGraphOrder(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph,
       l = snedges[mypart];
       for (j=istart; j<iend; j++) {
         k = adjncy[j];
-        if (where[k] == mypart)
+        if (where[k] == mypart) 
           auxadjncy[l++] = k;
       }
       snedges[mypart] = l;
@@ -509,7 +509,7 @@ void SplitGraphOrder(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph,
     iset(iend, 1, sadjwgt[mypart]);
 
     auxadjncy = sadjncy[mypart];
-    for (i=0; i<iend; i++)
+    for (i=0; i<iend; i++) 
       auxadjncy[i] = rename[auxadjncy[i]];
   }
 
@@ -531,7 +531,7 @@ void SplitGraphOrder(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph,
 
 
 /*************************************************************************/
-/*! This function takes a graph and generates a set of graphs, each of
+/*! This function takes a graph and generates a set of graphs, each of 
     which is a connected component in the original graph.
 
     This function relies on the fact that adjwgt is all equal to 1.
@@ -542,14 +542,14 @@ void SplitGraphOrder(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph,
     \param cptr is an array of size ncmps+1 that marks the start and end
            locations of the vertices in cind that make up the respective
            components (i.e., cptr, cind is in CSR format).
-    \param cind is an array of size equal to the number of vertices in
+    \param cind is an array of size equal to the number of vertices in 
            the original graph and stores the vertices that belong to each
            connected component.
 
     \returns an array of subgraphs corresponding to the extracted subgraphs.
 */
 /*************************************************************************/
-graph_t **SplitGraphOrderCC(ctrl_t *ctrl, graph_t *graph, idx_t ncmps,
+graph_t **SplitGraphOrderCC(ctrl_t *ctrl, graph_t *graph, idx_t ncmps, 
               idx_t *cptr, idx_t *cind)
 {
   idx_t i, ii, iii, j, k, l, istart, iend, mypart, nvtxs, snvtxs, snedges;
@@ -582,7 +582,7 @@ graph_t **SplitGraphOrderCC(ctrl_t *ctrl, graph_t *graph, idx_t ncmps,
   }
 
   rename = iwspacemalloc(ctrl, nvtxs);
-
+  
   sgraphs = (graph_t **)gk_malloc(sizeof(graph_t *)*ncmps, "SplitGraphOrderCC: sgraphs");
 
   /* Go and split the graph a component at a time */
@@ -611,7 +611,7 @@ graph_t **SplitGraphOrderCC(ctrl_t *ctrl, graph_t *graph, idx_t ncmps,
       iend   = xadj[i+1];
       if (bndptr[i] == -1) { /* This is an interior vertex */
         auxadjncy = sadjncy + snedges - istart;
-        for(j=istart; j<iend; j++)
+        for(j=istart; j<iend; j++) 
           auxadjncy[j] = adjncy[j];
         snedges += iend-istart;
       }
@@ -619,7 +619,7 @@ graph_t **SplitGraphOrderCC(ctrl_t *ctrl, graph_t *graph, idx_t ncmps,
         l = snedges;
         for (j=istart; j<iend; j++) {
           k = adjncy[j];
-          if (where[k] != 2)
+          if (where[k] != 2) 
             sadjncy[l++] = k;
         }
         snedges = l;
@@ -631,7 +631,7 @@ graph_t **SplitGraphOrderCC(ctrl_t *ctrl, graph_t *graph, idx_t ncmps,
     }
 
     iset(snedges, 1, sadjwgt);
-    for (i=0; i<snedges; i++)
+    for (i=0; i<snedges; i++) 
       sadjncy[i] = rename[sadjncy[i]];
 
     sgraphs[iii]->nvtxs  = snvtxs;
@@ -694,3 +694,8 @@ void MMDOrder(ctrl_t *ctrl, graph_t *graph, idx_t *order, idx_t lastvtx)
 
   WCOREPOP;
 }
+
+
+
+
+

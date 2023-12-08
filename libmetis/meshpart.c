@@ -8,7 +8,7 @@
  * Started 9/29/97
  * George
  *
- * $Id: meshpart.c 13931 2013-03-29 16:48:48Z karypis $
+ * $Id: meshpart.c 17513 2014-08-05 16:20:50Z dominique $
  *
  */
 
@@ -19,8 +19,8 @@
 * This function partitions a finite element mesh by partitioning its nodal
 * graph using KMETIS and then assigning elements in a load balanced fashion.
 **************************************************************************/
-int METIS_PartMeshNodal(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind,
-          idx_t *vwgt, idx_t *vsize, idx_t *nparts, real_t *tpwgts,
+int METIS_PartMeshNodal(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind, 
+          idx_t *vwgt, idx_t *vsize, idx_t *nparts, real_t *tpwgts, 
           idx_t *options, idx_t *objval, idx_t *epart, idx_t *npart)
 {
   int sigrval=0, renumber=0, ptype;
@@ -29,12 +29,12 @@ int METIS_PartMeshNodal(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind,
   int rstatus=METIS_OK;
 
   /* set up malloc cleaning code and signal catchers */
-  if (!gk_malloc_init())
+  if (!gk_malloc_init()) 
     return METIS_ERROR_MEMORY;
 
   gk_sigtrap();
 
-  if ((sigrval = gk_sigcatch()) != 0)
+  if ((sigrval = gk_sigcatch()) != 0) 
     goto SIGTHROW;
 
   renumber = GETOPTION(options, METIS_OPTION_NUMBERING, 0);
@@ -52,11 +52,11 @@ int METIS_PartMeshNodal(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind,
     raise(SIGERR);
 
   /* partition the graph */
-  if (ptype == METIS_PTYPE_KWAY)
-    rstatus = METIS_PartGraphKway(nn, &ncon, xadj, adjncy, vwgt, vsize, NULL,
+  if (ptype == METIS_PTYPE_KWAY) 
+    rstatus = METIS_PartGraphKway(nn, &ncon, xadj, adjncy, vwgt, vsize, NULL, 
                   nparts, tpwgts, NULL, options, objval, npart);
-  else
-    rstatus = METIS_PartGraphRecursive(nn, &ncon, xadj, adjncy, vwgt, vsize, NULL,
+  else 
+    rstatus = METIS_PartGraphRecursive(nn, &ncon, xadj, adjncy, vwgt, vsize, NULL, 
                   nparts, tpwgts, NULL, options, objval, npart);
 
   if (rstatus != METIS_OK)
@@ -87,10 +87,10 @@ SIGTHROW:
 * This function partitions a finite element mesh by partitioning its dual
 * graph using KMETIS and then assigning nodes in a load balanced fashion.
 **************************************************************************/
-int METIS_PartMeshDual(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind,
-          idx_t *vwgt, idx_t *vsize, idx_t *ncommon, idx_t *nparts,
-          real_t *tpwgts, idx_t *options, idx_t *objval, idx_t *epart,
-          idx_t *npart)
+int METIS_PartMeshDual(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind, 
+          idx_t *vwgt, idx_t *vsize, idx_t *ncommon, idx_t *nparts, 
+          real_t *tpwgts, idx_t *options, idx_t *objval, idx_t *epart, 
+          idx_t *npart) 
 {
   int sigrval=0, renumber=0, ptype;
   idx_t i, j;
@@ -99,12 +99,12 @@ int METIS_PartMeshDual(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind,
   int rstatus = METIS_OK;
 
   /* set up malloc cleaning code and signal catchers */
-  if (!gk_malloc_init())
+  if (!gk_malloc_init()) 
     return METIS_ERROR_MEMORY;
 
   gk_sigtrap();
 
-  if ((sigrval = gk_sigcatch()) != 0)
+  if ((sigrval = gk_sigcatch()) != 0) 
     goto SIGTHROW;
 
   renumber = GETOPTION(options, METIS_OPTION_NUMBERING, 0);
@@ -122,11 +122,11 @@ int METIS_PartMeshDual(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind,
     raise(SIGERR);
 
   /* partition the graph */
-  if (ptype == METIS_PTYPE_KWAY)
-    rstatus = METIS_PartGraphKway(ne, &ncon, xadj, adjncy, vwgt, vsize, NULL,
+  if (ptype == METIS_PTYPE_KWAY) 
+    rstatus = METIS_PartGraphKway(ne, &ncon, xadj, adjncy, vwgt, vsize, NULL, 
                   nparts, tpwgts, NULL, options, objval, epart);
-  else
-    rstatus = METIS_PartGraphRecursive(ne, &ncon, xadj, adjncy, vwgt, vsize, NULL,
+  else 
+    rstatus = METIS_PartGraphRecursive(ne, &ncon, xadj, adjncy, vwgt, vsize, NULL, 
                   nparts, tpwgts, NULL, options, objval, epart);
 
   if (rstatus != METIS_OK)
@@ -200,7 +200,7 @@ void InduceRowPartFromColumnPart(idx_t nrows, idx_t *rowptr, idx_t *rowind,
       itpwgts[i] = 1+nrows*tpwgts[i];
   }
 
-  /* first assign the rows consisting only of columns that belong to
+  /* first assign the rows consisting only of columns that belong to 
      a single partition. Assign rows that are empty to -2 (un-assigned) */
   for (i=0; i<nrows; i++) {
     if (rowptr[i+1]-rowptr[i] == 0) {
@@ -222,12 +222,12 @@ void InduceRowPartFromColumnPart(idx_t nrows, idx_t *rowptr, idx_t *rowind,
   /* next assign the rows consisting of columns belonging to multiple
      partitions in a  balanced way */
   for (i=0; i<nrows; i++) {
-    if (rpart[i] == -1) {
+    if (rpart[i] == -1) { 
       for (nnbrs=0, j=rowptr[i]; j<rowptr[i+1]; j++) {
         me = cpart[rowind[j]];
         if (nbrmrk[me] == -1) {
-          nbrdom[nnbrs] = me;
-          nbrwgt[nnbrs] = 1;
+          nbrdom[nnbrs] = me; 
+          nbrwgt[nnbrs] = 1; 
           nbrmrk[me] = nnbrs++;
         }
         else {
@@ -237,7 +237,7 @@ void InduceRowPartFromColumnPart(idx_t nrows, idx_t *rowptr, idx_t *rowind,
       ASSERT(nnbrs > 0);
 
       /* assign it first to the domain with most things in common */
-      rpart[i] = nbrdom[iargmax(nnbrs, nbrwgt)];
+      rpart[i] = nbrdom[iargmax(nnbrs, nbrwgt,1)];
 
       /* if overweight, assign it to the light domain */
       if (pwgts[rpart[i]] > itpwgts[rpart[i]]) {
@@ -252,7 +252,7 @@ void InduceRowPartFromColumnPart(idx_t nrows, idx_t *rowptr, idx_t *rowind,
       pwgts[rpart[i]]++;
 
       /* reset nbrmrk array */
-      for (j=0; j<nnbrs; j++)
+      for (j=0; j<nnbrs; j++) 
         nbrmrk[nbrdom[j]] = -1;
     }
   }

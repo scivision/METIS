@@ -5,18 +5,18 @@
  * The following C function was developed from a FORTRAN subroutine
  * in SPARSPAK written by Eleanor Chu, Alan George, Joseph Liu
  * and Esmond Ng.
- *
+ * 
  * The FORTRAN-to-C transformation and modifications such as dynamic
  * memory allocation and deallocation were performed by Chunguang
  * Sun.
- * **************************************************************
+ * ************************************************************** 
  *
  * Taken from SMMS, George 12/13/94
  *
  * The meaning of invperm, and perm vectors is different from that
  * in genqmd_ of SparsPak
  *
- * $Id: mmd.c 5993 2009-01-07 02:09:57Z karypis $
+ * $Id: mmd.c 22385 2019-06-03 22:08:48Z karypis $
  */
 
 #include "metislib.h"
@@ -56,45 +56,47 @@ void genmmd(idx_t neqns, idx_t *xadj, idx_t *adjncy, idx_t *invp, idx_t *perm,
 {
     idx_t  ehead, i, mdeg, mdlmt, mdeg_node, nextmd, num, tag;
 
-    if (neqns <= 0)
+    if (neqns <= 0)  
       return;
 
-    /* Adjust from C to Fortran */
+    /* adjust from C to Fortran */
     xadj--; adjncy--; invp--; perm--; head--; qsize--; list--; marker--;
 
-    /* initialization for the minimum degree algorithm. */
+    /* initialization for the minimum degree algorithm */
     *ncsub = 0;
     mmdint(neqns, xadj, adjncy, head, invp, perm, qsize, list, marker);
 
-    /*  'num' counts the number of ordered nodes plus 1. */
+    /* 'num' counts the number of ordered nodes plus 1 */
     num = 1;
 
-    /* eliminate all isolated nodes. */
+    /* eliminate all isolated nodes */
     nextmd = head[1];
     while (nextmd > 0) {
       mdeg_node = nextmd;
       nextmd = invp[mdeg_node];
       marker[mdeg_node] = maxint;
       invp[mdeg_node] = -num;
-      num = num + 1;
+      num++;
     }
 
     /* search for node of the minimum degree. 'mdeg' is the current */
     /* minimum degree; 'tag' is used to facilitate marking nodes.   */
-    if (num > neqns)
+    if (num > neqns) 
       goto n1000;
     tag = 1;
     head[1] = 0;
     mdeg = 2;
 
-    /* infinite loop here ! */
+    /* infinite loop here */
     while (1) {
-      while (head[mdeg] <= 0)
+      while (head[mdeg] <= 0) 
         mdeg++;
 
       /* use value of 'delta' to set up 'mdlmt', which governs */
       /* when a degree update is to be performed.              */
-      mdlmt = mdeg + delta;
+      //mdlmt = mdeg + delta;
+      // the need for gk_min() was identified by jsf67
+      mdlmt = gk_min(neqns, mdeg+delta);
       ehead = 0;
 
 n500:
@@ -102,19 +104,19 @@ n500:
       while (mdeg_node <= 0) {
         mdeg++;
 
-        if (mdeg > mdlmt)
+        if (mdeg > mdlmt) 
           goto n900;
         mdeg_node = head[mdeg];
       };
 
-      /*  remove 'mdeg_node' from the degree structure. */
+      /* remove 'mdeg_node' from the degree structure */
       nextmd = invp[mdeg_node];
       head[mdeg] = nextmd;
-      if (nextmd > 0)
+      if (nextmd > 0)  
         perm[nextmd] = -mdeg;
       invp[mdeg_node] = -num;
       *ncsub += mdeg + qsize[mdeg_node] - 2;
-      if ((num+qsize[mdeg_node]) > neqns)
+      if ((num+qsize[mdeg_node]) > neqns)  
         goto n1000;
 
       /*  eliminate 'mdeg_node' and perform quotient graph */
@@ -123,7 +125,7 @@ n500:
       if (tag >= maxint) {
         tag = 1;
         for (i = 1; i <= neqns; i++)
-          if (marker[i] < maxint)
+          if (marker[i] < maxint)  
             marker[i] = 0;
       };
 
@@ -132,15 +134,15 @@ n500:
       num += qsize[mdeg_node];
       list[mdeg_node] = ehead;
       ehead = mdeg_node;
-      if (delta >= 0)
+      if (delta >= 0) 
         goto n500;
 
  n900:
       /* update degrees of the nodes involved in the  */
       /* minimum degree nodes elimination.            */
-      if (num > neqns)
+      if (num > neqns)  
         goto n1000;
-      mmdupd( ehead, neqns, xadj, adjncy, delta, &mdeg, head, invp, perm, qsize, list, marker, maxint, &tag);
+      mmdupd(ehead, neqns, xadj, adjncy, delta, &mdeg, head, invp, perm, qsize, list, marker, maxint, &tag);
     }; /* end of -- while ( 1 ) -- */
 
 n1000:
@@ -289,6 +291,7 @@ n1100:
       return;
  }
 
+
 /***************************************************************************
 *    mmdint ---- mult minimum degree initialization
 *    purpose -- this routine performs initialization for the
@@ -305,28 +308,29 @@ n1100:
 idx_t  mmdint(idx_t neqns, idx_t *xadj, idx_t *adjncy, idx_t *head, idx_t *forward,
      idx_t *backward, idx_t *qsize, idx_t *list, idx_t *marker)
 {
-    idx_t  fnode, ndeg, node;
+  idx_t fnode, ndeg, node;
 
-    for ( node = 1; node <= neqns; node++ ) {
-        head[node] = 0;
-        qsize[node] = 1;
-        marker[node] = 0;
-        list[node] = 0;
-    };
+  for (node=1; node<=neqns; node++) {
+    head[node] = 0;
+    qsize[node] = 1;
+    marker[node] = 0;
+    list[node] = 0;
+  };
 
-    /* initialize the degree doubly linked lists. */
-    for ( node = 1; node <= neqns; node++ ) {
-        ndeg = xadj[node+1] - xadj[node]/* + 1*/;   /* george */
-        if (ndeg == 0)
-          ndeg = 1;
-        fnode = head[ndeg];
-        forward[node] = fnode;
-        head[ndeg] = node;
-        if ( fnode > 0 ) backward[fnode] = node;
-        backward[node] = -ndeg;
-    };
-    return 0;
+  /* initialize the degree doubly linked lists. */
+  for (node=1; node<=neqns; node++) {
+    ndeg = xadj[node+1]-xadj[node]+1;
+    fnode = head[ndeg];
+    forward[node] = fnode;
+    head[ndeg] = node;
+    if (fnode > 0)
+      backward[fnode] = node;
+    backward[node] = -ndeg;
+  };
+
+  return 0;
 }
+
 
 /****************************************************************************
 * mmdnum --- multi minimum degree numbering
@@ -390,6 +394,7 @@ void mmdnum(idx_t neqns, idx_t *perm, idx_t *invp, idx_t *qsize)
   };
   return;
 }
+
 
 /****************************************************************************
 * mmdupd ---- multiple minimum degree update
@@ -545,7 +550,7 @@ n1600:    if ( enode <= 0 )  goto n2300;
                 if ( marker[nabor] < *tag ) {
                      marker[nabor] = *tag;
                      link = nabor;
-                     if ( forward[nabor] >= 0 )
+                     if ( forward[nabor] >= 0 ) 
                           /*if uneliminated, include it in deg count.*/
                           deg += qsize[nabor];
                      else {

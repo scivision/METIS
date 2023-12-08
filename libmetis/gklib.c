@@ -3,8 +3,8 @@
 \brief Various helper routines generated using GKlib's templates
 
 \date   Started 4/12/2007
-\author George
-\author Copyright 1997-2009, Regents of the University of Minnesota
+\author George  
+\author Copyright 1997-2009, Regents of the University of Minnesota 
 \version\verbatim $Id: gklib.c 10395 2011-06-23 23:28:06Z karypis $ \endverbatim
 */
 
@@ -117,3 +117,4 @@ void uvwsorti(size_t n, uvw_t *base)
   GK_MKQSORT(uvw_t, base, n, uvwkey_lt);
 #undef uvwkey_lt
 }
+

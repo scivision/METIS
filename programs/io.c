@@ -8,7 +8,7 @@
  * Started 8/28/94
  * George
  *
- * $Id: io.c 11932 2012-05-10 18:18:23Z dominique $
+ * $Id: io.c 17513 2014-08-05 16:20:50Z dominique $
  *
  */
 
@@ -28,7 +28,7 @@ graph_t *ReadGraph(params_t *params)
   FILE *fpin;
   graph_t *graph;
 
-  if (!gk_fexists(params->filename))
+  if (!gk_fexists(params->filename)) 
     errexit("File %s does not exist!\n", params->filename);
 
   graph = CreateGraph();
@@ -37,38 +37,38 @@ graph_t *ReadGraph(params_t *params)
 
   /* Skip comment lines until you get to the first valid line */
   do {
-    if (gk_getline(&line, &lnlen, fpin) == -1)
+    if (gk_getline(&line, &lnlen, fpin) == -1) 
       errexit("Premature end of input file: file: %s\n", params->filename);
   } while (line[0] == '%');
 
 
   fmt = ncon = 0;
-  nfields = sscanf(line, "%"SCIDX" %"SCIDX" %"SCIDX" %"SCIDX,
+  nfields = sscanf(line, "%"SCIDX" %"SCIDX" %"SCIDX" %"SCIDX, 
                 &(graph->nvtxs), &(graph->nedges), &fmt, &ncon);
 
-  if (nfields < 2)
+  if (nfields < 2) 
     errexit("The input file does not specify the number of vertices and edges.\n");
 
-  if (graph->nvtxs <= 0 || graph->nedges <= 0)
-    errexit("The supplied nvtxs:%"PRIDX" and nedges:%"PRIDX" must be positive.\n",
+  if (graph->nvtxs <= 0 || graph->nedges <= 0) 
+    errexit("The supplied nvtxs:%"PRIDX" and nedges:%"PRIDX" must be positive.\n", 
         graph->nvtxs, graph->nedges);
-
-  if (fmt > 111)
+        
+  if (fmt > 111) 
     errexit("Cannot read this type of file format [fmt=%"PRIDX"]!\n", fmt);
 
   sprintf(fmtstr, "%03"PRIDX, fmt%1000);
   readvs = (fmtstr[0] == '1');
   readvw = (fmtstr[1] == '1');
   readew = (fmtstr[2] == '1');
-
+    
   /*printf("%s %"PRIDX" %"PRIDX" %"PRIDX"\n", fmtstr, readvs, readvw, readew); */
 
 
-  if (ncon > 0 && !readvw)
+  if (ncon > 0 && !readvw) 
     errexit(
       "------------------------------------------------------------------------------\n"
       "***  I detected an error in your input file  ***\n\n"
-      "You specified ncon=%"PRIDX", but the fmt parameter does not specify vertex weights\n"
+      "You specified ncon=%"PRIDX", but the fmt parameter does not specify vertex weights\n" 
       "Make sure that the fmt parameter is set to either 10 or 11.\n"
       "------------------------------------------------------------------------------\n", ncon);
 
@@ -78,7 +78,7 @@ graph_t *ReadGraph(params_t *params)
   xadj   = graph->xadj   = ismalloc(graph->nvtxs+1, 0, "ReadGraph: xadj");
   adjncy = graph->adjncy = imalloc(graph->nedges, "ReadGraph: adjncy");
   vwgt   = graph->vwgt   = ismalloc(ncon*graph->nvtxs, 1, "ReadGraph: vwgt");
-  adjwgt = graph->adjwgt = ismalloc(graph->nedges, 1, "ReadGraph: adjwgt");
+  adjwgt = graph->adjwgt = (readew ? imalloc(graph->nedges, "ReadGraph: adjwgt") : NULL);
   vsize  = graph->vsize  = ismalloc(graph->nvtxs, 1, "ReadGraph: vsize");
 
 
@@ -87,7 +87,7 @@ graph_t *ReadGraph(params_t *params)
    *---------------------------------------------------------------------*/
   for (xadj[0]=0, k=0, i=0; i<graph->nvtxs; i++) {
     do {
-      if (gk_getline(&line, &lnlen, fpin) == -1)
+      if (gk_getline(&line, &lnlen, fpin) == -1) 
         errexit("Premature end of input file while reading vertex %"PRIDX".\n", i+1);
     } while (line[0] == '%');
 
@@ -133,19 +133,19 @@ graph_t *ReadGraph(params_t *params)
         if (newstr == curstr)
           errexit("Premature end of line for vertex %"PRIDX"\n", i+1);
         if (ewgt <= 0)
-          errexit("The weight (%"PRIDX") for edge (%"PRIDX", %"PRIDX") must be positive.\n",
+          errexit("The weight (%"PRIDX") for edge (%"PRIDX", %"PRIDX") must be positive.\n", 
               ewgt, i+1, edge);
         curstr = newstr;
       }
 
       if (k == graph->nedges)
-        errexit("There are more edges in the file than the %"PRIDX" specified.\n",
+        errexit("There are more edges in the file than the %"PRIDX" specified.\n", 
             graph->nedges/2);
 
       adjncy[k] = edge-1;
-      adjwgt[k] = ewgt;
+      if (readew) adjwgt[k] = ewgt;
       k++;
-    }
+    } 
     xadj[i+1] = k;
   }
   gk_fclose(fpin);
@@ -154,7 +154,7 @@ graph_t *ReadGraph(params_t *params)
     printf("------------------------------------------------------------------------------\n");
     printf("***  I detected an error in your input file  ***\n\n");
     printf("In the first line of the file, you specified that the graph contained\n"
-           "%"PRIDX" edges. However, I only found %"PRIDX" edges in the file.\n",
+           "%"PRIDX" edges. However, I only found %"PRIDX" edges in the file.\n", 
            graph->nedges/2, k/2);
     if (2*k == graph->nedges) {
       printf("\n *> I detected that you specified twice the number of edges that you have in\n");
@@ -185,7 +185,7 @@ mesh_t *ReadMesh(params_t *params)
   FILE *fpin;
   mesh_t *mesh;
 
-  if (!gk_fexists(params->filename))
+  if (!gk_fexists(params->filename)) 
     errexit("File %s does not exist!\n", params->filename);
 
   mesh = CreateMesh();
@@ -197,7 +197,7 @@ mesh_t *ReadMesh(params_t *params)
 
   /* Skip comment lines until you get to the first valid line */
   do {
-    if (gk_getline(&line, &lnlen, fpin) == -1)
+    if (gk_getline(&line, &lnlen, fpin) == -1) 
       errexit("Premature end of input file: file: %s\n", params->filename);
   } while (line[0] == '%');
 
@@ -205,12 +205,12 @@ mesh_t *ReadMesh(params_t *params)
   mesh->ncon = 0;
   nfields = sscanf(line, "%"SCIDX" %"SCIDX, &(mesh->ne), &(mesh->ncon));
 
-  if (nfields < 1)
+  if (nfields < 1) 
     errexit("The input file does not specify the number of elements.\n");
 
-  if (mesh->ne <= 0)
+  if (mesh->ne <= 0) 
     errexit("The supplied number of elements:%"PRIDX" must be positive.\n", mesh->ne);
-
+        
   if (mesh->ne > nlines)
     errexit("The file has %zu lines which smaller than the number of "
             "elements of %"PRIDX" specified in the header line.\n", nlines, mesh->ne);
@@ -226,7 +226,7 @@ mesh_t *ReadMesh(params_t *params)
    *---------------------------------------------------------------------*/
   for (eptr[0]=0, k=0, i=0; i<mesh->ne; i++) {
     do {
-      if (gk_getline(&line, &lnlen, fpin) == -1)
+      if (gk_getline(&line, &lnlen, fpin) == -1) 
         errexit("Premature end of input file while reading element %"PRIDX".\n", i+1);
     } while (line[0] == '%');
 
@@ -254,13 +254,13 @@ mesh_t *ReadMesh(params_t *params)
         errexit("Node %"PRIDX" for element %"PRIDX" is out of bounds\n", node, i+1);
 
       eind[k++] = node-1;
-    }
+    } 
     eptr[i+1] = k;
   }
   gk_fclose(fpin);
 
   mesh->ncon = (ncon == 0 ? 1 : ncon);
-  mesh->nn   = imax(eptr[mesh->ne], eind)+1;
+  mesh->nn   = imax(eptr[mesh->ne], eind, 1)+1;
 
   gk_free((void *)&line, LTERM);
 
@@ -269,7 +269,7 @@ mesh_t *ReadMesh(params_t *params)
 
 
 /*************************************************************************/
-/*! This function reads in the target partition weights. If no file is
+/*! This function reads in the target partition weights. If no file is 
     specified the weights are set to 1/nparts */
 /*************************************************************************/
 void ReadTPwgts(params_t *params, idx_t ncon)
@@ -290,7 +290,7 @@ void ReadTPwgts(params_t *params, idx_t ncon)
     return;
   }
 
-  if (!gk_fexists(params->tpwgtsfile))
+  if (!gk_fexists(params->tpwgtsfile)) 
     errexit("Graph file %s does not exist!\n", params->tpwgtsfile);
 
   fpin = gk_fopen(params->tpwgtsfile, "r", "ReadTPwgts: tpwgtsfile");
@@ -354,7 +354,7 @@ void ReadTPwgts(params_t *params, idx_t ncon)
     if (from < 0 || to < 0 || from >= params->nparts || to >= params->nparts)
       errexit("Invalid partition range for %"PRIDX":%"PRIDX"\n", from, to);
     if (fromcnum < 0 || tocnum < 0 || fromcnum >= ncon || tocnum >= ncon)
-      errexit("Invalid constraint number range for %"PRIDX":%"PRIDX"\n",
+      errexit("Invalid constraint number range for %"PRIDX":%"PRIDX"\n", 
           fromcnum, tocnum);
     if (awgt <= 0.0 || awgt >= 1.0)
       errexit("Invalid partition weight of %"PRREAL"\n", awgt);
@@ -362,7 +362,7 @@ void ReadTPwgts(params_t *params, idx_t ncon)
       for (j=fromcnum; j<=tocnum; j++)
         params->tpwgts[i*ncon+j] = awgt;
     }
-  }
+  } 
 
   gk_fclose(fpin);
 
@@ -377,18 +377,18 @@ void ReadTPwgts(params_t *params, idx_t ncon)
     }
 
     /* Rescale the weights to be on the safe side */
-    if (nleft == 0)
+    if (nleft == 0) 
       rscale(params->nparts, 1.0/twgt, params->tpwgts+j, ncon);
-
+  
     /* Assign the left-over weight to the remaining partitions */
     if (nleft > 0) {
       if (twgt > 1)
         errexit("The total specified target partition weights for constraint #%"PRIDX
                 " of %"PRREAL" exceeds 1.0.\n", j, twgt);
-
+  
       awgt = (1.0 - twgt)/nleft;
       for (i=0; i<params->nparts; i++)
-        params->tpwgts[i*ncon+j] =
+        params->tpwgts[i*ncon+j] = 
             (params->tpwgts[i*ncon+j] < 0 ? awgt : params->tpwgts[i*ncon+j]);
     }
   }
@@ -442,7 +442,7 @@ void WritePartition(char *fname, idx_t *part, idx_t n, idx_t nparts)
 /*************************************************************************/
 /*! This function writes out the partition vectors for a mesh */
 /*************************************************************************/
-void WriteMeshPartition(char *fname, idx_t nparts, idx_t ne, idx_t *epart,
+void WriteMeshPartition(char *fname, idx_t nparts, idx_t ne, idx_t *epart, 
        idx_t nn, idx_t *npart)
 {
   FILE *fpout;
@@ -526,7 +526,7 @@ void WriteGraph(graph_t *graph, char *filename)
       }
     }
   }
-  if (adjwgt) {
+  if (adjwgt) { 
     for (i=0; i<xadj[nvtxs]; i++) {
       if (adjwgt[i] != 1) {
         hasewgt = 1;
@@ -549,7 +549,7 @@ void WriteGraph(graph_t *graph, char *filename)
   /* write the rest of the graph */
   for (i=0; i<nvtxs; i++) {
     fprintf(fpout, "\n");
-    if (hasvsize)
+    if (hasvsize) 
       fprintf(fpout, " %"PRIDX, vsize[i]);
 
     if (hasvwgt) {

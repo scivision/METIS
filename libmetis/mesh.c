@@ -18,13 +18,13 @@
 
 /*****************************************************************************/
 /*! This function creates a graph corresponding to the dual of a finite element
-    mesh.
+    mesh. 
 
     \param ne is the number of elements in the mesh.
     \param nn is the number of nodes in the mesh.
-    \param eptr is an array of size ne+1 used to mark the start and end
+    \param eptr is an array of size ne+1 used to mark the start and end 
            locations in the nind array.
-    \param eind is an array that stores for each element the set of node IDs
+    \param eind is an array that stores for each element the set of node IDs 
            (indices) that it is made off. The length of this array is equal
            to the total number of nodes over all the mesh elements.
     \param ncommon is the minimum number of nodes that two elements must share
@@ -32,27 +32,27 @@
     \param numflag is either 0 or 1 indicating if the numbering of the nodes
            starts from 0 or 1, respectively. The same numbering is used for the
            returned graph as well.
-    \param r_xadj indicates where the adjacency list of each vertex is stored
-           in r_adjncy. The memory for this array is allocated by this routine.
+    \param r_xadj indicates where the adjacency list of each vertex is stored 
+           in r_adjncy. The memory for this array is allocated by this routine. 
            It can be freed by calling METIS_free().
-    \param r_adjncy stores the adjacency list of each vertex in the generated
-           dual graph. The memory for this array is allocated by this routine.
+    \param r_adjncy stores the adjacency list of each vertex in the generated 
+           dual graph. The memory for this array is allocated by this routine. 
            It can be freed by calling METIS_free().
 
 */
 /*****************************************************************************/
-int METIS_MeshToDual(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind,
+int METIS_MeshToDual(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind, 
           idx_t *ncommon, idx_t *numflag,  idx_t **r_xadj, idx_t **r_adjncy)
 {
   int sigrval=0, renumber=0;
 
   /* set up malloc cleaning code and signal catchers */
-  if (!gk_malloc_init())
+  if (!gk_malloc_init()) 
     return METIS_ERROR_MEMORY;
 
   gk_sigtrap();
 
-  if ((sigrval = gk_sigcatch()) != 0)
+  if ((sigrval = gk_sigcatch()) != 0) 
     goto SIGTHROW;
 
 
@@ -87,42 +87,42 @@ SIGTHROW:
 
 
 /*****************************************************************************/
-/*! This function creates a graph corresponding to (almost) the nodal of a
+/*! This function creates a graph corresponding to (almost) the nodal of a 
     finite element mesh. In the nodal graph, each node is connected to the
     nodes corresponding to the union of nodes present in all the elements
-    in which that node belongs.
+    in which that node belongs. 
 
     \param ne is the number of elements in the mesh.
     \param nn is the number of nodes in the mesh.
-    \param eptr is an array of size ne+1 used to mark the start and end
+    \param eptr is an array of size ne+1 used to mark the start and end 
            locations in the nind array.
-    \param eind is an array that stores for each element the set of node IDs
+    \param eind is an array that stores for each element the set of node IDs 
            (indices) that it is made off. The length of this array is equal
            to the total number of nodes over all the mesh elements.
     \param numflag is either 0 or 1 indicating if the numbering of the nodes
            starts from 0 or 1, respectively. The same numbering is used for the
            returned graph as well.
-    \param r_xadj indicates where the adjacency list of each vertex is stored
-           in r_adjncy. The memory for this array is allocated by this routine.
+    \param r_xadj indicates where the adjacency list of each vertex is stored 
+           in r_adjncy. The memory for this array is allocated by this routine. 
            It can be freed by calling METIS_free().
-    \param r_adjncy stores the adjacency list of each vertex in the generated
-           dual graph. The memory for this array is allocated by this routine.
+    \param r_adjncy stores the adjacency list of each vertex in the generated 
+           dual graph. The memory for this array is allocated by this routine. 
            It can be freed by calling METIS_free().
 
 */
 /*****************************************************************************/
-int METIS_MeshToNodal(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind,
+int METIS_MeshToNodal(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind, 
           idx_t *numflag,  idx_t **r_xadj, idx_t **r_adjncy)
 {
   int sigrval=0, renumber=0;
 
   /* set up malloc cleaning code and signal catchers */
-  if (!gk_malloc_init())
+  if (!gk_malloc_init()) 
     return METIS_ERROR_MEMORY;
 
   gk_sigtrap();
 
-  if ((sigrval = gk_sigcatch()) != 0)
+  if ((sigrval = gk_sigcatch()) != 0) 
     goto SIGTHROW;
 
 
@@ -159,7 +159,7 @@ SIGTHROW:
 /*****************************************************************************/
 /*! This function creates the dual of a finite element mesh */
 /*****************************************************************************/
-void CreateGraphDual(idx_t ne, idx_t nn, idx_t *eptr, idx_t *eind, idx_t ncommon,
+void CreateGraphDual(idx_t ne, idx_t nn, idx_t *eptr, idx_t *eind, idx_t ncommon, 
           idx_t **r_xadj, idx_t **r_adjncy)
 {
   idx_t i, j, nnbrs;
@@ -192,7 +192,7 @@ void CreateGraphDual(idx_t ne, idx_t nn, idx_t *eptr, idx_t *eind, idx_t ncommon
   /* Allocate memory for xadj, since you know its size.
      These are done using standard malloc as they are returned
      to the calling function */
-  if ((xadj = (idx_t *)malloc((ne+1)*sizeof(idx_t))) == NULL)
+  if ((xadj = (idx_t *)malloc((ne+1)*sizeof(idx_t))) == NULL) 
     gk_errexit(SIGMEM, "***Failed to allocate memory for xadj.\n");
   *r_xadj = xadj;
   iset(ne+1, 0, xadj);
@@ -202,7 +202,7 @@ void CreateGraphDual(idx_t ne, idx_t nn, idx_t *eptr, idx_t *eind, idx_t ncommon
   nbrs   = imalloc(ne, "CreateGraphDual: nbrs");
 
   for (i=0; i<ne; i++) {
-    xadj[i] = FindCommonElements(i, eptr[i+1]-eptr[i], eind+eptr[i], nptr,
+    xadj[i] = FindCommonElements(i, eptr[i+1]-eptr[i], eind+eptr[i], nptr, 
                   nind, eptr, ncommon, marker, nbrs);
   }
   MAKECSR(i, ne, xadj);
@@ -218,23 +218,23 @@ void CreateGraphDual(idx_t ne, idx_t nn, idx_t *eptr, idx_t *eind, idx_t ncommon
   *r_adjncy = adjncy;
 
   for (i=0; i<ne; i++) {
-    nnbrs = FindCommonElements(i, eptr[i+1]-eptr[i], eind+eptr[i], nptr,
+    nnbrs = FindCommonElements(i, eptr[i+1]-eptr[i], eind+eptr[i], nptr, 
                 nind, eptr, ncommon, marker, nbrs);
     for (j=0; j<nnbrs; j++)
       adjncy[xadj[i]++] = nbrs[j];
   }
   SHIFTCSR(i, ne, xadj);
-
+  
   gk_free((void **)&nptr, &nind, &marker, &nbrs, LTERM);
 }
 
 
 /*****************************************************************************/
-/*! This function finds all elements that share at least ncommon nodes with
-    the ``query'' element.
+/*! This function finds all elements that share at least ncommon nodes with 
+    the ``query'' element. 
 */
 /*****************************************************************************/
-idx_t FindCommonElements(idx_t qid, idx_t elen, idx_t *eind, idx_t *nptr,
+idx_t FindCommonElements(idx_t qid, idx_t elen, idx_t *eind, idx_t *nptr, 
           idx_t *nind, idx_t *eptr, idx_t ncommon, idx_t *marker, idx_t *nbrs)
 {
   idx_t i, ii, j, jj, k, l, overlap;
@@ -245,7 +245,7 @@ idx_t FindCommonElements(idx_t qid, idx_t elen, idx_t *eind, idx_t *nptr,
     for (ii=nptr[j]; ii<nptr[j+1]; ii++) {
       jj = nind[ii];
 
-      if (marker[jj] == 0)
+      if (marker[jj] == 0) 
         nbrs[k++] = jj;
       marker[jj]++;
     }
@@ -260,8 +260,8 @@ idx_t FindCommonElements(idx_t qid, idx_t elen, idx_t *eind, idx_t *nptr,
   /* compact the list to contain only those with at least ncommon nodes */
   for (j=0, i=0; i<k; i++) {
     overlap = marker[l = nbrs[i]];
-    if (overlap >= ncommon ||
-        overlap >= elen-1 ||
+    if (overlap >= ncommon || 
+        overlap >= elen-1 || 
         overlap >= eptr[l+1]-eptr[l]-1)
       nbrs[j++] = l;
     marker[l] = 0;
@@ -274,7 +274,7 @@ idx_t FindCommonElements(idx_t qid, idx_t elen, idx_t *eind, idx_t *nptr,
 /*****************************************************************************/
 /*! This function creates the (almost) nodal of a finite element mesh */
 /*****************************************************************************/
-void CreateGraphNodal(idx_t ne, idx_t nn, idx_t *eptr, idx_t *eind,
+void CreateGraphNodal(idx_t ne, idx_t nn, idx_t *eptr, idx_t *eind, 
           idx_t **r_xadj, idx_t **r_adjncy)
 {
   idx_t i, j, nnbrs;
@@ -313,7 +313,7 @@ void CreateGraphNodal(idx_t ne, idx_t nn, idx_t *eptr, idx_t *eind,
   nbrs   = imalloc(nn, "CreateGraphNodal: nbrs");
 
   for (i=0; i<nn; i++) {
-    xadj[i] = FindCommonNodes(i, nptr[i+1]-nptr[i], nind+nptr[i], eptr,
+    xadj[i] = FindCommonNodes(i, nptr[i+1]-nptr[i], nind+nptr[i], eptr, 
                   eind, marker, nbrs);
   }
   MAKECSR(i, nn, xadj);
@@ -329,23 +329,23 @@ void CreateGraphNodal(idx_t ne, idx_t nn, idx_t *eptr, idx_t *eind,
   *r_adjncy = adjncy;
 
   for (i=0; i<nn; i++) {
-    nnbrs = FindCommonNodes(i, nptr[i+1]-nptr[i], nind+nptr[i], eptr,
+    nnbrs = FindCommonNodes(i, nptr[i+1]-nptr[i], nind+nptr[i], eptr, 
                 eind, marker, nbrs);
     for (j=0; j<nnbrs; j++)
       adjncy[xadj[i]++] = nbrs[j];
   }
   SHIFTCSR(i, nn, xadj);
-
+  
   gk_free((void **)&nptr, &nind, &marker, &nbrs, LTERM);
 }
 
 
 /*****************************************************************************/
 /*! This function finds the union of nodes that are in the same elements with
-    the ``query'' node.
+    the ``query'' node. 
 */
 /*****************************************************************************/
-idx_t FindCommonNodes(idx_t qid, idx_t nelmnts, idx_t *elmntids, idx_t *eptr,
+idx_t FindCommonNodes(idx_t qid, idx_t nelmnts, idx_t *elmntids, idx_t *eptr, 
           idx_t *eind, idx_t *marker, idx_t *nbrs)
 {
   idx_t i, ii, j, jj, k;
@@ -392,7 +392,7 @@ mesh_t *CreateMesh(void)
 /*************************************************************************/
 /*! This function initializes a mesh_t data structure */
 /*************************************************************************/
-void InitMesh(mesh_t *mesh)
+void InitMesh(mesh_t *mesh) 
 {
   memset((void *)mesh, 0, sizeof(mesh_t));
 }
@@ -401,11 +401,12 @@ void InitMesh(mesh_t *mesh)
 /*************************************************************************/
 /*! This function deallocates any memory stored in a mesh */
 /*************************************************************************/
-void FreeMesh(mesh_t **r_mesh)
+void FreeMesh(mesh_t **r_mesh) 
 {
   mesh_t *mesh = *r_mesh;
-
+  
   gk_free((void **)&mesh->eptr, &mesh->eind, &mesh->ewgt, &mesh, LTERM);
 
   *r_mesh = NULL;
 }
+

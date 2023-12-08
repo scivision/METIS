@@ -15,7 +15,7 @@
 #include "metislib.h"
 
 /*************************************************************************
-* This function takes a bisection and constructs a minimum weight vertex
+* This function takes a bisection and constructs a minimum weight vertex 
 * separator out of it. It uses the node-based separator refinement for it.
 **************************************************************************/
 void ConstructSeparator(ctrl_t *ctrl, graph_t *graph)
@@ -52,8 +52,8 @@ void ConstructSeparator(ctrl_t *ctrl, graph_t *graph)
 
   ASSERT(CheckNodePartitionParams(graph));
 
-  FM_2WayNodeRefine2Sided(ctrl, graph, 1);
-  FM_2WayNodeRefine1Sided(ctrl, graph, 4);
+  FM_2WayNodeRefine2Sided(ctrl, graph, 1); 
+  FM_2WayNodeRefine1Sided(ctrl, graph, 4); 
 
   ASSERT(IsSeparable(graph));
 
@@ -62,7 +62,7 @@ void ConstructSeparator(ctrl_t *ctrl, graph_t *graph)
 
 
 /*************************************************************************
-* This function takes a bisection and constructs a minimum weight vertex
+* This function takes a bisection and constructs a minimum weight vertex 
 * separator out of it. It uses an unweighted minimum-cover algorithm
 * followed by node-based separator refinement.
 **************************************************************************/
@@ -128,7 +128,7 @@ void ConstructMinCoverSeparator(ctrl_t *ctrl, graph_t *graph)
           for (j=xadj[i]; j<xadj[i+1]; j++) {
             jj = adjncy[j];
             if (where[jj] != k) {
-              ASSERT(bndptr[jj] != -1);
+              ASSERT(bndptr[jj] != -1); 
               ASSERTP(vmap[jj] != -1, ("%"PRIDX" %"PRIDX" %"PRIDX"\n", jj, vmap[jj], graph->bndptr[jj]));
               badjncy[l++] = vmap[jj];
             }
@@ -169,7 +169,8 @@ void ConstructMinCoverSeparator(ctrl_t *ctrl, graph_t *graph)
 
   ASSERT(CheckNodePartitionParams(graph));
 
-  FM_2WayNodeRefine1Sided(ctrl, graph, ctrl->niter);
+  FM_2WayNodeRefine1Sided(ctrl, graph, ctrl->niter); 
 
   ASSERT(IsSeparable(graph));
 }
+

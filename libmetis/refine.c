@@ -3,9 +3,9 @@
 \brief This file contains the driving routines for multilevel refinement
 
 \date   Started 7/24/1997
-\author George
-\author Copyright 1997-2009, Regents of the University of Minnesota
-\version\verbatim $Id: refine.c 10513 2011-07-07 22:06:03Z karypis $ \endverbatim
+\author George  
+\author Copyright 1997-2009, Regents of the University of Minnesota 
+\version\verbatim $Id: refine.c 14362 2013-05-21 21:35:23Z karypis $ \endverbatim
 */
 
 #include "metislib.h"
@@ -29,7 +29,7 @@ void Refine2Way(ctrl_t *ctrl, graph_t *orggraph, graph_t *graph, real_t *tpwgts)
 
     Balance2Way(ctrl, graph, tpwgts);
 
-    FM_2WayRefine(ctrl, graph, tpwgts, ctrl->niter);
+    FM_2WayRefine(ctrl, graph, tpwgts, ctrl->niter); 
 
     IFSET(ctrl->dbglvl, METIS_DBG_TIME, gk_stopcputimer(ctrl->RefTmr));
 
@@ -37,6 +37,8 @@ void Refine2Way(ctrl_t *ctrl, graph_t *orggraph, graph_t *graph, real_t *tpwgts)
       break;
 
     graph = graph->finer;
+    graph_ReadFromDisk(ctrl, graph);
+
     IFSET(ctrl->dbglvl, METIS_DBG_TIME, gk_startcputimer(ctrl->ProjectTmr));
     Project2WayPartition(ctrl, graph);
     IFSET(ctrl->dbglvl, METIS_DBG_TIME, gk_stopcputimer(ctrl->ProjectTmr));
@@ -122,7 +124,7 @@ void Compute2WayPartitionParams(ctrl_t *ctrl, graph_t *graph)
     }
     id[i] = tid;
     ed[i] = ted;
-
+  
     if (ted > 0 || istart == iend) {
       BNDInsert(nbnd, bndind, bndptr, i);
       mincut += ted;
@@ -146,8 +148,11 @@ void Project2WayPartition(ctrl_t *ctrl, graph_t *graph)
   idx_t *cwhere, *cbndptr;
   idx_t *id, *ed;
   graph_t *cgraph;
+  int dropedges;
 
   Allocate2WayPartitionMemory(ctrl, graph);
+
+  dropedges = ctrl->dropedges;
 
   cgraph  = graph->coarser;
   cwhere  = cgraph->where;
@@ -171,14 +176,14 @@ void Project2WayPartition(ctrl_t *ctrl, graph_t *graph)
   for (i=0; i<nvtxs; i++) {
     j = cmap[i];
     where[i] = cwhere[j];
-    cmap[i]  = cbndptr[j];
+    cmap[i]  = (dropedges ? 0 : cbndptr[j]);
   }
 
   /* Compute the refinement information of the nodes */
   for (nbnd=0, i=0; i<nvtxs; i++) {
     istart = xadj[i];
     iend   = xadj[i+1];
-
+  
     tid = ted = 0;
     if (cmap[i] == -1) { /* Interior node. Note that cmap[i] = cbndptr[cmap[i]] */
       for (j=istart; j<iend; j++)
@@ -196,10 +201,10 @@ void Project2WayPartition(ctrl_t *ctrl, graph_t *graph)
     id[i] = tid;
     ed[i] = ted;
 
-    if (ted > 0 || istart == iend)
+    if (ted > 0 || istart == iend) 
       BNDInsert(nbnd, bndind, bndptr, i);
   }
-  graph->mincut = cgraph->mincut;
+  graph->mincut = (dropedges ? ComputeCut(graph, where) : cgraph->mincut);
   graph->nbnd   = nbnd;
 
   /* copy pwgts */
@@ -208,3 +213,4 @@ void Project2WayPartition(ctrl_t *ctrl, graph_t *graph)
   FreeGraph(&graph->coarser);
   graph->coarser = NULL;
 }
+

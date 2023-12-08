@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 
   memset((void *)&params, 0, sizeof(params_t));
   params.filename = gk_strdup(argv[1]);
-
+    
   graph = ReadGraph(&params);
   if (graph->nvtxs == 0) {
     printf("Empty graph!\n");
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
       8*sizeof(idx_t), 8*sizeof(real_t), 8*sizeof(idx_t *));
   printf("\n");
   printf("Graph Information ---------------------------------------------------\n");
-  printf("  Name: %s, #Vertices: %"PRIDX", #Edges: %"PRIDX"\n\n",
+  printf("  Name: %s, #Vertices: %"PRIDX", #Edges: %"PRIDX"\n\n", 
       params.filename, graph->nvtxs, graph->nedges/2);
   printf("Checking Graph... ---------------------------------------------------\n");
 
@@ -69,4 +69,6 @@ int main(int argc, char *argv[])
 
   FreeGraph(&graph);
   gk_free((void **)&params.filename, &params.tpwgtsfile, &params.tpwgts, LTERM);
-}
+}  
+
+

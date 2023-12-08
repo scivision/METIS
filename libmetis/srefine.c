@@ -3,12 +3,12 @@
  *
  * srefine.c
  *
- * This file contains code for the separator refinement algortihms
+ * This file contains code for the separator refinement algorithms
  *
  * Started 8/1/97
  * George
  *
- * $Id: srefine.c 10515 2011-07-08 15:46:18Z karypis $
+ * $Id: srefine.c 14362 2013-05-21 21:35:23Z karypis $
  *
  */
 
@@ -16,7 +16,7 @@
 
 
 /*************************************************************************/
-/*! This function is the entry point of the separator refinement.
+/*! This function is the entry point of the separator refinement. 
     It does not perform any refinement on graph, but it starts by first
     projecting it to the next level finer graph and proceeds from there. */
 /*************************************************************************/
@@ -32,21 +32,23 @@ void Refine2WayNode(ctrl_t *ctrl, graph_t *orggraph, graph_t *graph)
     do {
       graph = graph->finer;
 
+      graph_ReadFromDisk(ctrl, graph);
+
       IFSET(ctrl->dbglvl, METIS_DBG_TIME, gk_startcputimer(ctrl->ProjectTmr));
       Project2WayNodePartition(ctrl, graph);
       IFSET(ctrl->dbglvl, METIS_DBG_TIME, gk_stopcputimer(ctrl->ProjectTmr));
 
       IFSET(ctrl->dbglvl, METIS_DBG_TIME, gk_startcputimer(ctrl->RefTmr));
-      FM_2WayNodeBalance(ctrl, graph);
+      FM_2WayNodeBalance(ctrl, graph); 
 
       ASSERT(CheckNodePartitionParams(graph));
 
       switch (ctrl->rtype) {
         case METIS_RTYPE_SEP2SIDED:
-          FM_2WayNodeRefine2Sided(ctrl, graph, ctrl->niter);
+          FM_2WayNodeRefine2Sided(ctrl, graph, ctrl->niter); 
           break;
         case METIS_RTYPE_SEP1SIDED:
-          FM_2WayNodeRefine1Sided(ctrl, graph, ctrl->niter);
+          FM_2WayNodeRefine1Sided(ctrl, graph, ctrl->niter); 
           break;
         default:
           gk_errexit(SIGERR, "Unknown rtype of %d\n", ctrl->rtype);
@@ -148,11 +150,11 @@ void Project2WayNodePartition(ctrl_t *ctrl, graph_t *graph)
 
   Allocate2WayNodePartitionMemory(ctrl, graph);
   where = graph->where;
-
+  
   /* Project the partition */
   for (i=0; i<nvtxs; i++) {
     where[i] = cwhere[cmap[i]];
-    ASSERTP(where[i] >= 0 && where[i] <= 2, ("%"PRIDX" %"PRIDX" %"PRIDX" %"PRIDX"\n",
+    ASSERTP(where[i] >= 0 && where[i] <= 2, ("%"PRIDX" %"PRIDX" %"PRIDX" %"PRIDX"\n", 
           i, cmap[i], where[i], cwhere[cmap[i]]));
   }
 

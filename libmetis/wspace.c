@@ -1,10 +1,10 @@
 /*!
-\file
+\file 
 \brief Functions dealing with memory allocation and workspace management
 
 \date Started 2/24/96
 \author George
-\author Copyright 1997-2009, Regents of the University of Minnesota
+\author Copyright 1997-2009, Regents of the University of Minnesota 
 \version $Id: wspace.c 10492 2011-07-06 09:28:42Z karypis $
 */
 
@@ -20,16 +20,15 @@ void AllocateWorkSpace(ctrl_t *ctrl, graph_t *graph)
 
   switch (ctrl->optype) {
     case METIS_OP_PMETIS:
-      coresize = 3*(graph->nvtxs+1)*sizeof(idx_t) +
-                 5*(ctrl->nparts+1)*graph->ncon*sizeof(idx_t) +
+      coresize = 3*(graph->nvtxs+1)*sizeof(idx_t) + 
+                 5*(ctrl->nparts+1)*graph->ncon*sizeof(idx_t) + 
                  5*(ctrl->nparts+1)*graph->ncon*sizeof(real_t);
       break;
     default:
-      coresize = 4*(graph->nvtxs+1)*sizeof(idx_t) +
-                 5*(ctrl->nparts+1)*graph->ncon*sizeof(idx_t) +
+      coresize = 4*(graph->nvtxs+1)*sizeof(idx_t) + 
+                 5*(ctrl->nparts+1)*graph->ncon*sizeof(idx_t) + 
                  5*(ctrl->nparts+1)*graph->ncon*sizeof(real_t);
   }
-  /*coresize = 0;*/
   ctrl->mcore = gk_mcoreCreate(coresize);
 
   ctrl->nbrpoolsize = 0;
@@ -40,20 +39,21 @@ void AllocateWorkSpace(ctrl_t *ctrl, graph_t *graph)
 /*************************************************************************/
 /*! This function allocates refinement-specific memory for the workspace */
 /*************************************************************************/
-void AllocateRefinementWorkSpace(ctrl_t *ctrl, idx_t nbrpoolsize)
+void AllocateRefinementWorkSpace(ctrl_t *ctrl, idx_t nbrpoolsize_max, idx_t nbrpoolsize)
 {
+  ctrl->nbrpoolsize_max = nbrpoolsize_max;
   ctrl->nbrpoolsize     = nbrpoolsize;
   ctrl->nbrpoolcpos     = 0;
   ctrl->nbrpoolreallocs = 0;
 
   switch (ctrl->objtype) {
     case METIS_OBJTYPE_CUT:
-      ctrl->cnbrpool = (cnbr_t *)gk_malloc(ctrl->nbrpoolsize*sizeof(cnbr_t),
+      ctrl->cnbrpool = (cnbr_t *)gk_malloc(ctrl->nbrpoolsize*sizeof(cnbr_t), 
                              "AllocateRefinementWorkSpace: cnbrpool");
       break;
 
     case METIS_OBJTYPE_VOL:
-      ctrl->vnbrpool = (vnbr_t *)gk_malloc(ctrl->nbrpoolsize*sizeof(vnbr_t),
+      ctrl->vnbrpool = (vnbr_t *)gk_malloc(ctrl->nbrpoolsize*sizeof(vnbr_t), 
                              "AllocateRefinementWorkSpace: vnbrpool");
       break;
 
@@ -82,21 +82,22 @@ void FreeWorkSpace(ctrl_t *ctrl)
   gk_mcoreDestroy(&ctrl->mcore, ctrl->dbglvl&METIS_DBG_INFO);
 
   IFSET(ctrl->dbglvl, METIS_DBG_INFO,
-      printf(" nbrpool statistics\n"
+      printf(" nbrpool statistics\n" 
              "        nbrpoolsize: %12zu   nbrpoolcpos: %12zu\n"
              "    nbrpoolreallocs: %12zu\n\n",
-             ctrl->nbrpoolsize,  ctrl->nbrpoolcpos,
+             ctrl->nbrpoolsize,  ctrl->nbrpoolcpos, 
              ctrl->nbrpoolreallocs));
 
   gk_free((void **)&ctrl->cnbrpool, &ctrl->vnbrpool, LTERM);
-  ctrl->nbrpoolsize = 0;
-  ctrl->nbrpoolcpos = 0;
+  ctrl->nbrpoolsize_max = 0;
+  ctrl->nbrpoolsize     = 0;
+  ctrl->nbrpoolcpos     = 0;
 
   if (ctrl->minconn) {
     iFreeMatrix(&(ctrl->adids),  ctrl->nparts, INIT_MAXNAD);
     iFreeMatrix(&(ctrl->adwgts), ctrl->nparts, INIT_MAXNAD);
 
-    gk_free((void **)&ctrl->pvec1, &ctrl->pvec2,
+    gk_free((void **)&ctrl->pvec1, &ctrl->pvec2, 
         &ctrl->maxnads, &ctrl->nads, LTERM);
   }
 }
@@ -171,12 +172,14 @@ void cnbrpoolReset(ctrl_t *ctrl)
 /*************************************************************************/
 idx_t cnbrpoolGetNext(ctrl_t *ctrl, idx_t nnbrs)
 {
+  nnbrs = gk_min(ctrl->nparts, nnbrs);
   ctrl->nbrpoolcpos += nnbrs;
 
   if (ctrl->nbrpoolcpos > ctrl->nbrpoolsize) {
     ctrl->nbrpoolsize += gk_max(10*nnbrs, ctrl->nbrpoolsize/2);
+    ctrl->nbrpoolsize = gk_min(ctrl->nbrpoolsize, ctrl->nbrpoolsize_max);
 
-    ctrl->cnbrpool = (cnbr_t *)gk_realloc(ctrl->cnbrpool,
+    ctrl->cnbrpool = (cnbr_t *)gk_realloc(ctrl->cnbrpool,  
                           ctrl->nbrpoolsize*sizeof(cnbr_t), "cnbrpoolGet: cnbrpool");
     ctrl->nbrpoolreallocs++;
   }
@@ -199,15 +202,18 @@ void vnbrpoolReset(ctrl_t *ctrl)
 /*************************************************************************/
 idx_t vnbrpoolGetNext(ctrl_t *ctrl, idx_t nnbrs)
 {
+  nnbrs = gk_min(ctrl->nparts, nnbrs);
   ctrl->nbrpoolcpos += nnbrs;
 
   if (ctrl->nbrpoolcpos > ctrl->nbrpoolsize) {
     ctrl->nbrpoolsize += gk_max(10*nnbrs, ctrl->nbrpoolsize/2);
+    ctrl->nbrpoolsize = gk_min(ctrl->nbrpoolsize, ctrl->nbrpoolsize_max);
 
-    ctrl->vnbrpool = (vnbr_t *)gk_realloc(ctrl->vnbrpool,
+    ctrl->vnbrpool = (vnbr_t *)gk_realloc(ctrl->vnbrpool,  
                           ctrl->nbrpoolsize*sizeof(vnbr_t), "vnbrpoolGet: vnbrpool");
     ctrl->nbrpoolreallocs++;
   }
 
   return ctrl->nbrpoolcpos - nnbrs;
 }
+

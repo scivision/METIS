@@ -12,7 +12,7 @@
 
 
 /*-------------------------------------------------------------------
- * Command-line options
+ * Command-line options 
  *-------------------------------------------------------------------*/
 static struct gk_option long_options[] = {
   {"gtype",          1,      0,      METIS_OPTION_GTYPE},
@@ -185,7 +185,7 @@ static char shorthelpstr[][100] = {
 "          use 'mpmetis -help' for a summary of the options.",
 ""
 };
-
+ 
 
 
 /*************************************************************************
@@ -336,8 +336,8 @@ params_t *parse_cmdline(int argc, char *argv[])
 
   params->filename = gk_strdup(argv[gk_optind++]);
   params->nparts   = atoi(argv[gk_optind++]);
-
-  if (params->nparts < 2)
+    
+  if (params->nparts < 2) 
     errexit("The number of partitions should be greater than 1!\n");
 
 
@@ -362,3 +362,5 @@ params_t *parse_cmdline(int argc, char *argv[])
 
   return params;
 }
+
+

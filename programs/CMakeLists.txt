@@ -8,11 +8,7 @@ add_executable(graphchk graphchk.c io.c)
 add_executable(cmpfillin cmpfillin.c io.c smbfactor.c)
 foreach(prog IN ITEMS gpmetis ndmetis mpmetis m2gmetis graphchk cmpfillin)
   target_link_libraries(${prog} PRIVATE metis)
-  target_include_directories(${prog} PRIVATE
-    ${PROJECT_SOURCE_DIR}/src/GKlib
-    ${PROJECT_BINARY_DIR}/include
-    )
-  target_compile_definitions(${prog} PRIVATE SVNINFO="${SVNREV}")
+  target_include_directories(${prog} PRIVATE ${gklib_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/include)
 #  target_link_libraries(${prog} metis profiler)
 endforeach(prog)
 

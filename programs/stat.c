@@ -4,9 +4,9 @@
        and orderings.
 
 \date   Started 7/25/1997
-\author George
-\author Copyright 1997-2009, Regents of the University of Minnesota
-\version\verbatim $Id: stat.c 10046 2011-06-01 14:13:40Z karypis $ \endverbatim
+\author George  
+\author Copyright 1997-2009, Regents of the University of Minnesota 
+\version\verbatim $Id: stat.c 17513 2014-08-05 16:20:50Z dominique $ \endverbatim
 */
 
 
@@ -35,8 +35,8 @@ void ComputePartitionInfo(params_t *params, graph_t *graph, idx_t *where)
   nparts = params->nparts;
   tpwgts = params->tpwgts;
 
-  /* Compute objective-related infomration */
-  printf(" - Edgecut: %"PRIDX", communication volume: %"PRIDX".\n\n",
+  /* Compute objective-related information */
+  printf(" - Edgecut: %"PRIDX", communication volume: %"PRIDX".\n\n", 
       ComputeCut(graph, where), ComputeVolume(graph, where));
 
 
@@ -44,7 +44,7 @@ void ComputePartitionInfo(params_t *params, graph_t *graph, idx_t *where)
   kpwgts = ismalloc(ncon*nparts, 0, "ComputePartitionInfo: kpwgts");
 
   for (i=0; i<nvtxs; i++) {
-    for (j=0; j<ncon; j++)
+    for (j=0; j<ncon; j++) 
       kpwgts[where[i]*ncon+j] += vwgt[i*ncon+j];
   }
 
@@ -58,7 +58,7 @@ void ComputePartitionInfo(params_t *params, graph_t *graph, idx_t *where)
         k = i;
       }
     }
-    printf("     constraint #%"PRIDX":  %5.3"PRREAL" out of %5.3"PRREAL"\n",
+    printf("     constraint #%"PRIDX":  %5.3"PRREAL" out of %5.3"PRREAL"\n", 
         j, unbalance,
          1.0*nparts*vwgt[ncon*iargmax_strd(nvtxs, vwgt+j, ncon)+j]/
             (1.0*isum(nparts, kpwgts+j, ncon)));
@@ -110,7 +110,7 @@ void ComputePartitionInfo(params_t *params, graph_t *graph, idx_t *where)
 
   printf(" - Subdomain connectivity: max: %"PRIDX", min: %"PRIDX", avg: %.2"PRREAL"\n\n",
       maxndom, minndom, 1.0*tndom/nparts);
-
+      
   gk_free((void **)&pptr, &pind, &pdom, LTERM);
 
 
@@ -132,7 +132,7 @@ void ComputePartitionInfo(params_t *params, graph_t *graph, idx_t *where)
       printf(" - There are %"PRIDX" non-contiguous partitions.\n"
              "   Total components after removing the cut edges: %"PRIDX",\n"
              "   max components: %"PRIDX" for pid: %"PRIDX".\n",
-          nover, ncmps, imax(nparts, cpwgts), (idx_t)iargmax(nparts, cpwgts));
+          nover, ncmps, imax(nparts, cpwgts,1), (idx_t)iargmax(nparts, cpwgts,1));
     }
     else {
       printf(" - The original graph had %"PRIDX" connected components and the resulting\n"
@@ -144,3 +144,5 @@ void ComputePartitionInfo(params_t *params, graph_t *graph, idx_t *where)
   gk_free((void **)&cptr, &cind, &cpwgts, LTERM);
 
 }
+
+

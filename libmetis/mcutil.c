@@ -1,5 +1,5 @@
 /*
- * mutil.c
+ * mutil.c 
  *
  * This file contains various utility functions for the MOC portion of the
  * code
@@ -15,14 +15,14 @@
 
 
 /*************************************************************************/
-/*! This function compares two vectors x & y and returns true
+/*! This function compares two vectors x & y and returns true 
     if \forall i, x[i] <= y[i].
 */
 /**************************************************************************/
 int rvecle(idx_t n, real_t *x, real_t *y)
 {
   for (n--; n>=0; n--) {
-    if (x[n] > y[n])
+    if (x[n] > y[n]) 
       return 0;
   }
 
@@ -31,14 +31,14 @@ int rvecle(idx_t n, real_t *x, real_t *y)
 
 
 /*************************************************************************/
-/*! This function compares two vectors x & y and returns true
+/*! This function compares two vectors x & y and returns true 
     if \forall i, x[i] >= y[i].
 */
 /**************************************************************************/
 int rvecge(idx_t n, real_t *x, real_t *y)
 {
   for (n--; n>=0; n--) {
-    if (x[n] < y[n])
+    if (x[n] < y[n]) 
       return 0;
   }
 
@@ -47,14 +47,14 @@ int rvecge(idx_t n, real_t *x, real_t *y)
 
 
 /*************************************************************************/
-/*! This function compares vectors x1+x2 against y and returns true
-    if \forall i, x1[i]+x2[i] <= y[i].
+/*! This function compares vectors x1+x2 against y and returns true 
+    if \forall i, x1[i]+x2[i] <= y[i]. 
 */
 /**************************************************************************/
 int rvecsumle(idx_t n, real_t *x1, real_t *x2, real_t *y)
 {
   for (n--; n>=0; n--) {
-    if (x1[n]+x2[n] > y[n])
+    if (x1[n]+x2[n] > y[n]) 
       return 0;
   }
 
@@ -72,7 +72,7 @@ real_t rvecmaxdiff(idx_t n, real_t *x, real_t *y)
   max = x[0]-y[0];
 
   for (n--; n>0; n--) {
-    if (max < x[n]-y[n])
+    if (max < x[n]-y[n]) 
       max = x[n]-y[n];
   }
 
@@ -86,7 +86,7 @@ real_t rvecmaxdiff(idx_t n, real_t *x, real_t *y)
 int ivecle(idx_t n, idx_t *x, idx_t *z)
 {
   for (n--; n>=0; n--) {
-    if (x[n] > z[n])
+    if (x[n] > z[n]) 
       return 0;
   }
 
@@ -100,7 +100,7 @@ int ivecle(idx_t n, idx_t *x, idx_t *z)
 int ivecge(idx_t n, idx_t *x, idx_t *z)
 {
   for (n--; n>=0; n--) {
-    if (x[n] < z[n])
+    if (x[n] < z[n]) 
       return 0;
   }
 
@@ -114,7 +114,7 @@ int ivecge(idx_t n, idx_t *x, idx_t *z)
 int ivecaxpylez(idx_t n, idx_t a, idx_t *x, idx_t *y, idx_t *z)
 {
   for (n--; n>=0; n--) {
-    if (a*x[n]+y[n] > z[n])
+    if (a*x[n]+y[n] > z[n]) 
       return 0;
   }
 
@@ -128,7 +128,7 @@ int ivecaxpylez(idx_t n, idx_t a, idx_t *x, idx_t *y, idx_t *z)
 int ivecaxpygez(idx_t n, idx_t a, idx_t *x, idx_t *y, idx_t *z)
 {
   for (n--; n>=0; n--) {
-    if (a*x[n]+y[n] < z[n])
+    if (a*x[n]+y[n] < z[n]) 
       return 0;
   }
 
@@ -137,10 +137,10 @@ int ivecaxpygez(idx_t n, idx_t a, idx_t *x, idx_t *y, idx_t *z)
 
 
 /*************************************************************************/
-/*! This function checks if v+u2 provides a better balance in the weight
+/*! This function checks if v+u2 provides a better balance in the weight 
      vector that v+u1 */
 /*************************************************************************/
-int BetterVBalance(idx_t ncon, real_t *invtvwgt, idx_t *v_vwgt, idx_t *u1_vwgt,
+int BetterVBalance(idx_t ncon, real_t *invtvwgt, idx_t *v_vwgt, idx_t *u1_vwgt, 
         idx_t *u2_vwgt)
 {
   idx_t i;
@@ -163,9 +163,9 @@ int BetterVBalance(idx_t ncon, real_t *invtvwgt, idx_t *v_vwgt, idx_t *u1_vwgt,
 
 
 /*************************************************************************/
-/*! This function takes two ubfactor-centered load imbalance vectors x & y,
+/*! This function takes two ubfactor-centered load imbalance vectors x & y, 
     and returns true if y is better balanced than x. */
-/*************************************************************************/
+/*************************************************************************/ 
 int BetterBalance2Way(idx_t n, real_t *x, real_t *y)
 {
   real_t nrm1=0.0, nrm2=0.0;
@@ -179,15 +179,15 @@ int BetterBalance2Way(idx_t n, real_t *x, real_t *y)
 
 
 /*************************************************************************/
-/*! Given a vertex and two weights, this function returns 1, if the second
-    partition will be more balanced than the first after the weighted
+/*! Given a vertex and two weights, this function returns 1, if the second 
+    partition will be more balanced than the first after the weighted 
     additional of that vertex.
     The balance determination takes into account the ideal target weights
     of the two partitions.
 */
 /*************************************************************************/
-int BetterBalanceKWay(idx_t ncon, idx_t *vwgt, real_t *ubvec,
-        idx_t a1, idx_t *pt1, real_t *bm1,
+int BetterBalanceKWay(idx_t ncon, idx_t *vwgt, real_t *ubvec, 
+        idx_t a1, idx_t *pt1, real_t *bm1, 
         idx_t a2, idx_t *pt2, real_t *bm2)
 {
   idx_t i;
@@ -204,7 +204,7 @@ int BetterBalanceKWay(idx_t ncon, idx_t *vwgt, real_t *ubvec,
     nrm2 += tmp*tmp;
     max2 = (tmp > max2 ? tmp : max2);
 
-    //printf("%4d %4d %4d %4d %4d %4d %4d %.2f\n",
+    //printf("%4d %4d %4d %4d %4d %4d %4d %.2f\n", 
     //    (int)vwgt[i],
     //    (int)a1, (int)pt1[i], (int)tpt1[i],
     //    (int)a2, (int)pt2[i], (int)tpt2[i], ubvec[i]);
@@ -222,9 +222,9 @@ int BetterBalanceKWay(idx_t ncon, idx_t *vwgt, real_t *ubvec,
 
 
 /*************************************************************************/
-/*! Computes the maximum load imbalance of a partitioning solution over
+/*! Computes the maximum load imbalance of a partitioning solution over 
     all the constraints. */
-/**************************************************************************/
+/**************************************************************************/ 
 real_t ComputeLoadImbalance(graph_t *graph, idx_t nparts, real_t *pijbm)
 {
   idx_t i, j, ncon, *pwgts;
@@ -247,12 +247,12 @@ real_t ComputeLoadImbalance(graph_t *graph, idx_t nparts, real_t *pijbm)
 
 
 /*************************************************************************/
-/*! Computes the maximum load imbalance difference of a partitioning
-    solution over all the constraints.
-    The difference is defined with respect to the allowed maximum
-    unbalance for the respective constraint.
+/*! Computes the maximum load imbalance difference of a partitioning 
+    solution over all the constraints. 
+    The difference is defined with respect to the allowed maximum 
+    unbalance for the respective constraint. 
  */
-/**************************************************************************/
+/**************************************************************************/ 
 real_t ComputeLoadImbalanceDiff(graph_t *graph, idx_t nparts, real_t *pijbm,
            real_t *ubvec)
 {
@@ -276,12 +276,12 @@ real_t ComputeLoadImbalanceDiff(graph_t *graph, idx_t nparts, real_t *pijbm,
 
 
 /*************************************************************************/
-/*! Computes the difference between load imbalance of each constraint across
+/*! Computes the difference between load imbalance of each constraint across 
     the partitions minus the desired upper bound on the load imabalnce.
     It also returns the maximum load imbalance across the partitions &
     constraints. */
-/**************************************************************************/
-real_t ComputeLoadImbalanceDiffVec(graph_t *graph, idx_t nparts, real_t *pijbm,
+/**************************************************************************/ 
+real_t ComputeLoadImbalanceDiffVec(graph_t *graph, idx_t nparts, real_t *pijbm, 
          real_t *ubfactors, real_t *diffvec)
 {
   idx_t i, j, ncon, *pwgts;
@@ -307,8 +307,8 @@ real_t ComputeLoadImbalanceDiffVec(graph_t *graph, idx_t nparts, real_t *pijbm,
 
 /*************************************************************************/
 /*! Computes the load imbalance of each constraint across the partitions. */
-/**************************************************************************/
-void ComputeLoadImbalanceVec(graph_t *graph, idx_t nparts, real_t *pijbm,
+/**************************************************************************/ 
+void ComputeLoadImbalanceVec(graph_t *graph, idx_t nparts, real_t *pijbm, 
          real_t *lbvec)
 {
   idx_t i, j, ncon, *pwgts;
@@ -326,3 +326,5 @@ void ComputeLoadImbalanceVec(graph_t *graph, idx_t nparts, real_t *pijbm,
     }
   }
 }
+
+

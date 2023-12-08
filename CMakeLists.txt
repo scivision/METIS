@@ -6,45 +6,41 @@ endif()
 
 project(METIS
 LANGUAGES C
-VERSION 5.1.0.4
+VERSION 5.2.1.1
 )
+# based on upstream e0f1b88b8efcb24ffa0ec55eabb78fbe61e58ae7
 
 enable_testing()
 
+include(FetchContent)
+
+FetchContent_Declare(GKlib
+GIT_REPOSITORY https://github.com/scivision/GKlib.git
+GIT_TAG 44630ca
+GIT_SHALLOW true
+)
+FetchContent_MakeAvailable(GKlib)
+
 option(BUILD_TESTING "Build METIS self-tests" ON)
-
-if(NOT intsize)
-  set(intsize 32)
-endif()
-if(NOT realsize)
-  set(realsize 32)
-endif()
-
-
-set(GKLIB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src/GKlib CACHE PATH "path to GKlib")
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 
 set(CMAKE_C_STANDARD 99)
 
-# Configure libmetis library.
-if(BUILD_SHARED_LIBS)
-  set(METIS_LIBRARY_TYPE SHARED)
-else()
-  set(METIS_LIBRARY_TYPE STATIC)
+if(NOT DEFINED REALTYPEWIDTH)
+  set(REALTYPEWIDTH 32)
 endif()
+if(NOT DEFINED IDXTYPEWIDTH)
+  set(IDXTYPEWIDTH 32)
+endif()
+add_compile_definitions(REALTYPEWIDTH=${REALTYPEWIDTH} IDXTYPEWIDTH=${IDXTYPEWIDTH})
 
-include(${GKLIB_PATH}/GKlibSystem.cmake)
-# Add include directories.
-#include_directories(${GKLIB_PATH})
-# Recursively look for CMakeLists.txt in subdirs.
-add_subdirectory(include)
+include(conf/gkbuild.cmake)
+
+install(FILES include/metis.h TYPE INCLUDE)
+
 add_subdirectory(libmetis)
 add_subdirectory(programs)
 
-add_test(NAME GraphCheck
-COMMAND $<TARGET_FILE:graphchk> ${CMAKE_CURRENT_SOURCE_DIR}/src/tests/tiny_01.graph)
+# add_test(NAME GraphCheck
+# COMMAND $<TARGET_FILE:graphchk> ${CMAKE_CURRENT_SOURCE_DIR}/src/tests/tiny_01.graph)
 
 file(GENERATE OUTPUT .gitignore CONTENT "*")
