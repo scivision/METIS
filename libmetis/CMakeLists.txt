@@ -1,16 +1,8 @@
-# Find sources.
-file(GLOB metis_sources *.c)
-# Build libmetis.
-add_library(metis ${METIS_LIBRARY_TYPE} ${GKlib_sources} ${metis_sources})
-target_include_directories(metis PUBLIC
-$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-$<INSTALL_INTERFACE:include>
-PRIVATE ${PROJECT_SOURCE_DIR}/include ${gklib_SOURCE_DIR}
+target_sources(metis PRIVATE
+auxapi.c	contig.c	graph.c		mesh.c		options.c	srefine.c
+balance.c	debug.c		initpart.c	meshpart.c	parmetis.c	stat.c
+bucketsort.c	fm.c		kmetis.c	minconn.c	pmetis.c	timing.c
+checkgraph.c	fortran.c	kwayfm.c	mincover.c	refine.c	util.c
+coarsen.c	frename.c	kwayrefine.c	mmd.c		separator.c	wspace.c
+compress.c	gklib.c		mcutil.c	ometis.c	sfm.c
 )
-target_link_libraries(metis
-PRIVATE
-GKlib
-$<$<BOOL:${UNIX}>:m>
-)
-
-install(TARGETS metis)
