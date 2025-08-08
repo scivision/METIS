@@ -13,6 +13,7 @@ VERSION 5.2.1.2
 enable_testing()
 
 include(FetchContent)
+include(GNUInstallDirs)
 include(cmake/GitSubmodule.cmake)
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND metis_IS_TOP_LEVEL)
@@ -41,12 +42,11 @@ install(FILES include/metis.h TYPE INCLUDE)
 add_library(metis)
 target_include_directories(metis PUBLIC
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libmetis>
-$<INSTALL_INTERFACE:include>
+$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 PRIVATE ${PROJECT_SOURCE_DIR}/include ${gklib_SOURCE_DIR}
 )
 target_link_libraries(metis
-PUBLIC GKlib
-PRIVATE $<$<BOOL:${UNIX}>:m>
+PUBLIC GKlib $<$<BOOL:${UNIX}>:m>
 )
 
 install(TARGETS metis EXPORT ${PROJECT_NAME}-targets)
