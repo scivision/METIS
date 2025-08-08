@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14...4.1)
+cmake_minimum_required(VERSION 3.16...4.1)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT DEFINED ENV{CMAKE_BUILD_TYPE})
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Debug or Release")
@@ -12,7 +12,6 @@ VERSION 5.2.1.2
 
 enable_testing()
 
-include(FetchContent)
 include(GNUInstallDirs)
 include(cmake/GitSubmodule.cmake)
 
@@ -43,11 +42,14 @@ add_library(metis)
 target_include_directories(metis PUBLIC
 "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libmetis;${CMAKE_CURRENT_SOURCE_DIR}/include>"
 $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-PRIVATE ${PROJECT_SOURCE_DIR}/include ${gklib_SOURCE_DIR}
+PRIVATE ${PROJECT_SOURCE_DIR}/include
 )
 target_link_libraries(metis
-PUBLIC GKlib $<$<BOOL:${UNIX}>:m>
+PUBLIC GKlib::GKlib $<$<BOOL:${UNIX}>:m>
 )
+
+add_library(metis::metis INTERFACE IMPORTED GLOBAL)
+target_link_libraries(metis::metis INTERFACE metis)
 
 install(TARGETS metis EXPORT ${PROJECT_NAME}-targets)
 
