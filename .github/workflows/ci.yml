@@ -7,6 +7,13 @@ on:
       - "**.cmake"
       - "**/CMakeLists.txt"
       - ".github/workflows/ci.yml"
+  workflow_dispatch:
+
+# avoid wasted runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 
 jobs:
 
@@ -21,7 +28,8 @@ jobs:
     timeout-minutes: 5
 
     steps:
-    - uses: actions/checkout@v4
+    - &checkout
+       uses: actions/checkout@v4
 
     - run: cmake -B build -DIDXTYPEWIDTH=${{ matrix.intsize }}
     - run: cmake --build build --parallel
@@ -34,10 +42,6 @@ jobs:
     timeout-minutes: 5
 
     steps:
-    - uses: actions/checkout@v4
+    - *checkout
 
-    - run: cmake -B build
-
-    - run: cmake --build build --config Release --parallel
-
-    - run: ctest --test-dir build -C Release -V
+    - run: cmake --workflow release

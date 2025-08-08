@@ -20,7 +20,7 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND metis_IS_TOP_LEVEL)
   set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/local" CACHE PATH "install prefix" FORCE)
 endif()
 
-option(BUILD_TESTING "Build METIS self-tests" ON)
+option(BUILD_TESTING "Build METIS self-tests")
 
 message(STATUS "${PROJECT_NAME} ${PROJECT_VERSION} CMake ${CMAKE_VERSION} install prefix ${CMAKE_INSTALL_PREFIX}")
 
@@ -41,7 +41,7 @@ install(FILES include/metis.h TYPE INCLUDE)
 # Build libmetis.
 add_library(metis)
 target_include_directories(metis PUBLIC
-$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libmetis>
+"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libmetis;${CMAKE_CURRENT_SOURCE_DIR}/include>"
 $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 PRIVATE ${PROJECT_SOURCE_DIR}/include ${gklib_SOURCE_DIR}
 )
