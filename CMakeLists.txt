@@ -6,13 +6,14 @@ endif()
 
 project(metis
 LANGUAGES C
-VERSION 5.2.1.1
+VERSION 5.2.1.2
 )
 # based on upstream e0f1b88b8efcb24ffa0ec55eabb78fbe61e58ae7
 
 enable_testing()
 
 include(FetchContent)
+include(cmake/GitSubmodule.cmake)
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND metis_IS_TOP_LEVEL)
   set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/local" CACHE PATH "install prefix" FORCE)
@@ -22,12 +23,8 @@ option(BUILD_TESTING "Build METIS self-tests" ON)
 
 message(STATUS "${PROJECT_NAME} ${PROJECT_VERSION} CMake ${CMAKE_VERSION} install prefix ${CMAKE_INSTALL_PREFIX}")
 
-FetchContent_Declare(GKlib
-GIT_REPOSITORY https://github.com/scivision/GKlib.git
-GIT_TAG 6897bfe
-GIT_SHALLOW true
-)
-FetchContent_MakeAvailable(GKlib)
+git_submodule(${CMAKE_CURRENT_SOURCE_DIR}/GKlib)
+add_subdirectory(GKlib)
 
 set(CMAKE_C_STANDARD 99)
 
