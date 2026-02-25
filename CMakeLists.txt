@@ -46,8 +46,7 @@ target_link_libraries(metis
 PUBLIC GKlib::GKlib $<$<BOOL:${UNIX}>:m>
 )
 
-add_library(metis::metis INTERFACE IMPORTED GLOBAL)
-target_link_libraries(metis::metis INTERFACE metis)
+add_library(metis::metis ALIAS metis)
 
 install(TARGETS metis EXPORT ${PROJECT_NAME}-targets)
 
