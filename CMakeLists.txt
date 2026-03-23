@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20...4.1)
+cmake_minimum_required(VERSION 3.21...4.3)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT DEFINED ENV{CMAKE_BUILD_TYPE})
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Debug or Release")
@@ -13,7 +13,7 @@ VERSION 5.2.1.3
 enable_testing()
 
 include(GNUInstallDirs)
-include(cmake/GitSubmodule.cmake)
+include(FetchContent)
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND metis_IS_TOP_LEVEL)
   set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/local" CACHE PATH "install prefix" FORCE)
@@ -23,8 +23,10 @@ option(BUILD_TESTING "Build METIS self-tests")
 
 message(STATUS "${PROJECT_NAME} ${PROJECT_VERSION} CMake ${CMAKE_VERSION} install prefix ${CMAKE_INSTALL_PREFIX}")
 
-git_submodule(${CMAKE_CURRENT_SOURCE_DIR}/GKlib)
-add_subdirectory(GKlib)
+set(gklib_url "https://github.com/scivision/GKlib/archive/b4c45d104d421d3adb85fb900ca240eba781c95f.tar.gz")
+FetchContent_Declare(GKlib URL ${gklib_url})
+FetchContent_MakeAvailable(GKlib)
+
 
 set(CMAKE_C_STANDARD 99)
 

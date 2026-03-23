@@ -1,4 +1,0 @@
-[submodule "GKlib"]
-	path = GKlib
-	url = https://github.com/scivision/GKlib
-	shallow = true
