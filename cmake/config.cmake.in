@@ -4,4 +4,7 @@ find_dependency(GKlib CONFIG)
 
 include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@-targets.cmake)
 
+set(METIS_REALTYPEWIDTH @REALTYPEWIDTH@)
+set(METIS_IDXTYPEWIDTH @IDXTYPEWIDTH@)
+
 check_required_components(@PROJECT_NAME@)

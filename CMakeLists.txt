@@ -4,7 +4,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT DEFINED ENV{CMAKE_BUILD_TYPE})
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Debug or Release")
 endif()
 
-project(metis
+project(METIS
 LANGUAGES C
 VERSION 5.2.1.3
 )
@@ -15,7 +15,7 @@ enable_testing()
 include(GNUInstallDirs)
 include(FetchContent)
 
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND metis_IS_TOP_LEVEL)
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND METIS_IS_TOP_LEVEL)
   set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/local" CACHE PATH "install prefix" FORCE)
 endif()
 
@@ -48,7 +48,7 @@ target_link_libraries(metis
 PUBLIC GKlib::GKlib $<$<BOOL:${UNIX}>:m>
 )
 
-add_library(metis::metis ALIAS metis)
+add_library(METIS::METIS ALIAS metis)
 
 install(TARGETS metis EXPORT ${PROJECT_NAME}-targets)
 

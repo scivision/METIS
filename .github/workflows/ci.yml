@@ -14,18 +14,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  CMAKE_GENERATOR: Ninja
 
 
 jobs:
 
   unix:
-
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        intsize: [32, 64]
 
     runs-on: ${{ matrix.os }}
     timeout-minutes: 5
@@ -34,17 +30,28 @@ jobs:
     - &checkout
        uses: actions/checkout@v6
 
-    - run: cmake -B build -DIDXTYPEWIDTH=${{ matrix.intsize }}
-    - run: cmake --build build
-
-    - run: ctest --test-dir build -V
+    - run: cmake --workflow default
 
 
-  windows_msvc:
-    runs-on: windows-latest
+  int64:
+    runs-on: ubuntu-latest
     timeout-minutes: 5
 
     steps:
     - *checkout
 
-    - run: cmake --workflow release
+    - run: cmake --workflow int64
+
+
+  windows_mingw:
+    runs-on: windows-latest
+    timeout-minutes: 5
+
+    env:
+      CMAKE_GENERATOR: Ninja
+
+
+    steps:
+    - *checkout
+
+    - run: cmake --workflow default
