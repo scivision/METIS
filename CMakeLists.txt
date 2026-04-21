@@ -6,7 +6,7 @@ endif()
 
 project(METIS
 LANGUAGES C
-VERSION 5.2.1.3
+VERSION 5.2.1.4
 )
 # based on upstream e0f1b88b8efcb24ffa0ec55eabb78fbe61e58ae7
 
@@ -30,18 +30,24 @@ FetchContent_MakeAvailable(GKlib)
 
 set(CMAKE_C_STANDARD 99)
 
-add_compile_definitions(
-"REALTYPEWIDTH=$<IF:$<BOOL:${REALTYPEWIDTH}>,${REALTYPEWIDTH},32>"
-"IDXTYPEWIDTH=$<IF:$<BOOL:${IDXTYPEWIDTH}>,${IDXTYPEWIDTH},32>"
-)
+if(NOT DEFINED IDXTYPEWIDTH)
+  set(IDXTYPEWIDTH 32)
+endif()
+if(NOT DEFINED REALTYPEWIDTH)
+  set(REALTYPEWIDTH 32)
+endif()
+
+configure_file(include/metis.h.in metis.h @ONLY)
+
 include(conf/gkbuild.cmake)
 
-install(FILES include/metis.h TYPE INCLUDE)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/metis.h TYPE INCLUDE)
 
 # Build libmetis.
 add_library(metis)
 target_include_directories(metis PUBLIC
-"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libmetis;${CMAKE_CURRENT_SOURCE_DIR}/include>"
+"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libmetis;${CMAKE_CURRENT_BINARY_DIR}>"
+
 $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 target_link_libraries(metis
