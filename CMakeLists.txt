@@ -27,7 +27,8 @@ option(METIS_BUILD_TESTING "Build METIS self-tests")
 
 message(STATUS "${PROJECT_NAME} ${PROJECT_VERSION} CMake ${CMAKE_VERSION} install prefix ${CMAKE_INSTALL_PREFIX}")
 
-set(gklib_url "https://github.com/scivision/GKlib/archive/b4c45d104d421d3adb85fb900ca240eba781c95f.tar.gz")
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/cmake/libraries.json _json)
+string(JSON gklib_url GET "${_json}" "gklib")
 FetchContent_Declare(GKlib URL ${gklib_url})
 FetchContent_MakeAvailable(GKlib)
 
