@@ -14,6 +14,8 @@
 
 #include "metisbin.h"
 
+#include <stdlib.h>
+
 
 
 /*************************************************************************/
@@ -27,17 +29,17 @@ int main(int argc, char *argv[])
   params_t params;
 
   if (argc != 2 && argc != 3) {
-    printf("Usage: %s <GraphFile> [FixedGraphFile (for storing the fixed graph)]\n", argv[0]);
-    exit(0);
+    fprintf(stderr, "Usage: %s <GraphFile> [FixedGraphFile (for storing the fixed graph)]\n", argv[0]);
+    return EXIT_FAILURE;
   }
 
   memset((void *)&params, 0, sizeof(params_t));
   params.filename = gk_strdup(argv[1]);
-    
+
   graph = ReadGraph(&params);
   if (graph->nvtxs == 0) {
-    printf("Empty graph!\n");
-    exit(0);
+    fprintf(stderr, "Empty graph!\n");
+    return EXIT_FAILURE;
   }
 
   printf("**********************************************************************\n");
@@ -47,7 +49,7 @@ int main(int argc, char *argv[])
       8*sizeof(idx_t), 8*sizeof(real_t), 8*sizeof(idx_t *));
   printf("\n");
   printf("Graph Information ---------------------------------------------------\n");
-  printf("  Name: %s, #Vertices: %"PRIDX", #Edges: %"PRIDX"\n\n", 
+  printf("  Name: %s, #Vertices: %"PRIDX", #Edges: %"PRIDX"\n\n",
       params.filename, graph->nvtxs, graph->nedges/2);
   printf("Checking Graph... ---------------------------------------------------\n");
 
@@ -55,12 +57,14 @@ int main(int argc, char *argv[])
     printf("   The format of the graph is correct!\n");
   }
   else {
-    printf("   The format of the graph is incorrect!\n");
+    fprintf(stderr, "   The format of the graph is incorrect!\n");
     if (argc == 3) {
       fgraph = FixGraph(graph);
       WriteGraph(fgraph, argv[2]);
       FreeGraph(&fgraph);
       printf("   A corrected version was stored at %s\n", argv[2]);
+    } else {
+      return EXIT_FAILURE;
     }
   }
 
@@ -69,6 +73,4 @@ int main(int argc, char *argv[])
 
   FreeGraph(&graph);
   gk_free((void **)&params.filename, &params.tpwgtsfile, &params.tpwgts, LTERM);
-}  
-
-
+}
