@@ -35,7 +35,7 @@ typedef struct ckrinfo_t {
  idx_t id;              /*!< The internal degree of a vertex (sum of weights) */
  idx_t ed;            	/*!< The total external degree of a vertex */
  idx_t nnbrs;          	/*!< The number of neighboring subdomains */
- idx_t inbr;            /*!< The index in the cnbr_t array where the nnbrs list 
+ idx_t inbr;            /*!< The index in the cnbr_t array where the nnbrs list
                              of neighbors is stored */
 } ckrinfo_t;
 
@@ -62,7 +62,7 @@ typedef struct vkrinfo_t {
  idx_t ned;            	/*!< The total external degree of a vertex (count of edges) */
  idx_t gv;            	/*!< The volume gain of moving that vertex */
  idx_t nnbrs;          	/*!< The number of neighboring subdomains */
- idx_t inbr;            /*!< The index in the vnbr_t array where the nnbrs list 
+ idx_t inbr;            /*!< The index in the vnbr_t array where the nnbrs list
                              of neighbors is stored */
 } vkrinfo_t;
 
@@ -72,7 +72,7 @@ typedef struct vkrinfo_t {
     partition */
 /*************************************************************************/
 typedef struct nrinfo_t {
- idx_t edegrees[2];  
+ idx_t edegrees[2];
 } nrinfo_t;
 
 
@@ -81,7 +81,7 @@ typedef struct nrinfo_t {
 /*************************************************************************/
 typedef struct graph_t {
   idx_t nvtxs, nedges;	/* The # of vertices and edges in the graph */
-  idx_t ncon;		/* The # of constrains */ 
+  idx_t ncon;		/* The # of constrains */
   idx_t *xadj;		/* Pointers to the locally stored vertices */
   idx_t *vwgt;		/* Vertex weights */
   idx_t *vsize;		/* Vertex sizes for min-volume formulation */
@@ -176,7 +176,7 @@ typedef struct ctrl_t {
   real_t pfactor;		/* .1*(user-supplied prunning factor) */
 
   real_t *ubfactors;            /*!< The per-constraint ubfactors */
-  
+
   real_t *tpwgts;               /*!< The target partition weights */
   real_t *pijbm;                /*!< The nparts*ncon multiplies for the ith partition
                                      and jth constraint for obtaining the balance */
@@ -184,11 +184,11 @@ typedef struct ctrl_t {
   real_t cfactor;               /*!< The achieved compression factor */
 
   /* Various Timers */
-  double TotalTmr, InitPartTmr, MatchTmr, ContractTmr, CoarsenTmr, UncoarsenTmr, 
+  double TotalTmr, InitPartTmr, MatchTmr, ContractTmr, CoarsenTmr, UncoarsenTmr,
          RefTmr, ProjectTmr, SplitTmr, Aux1Tmr, Aux2Tmr, Aux3Tmr;
 
   /* Workspace information */
-  gk_mcore_t *mcore;    /*!< The persistent memory core for within function 
+  gk_mcore_t *mcore;    /*!< The persistent memory core for within function
                              mallocs/frees */
 
   /* These are for use by the k-way refinement routines */
@@ -204,7 +204,21 @@ typedef struct ctrl_t {
                              The size and current position of the pool is controlled
                              by nnbrs & cnbrs */
 
-  /* The subdomain graph, in sparse format  */ 
+  double *cnbrsqrt;     /*!< Precomputed lookup table cnbrsqrt[k] = sqrt((double)k) for
+                             k in [0,nparts], indexed by ckrinfo_t.nnbrs. Replaces the
+                             per-evaluation libm sqrt() in the k-way *cut* gain priority
+                             ed/sqrt(nnbrs), which is computed once per boundary vertex per
+                             refinement pass and once per adjacent vertex per move (see
+                             Greedy_KWayCutOptimize / Greedy_McKWayCutOptimize in kwayfm.c
+                             and the UpdateQueueInfo macro in macros.h).
+                             MUST stay double (not real_t): the division ed/sqrt(nnbrs) is
+                             evaluated in double before being narrowed into rgain, so a
+                             double table reproduces the exact IEEE result and keeps output
+                             bit-identical to the inline-sqrt version. A float table would
+                             silently change partitions. Allocated/freed with the refinement
+                             workspace; unused by the volume objective. */
+
+  /* The subdomain graph, in sparse format  */
   idx_t *maxnads;               /* The maximum allocated number of adjacent domains */
   idx_t *nads;                  /* The number of adjacent domains */
   idx_t **adids;                /* The IDs of the adjacent domains */

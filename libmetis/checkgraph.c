@@ -15,7 +15,7 @@
 
 
 /*************************************************************************/
-/*! This function checks if a graph is valid. A valid graph must satisfy 
+/*! This function checks if a graph is valid. A valid graph must satisfy
     the following constraints:
     - It should contain no self-edges.
     - It should be undirected; i.e., (u,v) and (v,u) should be present.
@@ -47,7 +47,7 @@ int CheckGraph(graph_t *graph, int numflag, int verbose)
 
   if (graph->nedges > 0) {
     minedge = maxedge = adjncy[0];
-    if (adjwgt) 
+    if (adjwgt)
       minewgt = maxewgt = adjwgt[0];
   }
 
@@ -73,10 +73,10 @@ int CheckGraph(graph_t *graph, int numflag, int verbose)
           if (adjncy[l] == i) {
             if (adjwgt) {
               if (adjwgt[l] != adjwgt[j]) {
-                if (verbose) 
+                if (verbose)
                   printf("Edges (u:%"PRIDX" v:%"PRIDX" wgt:%"PRIDX") and "
                          "(v:%"PRIDX" u:%"PRIDX" wgt:%"PRIDX") "
-                         "do not have the same weight!\n", 
+                         "do not have the same weight!\n",
                          i+numflag, k+numflag, adjwgt[j],
                          k+numflag, i+numflag, adjwgt[l]);
                 err++;
@@ -97,18 +97,18 @@ int CheckGraph(graph_t *graph, int numflag, int verbose)
       }
       else {
         if (verbose)
-          printf("Edge %"PRIDX" from vertex %"PRIDX" is repeated %"PRIDX" times\n", 
+          printf("Edge %"PRIDX" from vertex %"PRIDX" is repeated %"PRIDX" times\n",
               k+numflag, i+numflag, htable[k]++);
         err++;
       }
     }
 
-    for (j=xadj[i]; j<xadj[i+1]; j++) 
+    for (j=xadj[i]; j<xadj[i+1]; j++)
       htable[adjncy[j]] = 0;
   }
 
- 
-  if (err > 0 && verbose) { 
+
+  if (err > 0 && verbose) {
     printf("A total of %"PRIDX" errors exist in the input file. "
            "Correct them, and run again!\n", err);
   }
@@ -122,8 +122,8 @@ int CheckGraph(graph_t *graph, int numflag, int verbose)
 /*************************************************************************/
 /*! This function performs a quick check of the weights of the graph */
 /*************************************************************************/
-int CheckInputGraphWeights(idx_t nvtxs, idx_t ncon, idx_t *xadj, idx_t *adjncy, 
-        idx_t *vwgt, idx_t *vsize, idx_t *adjwgt) 
+int CheckInputGraphWeights(idx_t nvtxs, idx_t ncon, idx_t *xadj, idx_t *adjncy,
+        idx_t *vwgt, idx_t *vsize, idx_t *adjwgt)
 {
   idx_t i;
 
@@ -133,7 +133,7 @@ int CheckInputGraphWeights(idx_t nvtxs, idx_t ncon, idx_t *xadj, idx_t *adjncy,
   }
 
   if (vwgt) {
-    for (i=ncon*nvtxs; i>=0; i--) {
+    for (i=ncon*nvtxs-1; i>=0; i--) {
       if (vwgt[i] < 0) {
         printf("Input Error: negative vertex weight(s).\n");
         return 0;
@@ -141,7 +141,7 @@ int CheckInputGraphWeights(idx_t nvtxs, idx_t ncon, idx_t *xadj, idx_t *adjncy,
     }
   }
   if (vsize) {
-    for (i=nvtxs; i>=0; i--) {
+    for (i=nvtxs-1; i>=0; i--) {
       if (vsize[i] < 0) {
         printf("Input Error: negative vertex sizes(s).\n");
         return 0;
@@ -162,7 +162,7 @@ int CheckInputGraphWeights(idx_t nvtxs, idx_t ncon, idx_t *xadj, idx_t *adjncy,
 
 
 /*************************************************************************/
-/*! This function creates a graph whose topology is consistent with 
+/*! This function creates a graph whose topology is consistent with
     Metis' requirements that:
     - There are no self-edges.
     - It is undirected; i.e., (u,v) and (v,u) should be present and of the
@@ -199,7 +199,7 @@ graph_t *FixGraph(graph_t *graph)
 
   /* deal with vertex weights/sizes */
   ngraph->ncon  = graph->ncon;
-  ngraph->vwgt  = icopy(nvtxs*graph->ncon, graph->vwgt, 
+  ngraph->vwgt  = icopy(nvtxs*graph->ncon, graph->vwgt,
                         imalloc(nvtxs*graph->ncon, "FixGraph: vwgt"));
 
   ngraph->vsize = ismalloc(nvtxs, 1, "FixGraph: vsize");
@@ -265,4 +265,3 @@ graph_t *FixGraph(graph_t *graph)
 
   return ngraph;
 }
-

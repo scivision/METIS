@@ -14,15 +14,15 @@
 
 /*************************************************************************/
 /*! This function compresses a graph by merging identical vertices
-    The compression should lead to at least 10% reduction. 
+    The compression should lead to at least 10% reduction.
 
     The compressed graph that is generated has its adjwgts set to 1.
 
     \returns 1 if compression was performed, otherwise it returns 0.
- 
+
 */
 /**************************************************************************/
-graph_t *CompressGraph(ctrl_t *ctrl, idx_t nvtxs, idx_t *xadj, idx_t *adjncy, 
+graph_t *CompressGraph(ctrl_t *ctrl, idx_t nvtxs, idx_t *xadj, idx_t *adjncy,
              idx_t *vwgt, idx_t *cptr, idx_t *cind)
 {
   idx_t i, ii, iii, j, jj, k, l, cnvtxs, cnedges;
@@ -50,7 +50,7 @@ graph_t *CompressGraph(ctrl_t *ctrl, idx_t nvtxs, idx_t *xadj, idx_t *adjncy,
     ii = keys[i].val;
     if (map[ii] == -1) {
       mark[ii] = i;  /* Add the diagonal entry */
-      for (j=xadj[ii]; j<xadj[ii+1]; j++) 
+      for (j=xadj[ii]; j<xadj[ii+1]; j++)
         mark[adjncy[j]] = i;
 
       map[ii]   = cnvtxs;
@@ -62,7 +62,7 @@ graph_t *CompressGraph(ctrl_t *ctrl, idx_t nvtxs, idx_t *xadj, idx_t *adjncy,
         if (keys[i].key != keys[j].key || xadj[ii+1]-xadj[ii] != xadj[iii+1]-xadj[iii])
           break; /* Break if keys or degrees are different */
 
-        if (map[iii] == -1) { /* Do a comparison if iii has not been mapped */ 
+        if (map[iii] == -1) { /* Do a comparison if iii has not been mapped */
           for (jj=xadj[iii]; jj<xadj[iii+1]; jj++) {
             if (mark[adjncy[jj]] != i)
               break;
@@ -76,15 +76,32 @@ graph_t *CompressGraph(ctrl_t *ctrl, idx_t nvtxs, idx_t *xadj, idx_t *adjncy,
       }
 
       cptr[++cnvtxs] = l;
+
+      /* cnvtxs only grows, so once it reaches the rejection threshold the graph
+         is provably incompressible; stop the (verification-heavy) scan early.
+         Same predicate as the post-loop test, so the accept/reject decision and
+         all output are unchanged -- only the reject-path group count stops short.
+         This is the sole break in the outer loop, so afterward i<nvtxs iff we
+         aborted here (i==nvtxs on normal completion). */
+      if (cnvtxs >= COMPRESSION_FRACTION*nvtxs)
+        break;
     }
   }
 
-  IFSET(ctrl->dbglvl, METIS_DBG_INFO, 
-        printf("  Compression: reduction in # of vertices: %"PRIDX".\n", nvtxs-cnvtxs)); 
+  /* i < nvtxs means the loop aborted early (graph incompressible): cnvtxs is then
+     only a partial group count (the true final count would be larger), so
+     nvtxs-cnvtxs OVERSTATES the reduction -- it is an upper bound, not the exact
+     value. Mark it '<= ... (approx)' rather than scanning on to make it exact, since
+     the graph is rejected as incompressible either way. On the accept path the loop
+     always completes (i == nvtxs), so the figure is exact and printed unmarked. */
+  IFSET(ctrl->dbglvl, METIS_DBG_INFO,
+        printf("  Compression: reduction in # of vertices: %s%"PRIDX"%s.\n",
+               (i < nvtxs ? "<=" : ""), nvtxs-cnvtxs,
+               (i < nvtxs ? " (approx; incompressible, scan stopped early)" : "")));
 
 
   if (cnvtxs < COMPRESSION_FRACTION*nvtxs) {
-    /* Sufficient compression is possible, so go ahead and create the 
+    /* Sufficient compression is possible, so go ahead and create the
        compressed graph */
 
     graph = CreateGraph();
@@ -109,10 +126,10 @@ graph_t *CompressGraph(ctrl_t *ctrl, idx_t nvtxs, idx_t *xadj, idx_t *adjncy,
       for (j=cptr[i]; j<cptr[i+1]; j++) {
         ii = cind[j];
 
-        /* accumulate the vertex weights of the consistuent vertices */
+        /* accumulate the vertex weights of the constituent vertices */
         cvwgt[i] += (vwgt == NULL ? 1 : vwgt[ii]);
 
-        /* generate the combined adjancency list */
+        /* generate the combined adjacency list */
         for (jj=xadj[ii]; jj<xadj[ii+1]; jj++) {
           k = map[adjncy[jj]];
           if (mark[k] != i) {
@@ -141,13 +158,13 @@ graph_t *CompressGraph(ctrl_t *ctrl, idx_t nvtxs, idx_t *xadj, idx_t *adjncy,
 
 
 /*************************************************************************/
-/*! This function prunes all the vertices in a graph with degree greater 
-    than factor*average. 
+/*! This function prunes all the vertices in a graph with degree greater
+    than factor*average.
 
     \returns the number of vertices that were prunned.
 */
 /*************************************************************************/
-graph_t *PruneGraph(ctrl_t *ctrl, idx_t nvtxs, idx_t *xadj, idx_t *adjncy, 
+graph_t *PruneGraph(ctrl_t *ctrl, idx_t nvtxs, idx_t *xadj, idx_t *adjncy,
              idx_t *vwgt, idx_t *iperm, real_t factor)
 {
   idx_t i, j, k, l, nlarge, pnvtxs, pnedges;
@@ -172,11 +189,11 @@ graph_t *PruneGraph(ctrl_t *ctrl, idx_t nvtxs, idx_t *xadj, idx_t *adjncy,
     }
   }
 
-  IFSET(ctrl->dbglvl, METIS_DBG_INFO, 
-        printf("  Pruned %"PRIDX" of %"PRIDX" vertices.\n", nlarge, nvtxs)); 
+  IFSET(ctrl->dbglvl, METIS_DBG_INFO,
+        printf("  Pruned %"PRIDX" of %"PRIDX" vertices.\n", nlarge, nvtxs));
 
 
-  if (nlarge > 0 && nlarge < nvtxs) {  
+  if (nlarge > 0 && nlarge < nvtxs) {
     /* Prunning is possible, so go ahead and create the prunned graph */
     graph = CreateGraph();
 
@@ -190,10 +207,10 @@ graph_t *PruneGraph(ctrl_t *ctrl, idx_t nvtxs, idx_t *xadj, idx_t *adjncy,
     for (i=0; i<nvtxs; i++) {
       if (xadj[i+1]-xadj[i] < factor) {
         pvwgt[l] = (vwgt == NULL ? 1 : vwgt[i]);
-        
+
         for (j=xadj[i]; j<xadj[i+1]; j++) {
           k = perm[adjncy[j]];
-          if (k < pnvtxs) 
+          if (k < pnvtxs)
             padjncy[pnedges++] = k;
         }
         pxadj[++l] = pnedges;
@@ -207,8 +224,8 @@ graph_t *PruneGraph(ctrl_t *ctrl, idx_t nvtxs, idx_t *xadj, idx_t *adjncy,
     SetupGraph_tvwgt(graph);
     SetupGraph_label(graph);
   }
-  else if (nlarge > 0 && nlarge == nvtxs) {  
-    IFSET(ctrl->dbglvl, METIS_DBG_INFO, 
+  else if (nlarge > 0 && nlarge == nvtxs) {
+    IFSET(ctrl->dbglvl, METIS_DBG_INFO,
           printf("  Pruning is ignored as it removes all vertices.\n"));
     nlarge = 0;
   }
@@ -218,12 +235,3 @@ graph_t *PruneGraph(ctrl_t *ctrl, idx_t nvtxs, idx_t *xadj, idx_t *adjncy,
 
   return graph;
 }
-
-
-
-
-
-
-
-
-

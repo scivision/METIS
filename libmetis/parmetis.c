@@ -19,14 +19,14 @@
 /*! This function is the entry point for the node ND code for ParMETIS.
     The difference between this routine and the standard METIS_NodeND are
     the following
-    
+
     - It performs at least log2(npes) levels of nested dissection.
     - It stores the size of the log2(npes) top-level separators in the
       sizes array.
 */
 /*************************************************************************/
 int METIS_NodeNDP(idx_t nvtxs, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
-           idx_t npes, idx_t *options, idx_t *perm, idx_t *iperm, idx_t *sizes) 
+           idx_t npes, idx_t *options, idx_t *perm, idx_t *iperm, idx_t *sizes)
 {
   idx_t i, ii, j, l, nnvtxs=0;
   graph_t *graph;
@@ -39,7 +39,7 @@ int METIS_NodeNDP(idx_t nvtxs, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
   IFSET(ctrl->dbglvl, METIS_DBG_TIME, InitTimers(ctrl));
   IFSET(ctrl->dbglvl, METIS_DBG_TIME, gk_startcputimer(ctrl->TotalTmr));
 
-  /* compress the graph; not that compression only happens if not prunning 
+  /* compress the graph; not that compression only happens if not prunning
      has taken place. */
   if (ctrl->compress) {
     cptr = imalloc(nvtxs+1, "OMETIS: cptr");
@@ -57,7 +57,7 @@ int METIS_NodeNDP(idx_t nvtxs, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
   }
 
   /* if no compression, setup the graph in the normal way. */
-  if (ctrl->compress == 0) 
+  if (ctrl->compress == 0)
     graph = SetupGraph(ctrl, nvtxs, 1, xadj, adjncy, vwgt, NULL, NULL);
 
 
@@ -71,10 +71,10 @@ int METIS_NodeNDP(idx_t nvtxs, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
 
 
   /* Uncompress the ordering */
-  if (ctrl->compress) { 
+  if (ctrl->compress) {
     /* construct perm from iperm */
     for (i=0; i<nnvtxs; i++)
-      perm[iperm[i]] = i; 
+      perm[iperm[i]] = i;
     for (l=ii=0; ii<nnvtxs; ii++) {
       i = perm[ii];
       for (j=cptr[i]; j<cptr[i+1]; j++)
@@ -102,7 +102,7 @@ int METIS_NodeNDP(idx_t nvtxs, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
 /*! This function is similar to MlevelNestedDissection with the difference
     that it also records separator sizes for the top log2(npes) levels */
 /**************************************************************************/
-void MlevelNestedDissectionP(ctrl_t *ctrl, graph_t *graph, idx_t *order, 
+void MlevelNestedDissectionP(ctrl_t *ctrl, graph_t *graph, idx_t *order,
          idx_t lastvtx, idx_t npes, idx_t cpos, idx_t *sizes)
 {
   idx_t i, j, nvtxs, nbnd;
@@ -118,8 +118,8 @@ void MlevelNestedDissectionP(ctrl_t *ctrl, graph_t *graph, idx_t *order,
 
   MlevelNodeBisectionMultiple(ctrl, graph);
 
-  IFSET(ctrl->dbglvl, METIS_DBG_SEPINFO, 
-      printf("Nvtxs: %6"PRIDX", [%6"PRIDX" %6"PRIDX" %6"PRIDX"]\n", 
+  IFSET(ctrl->dbglvl, METIS_DBG_SEPINFO,
+      printf("Nvtxs: %6"PRIDX", [%6"PRIDX" %6"PRIDX" %6"PRIDX"]\n",
         graph->nvtxs, graph->pwgts[0], graph->pwgts[1], graph->pwgts[2]));
 
   if (cpos < npes-1) {
@@ -132,7 +132,7 @@ void MlevelNestedDissectionP(ctrl_t *ctrl, graph_t *graph, idx_t *order,
   nbnd   = graph->nbnd;
   bndind = graph->bndind;
   label  = graph->label;
-  for (i=0; i<nbnd; i++) 
+  for (i=0; i<nbnd; i++)
     order[label[bndind[i]]] = --lastvtx;
 
   SplitGraphOrder(ctrl, graph, &lgraph, &rgraph);
@@ -140,27 +140,27 @@ void MlevelNestedDissectionP(ctrl_t *ctrl, graph_t *graph, idx_t *order,
   /* Free the memory of the top level graph */
   FreeGraph(&graph);
 
-  if ((lgraph->nvtxs > MMDSWITCH || 2*cpos+2 < npes-1) && lgraph->nedges > 0) 
+  if ((lgraph->nvtxs > MMDSWITCH || 2*cpos+2 < npes-1) && lgraph->nedges > 0)
     MlevelNestedDissectionP(ctrl, lgraph, order, lastvtx-rgraph->nvtxs, npes, 2*cpos+2, sizes);
   else {
-    MMDOrder(ctrl, lgraph, order, lastvtx-rgraph->nvtxs); 
+    MMDOrder(ctrl, lgraph, order, lastvtx-rgraph->nvtxs);
     FreeGraph(&lgraph);
   }
-  if ((rgraph->nvtxs > MMDSWITCH || 2*cpos+1 < npes-1) && rgraph->nedges > 0) 
+  if ((rgraph->nvtxs > MMDSWITCH || 2*cpos+1 < npes-1) && rgraph->nedges > 0)
     MlevelNestedDissectionP(ctrl, rgraph, order, lastvtx, npes, 2*cpos+1, sizes);
   else {
-    MMDOrder(ctrl, rgraph, order, lastvtx); 
+    MMDOrder(ctrl, rgraph, order, lastvtx);
     FreeGraph(&rgraph);
   }
 }
 
 
 /*************************************************************************/
-/*! This function bisects a graph by computing a vertex separator 
+/*! This function bisects a graph by computing a vertex separator
 */
 /**************************************************************************/
-int METIS_ComputeVertexSeparator(idx_t *nvtxs, idx_t *xadj, idx_t *adjncy, 
-           idx_t *vwgt, idx_t *options, idx_t *r_sepsize, idx_t *part) 
+int METIS_ComputeVertexSeparator(idx_t *nvtxs, idx_t *xadj, idx_t *adjncy,
+           idx_t *vwgt, idx_t *options, idx_t *r_sepsize, idx_t *part)
 {
   idx_t i, j;
   graph_t *graph;
@@ -177,7 +177,7 @@ int METIS_ComputeVertexSeparator(idx_t *nvtxs, idx_t *xadj, idx_t *adjncy,
 
   /*============================================================
    * Perform the bisection
-   *============================================================*/ 
+   *============================================================*/
   ctrl->CoarsenTo = 100;
 
   MlevelNodeBisectionMultiple(ctrl, graph);
@@ -197,7 +197,7 @@ int METIS_ComputeVertexSeparator(idx_t *nvtxs, idx_t *xadj, idx_t *adjncy,
 /*! This function is the entry point of a node-based separator refinement
     of the nodes with an hmarker[] of 0. */
 /*************************************************************************/
-int METIS_NodeRefine(idx_t nvtxs, idx_t *xadj, idx_t *vwgt, idx_t *adjncy, 
+int METIS_NodeRefine(idx_t nvtxs, idx_t *xadj, idx_t *vwgt, idx_t *adjncy,
            idx_t *where, idx_t *hmarker, real_t ubfactor)
 {
   graph_t *graph;
@@ -219,7 +219,7 @@ int METIS_NodeRefine(idx_t nvtxs, idx_t *xadj, idx_t *vwgt, idx_t *adjncy,
 
   Compute2WayNodePartitionParams(ctrl, graph);
 
-  FM_2WayNodeRefine1SidedP(ctrl, graph, hmarker, ubfactor, 10); 
+  FM_2WayNodeRefine1SidedP(ctrl, graph, hmarker, ubfactor, 10);
   /* FM_2WayNodeRefine2SidedP(ctrl, graph, hmarker, ubfactor, 10); */
 
   icopy(nvtxs, graph->where, where);
@@ -235,15 +235,15 @@ int METIS_NodeRefine(idx_t nvtxs, idx_t *xadj, idx_t *vwgt, idx_t *adjncy,
 /*! This function performs a node-based 1-sided FM refinement that moves
     only nodes whose hmarker[] == -1. It is used by Parmetis. */
 /*************************************************************************/
-void FM_2WayNodeRefine1SidedP(ctrl_t *ctrl, graph_t *graph, 
+void FM_2WayNodeRefine1SidedP(ctrl_t *ctrl, graph_t *graph,
           idx_t *hmarker, real_t ubfactor, idx_t npasses)
 {
   idx_t i, ii, j, k, jj, kk, nvtxs, nbnd, nswaps, nmind, nbad, qsize;
   idx_t *xadj, *vwgt, *adjncy, *where, *pwgts, *edegrees, *bndind, *bndptr;
   idx_t *mptr, *mind, *swaps, *inqueue;
-  rpq_t *queue; 
+  rpq_t *queue;
   nrinfo_t *rinfo;
-  idx_t higain, oldgain, mincut, initcut, mincutorder;	
+  idx_t higain, oldgain, mincut, initcut, mincutorder;
   idx_t pass, from, to, limit;
   idx_t badmaxpwgt, mindiff, newdiff;
 
@@ -263,7 +263,7 @@ void FM_2WayNodeRefine1SidedP(ctrl_t *ctrl, graph_t *graph,
   rinfo  = graph->nrinfo;
 
   queue = rpqCreate(nvtxs);
-      
+
   inqueue = iset(nvtxs, -1, iwspacemalloc(ctrl, nvtxs));
   swaps   = iwspacemalloc(ctrl, nvtxs);
   mptr    = iwspacemalloc(ctrl, nvtxs+1);
@@ -273,13 +273,13 @@ void FM_2WayNodeRefine1SidedP(ctrl_t *ctrl, graph_t *graph,
 
   IFSET(ctrl->dbglvl, METIS_DBG_REFINE,
     printf("Partitions-N1: [%6"PRIDX" %6"PRIDX"] Nv-Nb[%6"PRIDX" %6"PRIDX"] "
-           "MaxPwgt[%6"PRIDX"]. ISep: %6"PRIDX"\n", 
-           pwgts[0], pwgts[1], graph->nvtxs, graph->nbnd, badmaxpwgt, 
+           "MaxPwgt[%6"PRIDX"]. ISep: %6"PRIDX"\n",
+           pwgts[0], pwgts[1], graph->nvtxs, graph->nbnd, badmaxpwgt,
            graph->mincut));
 
   to = (pwgts[0] < pwgts[1] ? 1 : 0);
   for (pass=0; pass<npasses; pass++) {
-    from = to; 
+    from = to;
     to   = (from+1)%2;
 
     rpqReset(queue);
@@ -311,7 +311,7 @@ void FM_2WayNodeRefine1SidedP(ctrl_t *ctrl, graph_t *graph,
     mptr[0] = nmind = nbad = 0;
     mindiff = abs(pwgts[0]-pwgts[1]);
     for (nswaps=0; nswaps<nvtxs; nswaps++) {
-      if ((higain = rpqGetTop(queue)) == -1) 
+      if ((higain = rpqGetTop(queue)) == -1)
         break;
 
       ASSERT(bndptr[higain] != -1);
@@ -324,11 +324,11 @@ void FM_2WayNodeRefine1SidedP(ctrl_t *ctrl, graph_t *graph,
       inqueue[higain] = -1;
 
       if (pwgts[to]+vwgt[higain] > badmaxpwgt) { /* Skip this vertex */
-        if (nbad++ > limit) 
-          break; 
+        if (nbad++ > limit)
+          break;
         else {
           nswaps--;
-          continue;  
+          continue;
         }
       }
 
@@ -351,7 +351,7 @@ void FM_2WayNodeRefine1SidedP(ctrl_t *ctrl, graph_t *graph,
       BNDDelete(nbnd, bndind, bndptr, higain);
       pwgts[to] += vwgt[higain];
       where[higain] = to;
-      swaps[nswaps] = higain;  
+      swaps[nswaps] = higain;
 
 
       /**********************************************************
@@ -374,7 +374,7 @@ void FM_2WayNodeRefine1SidedP(ctrl_t *ctrl, graph_t *graph,
           edegrees[0] = edegrees[1] = 0;
           for (jj=xadj[k]; jj<xadj[k+1]; jj++) {
             kk = adjncy[jj];
-            if (where[kk] != 2) 
+            if (where[kk] != 2)
               edegrees[where[kk]] += vwgt[kk];
             else {
               oldgain = vwgt[kk]-rinfo[kk].edegrees[from];
@@ -382,7 +382,7 @@ void FM_2WayNodeRefine1SidedP(ctrl_t *ctrl, graph_t *graph,
 
               /* Update the gain of this node if it was not skipped */
               if (inqueue[kk] == pass)
-                rpqUpdate(queue, kk, oldgain+vwgt[k]); 
+                rpqUpdate(queue, kk, oldgain+vwgt[k]);
             }
           }
 
@@ -397,15 +397,15 @@ void FM_2WayNodeRefine1SidedP(ctrl_t *ctrl, graph_t *graph,
 
 
       IFSET(ctrl->dbglvl, METIS_DBG_MOVEINFO,
-            printf("Moved %6"PRIDX" to %3"PRIDX", Gain: %5"PRIDX" [%5"PRIDX"] \t[%5"PRIDX" %5"PRIDX" %5"PRIDX"] [%3"PRIDX" %2"PRIDX"]\n", 
-                   higain, to, (vwgt[higain]-rinfo[higain].edegrees[from]), 
+            printf("Moved %6"PRIDX" to %3"PRIDX", Gain: %5"PRIDX" [%5"PRIDX"] \t[%5"PRIDX" %5"PRIDX" %5"PRIDX"] [%3"PRIDX" %2"PRIDX"]\n",
+                   higain, to, (vwgt[higain]-rinfo[higain].edegrees[from]),
                    vwgt[higain], pwgts[0], pwgts[1], pwgts[2], nswaps, limit));
 
     }
 
 
     /****************************************************************
-    * Roll back computation 
+    * Roll back computation
     *****************************************************************/
     for (nswaps--; nswaps>mincutorder; nswaps--) {
       higain = swaps[nswaps];
@@ -421,7 +421,7 @@ void FM_2WayNodeRefine1SidedP(ctrl_t *ctrl, graph_t *graph,
       edegrees[0] = edegrees[1] = 0;
       for (j=xadj[higain]; j<xadj[higain+1]; j++) {
         k = adjncy[j];
-        if (where[k] == 2) 
+        if (where[k] == 2)
           rinfo[k].edegrees[to] -= vwgt[higain];
         else
           edegrees[where[k]] += vwgt[k];
@@ -436,7 +436,7 @@ void FM_2WayNodeRefine1SidedP(ctrl_t *ctrl, graph_t *graph,
         BNDDelete(nbnd, bndind, bndptr, k);
         for (jj=xadj[k]; jj<xadj[k+1]; jj++) {
           kk = adjncy[jj];
-          if (where[kk] == 2) 
+          if (where[kk] == 2)
             rinfo[kk].edegrees[from] += vwgt[k];
         }
       }
@@ -445,7 +445,7 @@ void FM_2WayNodeRefine1SidedP(ctrl_t *ctrl, graph_t *graph,
     ASSERT(mincut == pwgts[2]);
 
     IFSET(ctrl->dbglvl, METIS_DBG_REFINE,
-      printf("\tMinimum sep: %6"PRIDX" at %5"PRIDX", PWGTS: [%6"PRIDX" %6"PRIDX"], NBND: %6"PRIDX", QSIZE: %6"PRIDX"\n", 
+      printf("\tMinimum sep: %6"PRIDX" at %5"PRIDX", PWGTS: [%6"PRIDX" %6"PRIDX"], NBND: %6"PRIDX", QSIZE: %6"PRIDX"\n",
           mincut, mincutorder, pwgts[0], pwgts[1], nbnd, qsize));
 
     graph->mincut = mincut;
@@ -462,18 +462,18 @@ void FM_2WayNodeRefine1SidedP(ctrl_t *ctrl, graph_t *graph,
 
 
 /*************************************************************************/
-/*! This function performs a node-based (two-sided) FM refinement that 
+/*! This function performs a node-based (two-sided) FM refinement that
     moves only nodes whose hmarker[] == -1. It is used by Parmetis. */
 /*************************************************************************/
-void FM_2WayNodeRefine2SidedP(ctrl_t *ctrl, graph_t *graph, 
+void FM_2WayNodeRefine2SidedP(ctrl_t *ctrl, graph_t *graph,
           idx_t *hmarker, real_t ubfactor, idx_t npasses)
 {
   idx_t i, ii, j, k, jj, kk, nvtxs, nbnd, nswaps, nmind;
   idx_t *xadj, *vwgt, *adjncy, *where, *pwgts, *edegrees, *bndind, *bndptr;
   idx_t *mptr, *mind, *moved, *swaps;
-  rpq_t *queues[2]; 
+  rpq_t *queues[2];
   nrinfo_t *rinfo;
-  idx_t higain, oldgain, mincut, initcut, mincutorder;	
+  idx_t higain, oldgain, mincut, initcut, mincutorder;
   idx_t pass, to, other, limit;
   idx_t badmaxpwgt, mindiff, newdiff;
   idx_t u[2], g[2];
@@ -541,15 +541,15 @@ void FM_2WayNodeRefine2SidedP(ctrl_t *ctrl, graph_t *graph,
     mindiff = abs(pwgts[0]-pwgts[1]);
     to = (pwgts[0] < pwgts[1] ? 0 : 1);
     for (nswaps=0; nswaps<nvtxs; nswaps++) {
-      u[0] = rpqSeeTopVal(queues[0]);  
+      u[0] = rpqSeeTopVal(queues[0]);
       u[1] = rpqSeeTopVal(queues[1]);
       if (u[0] != -1 && u[1] != -1) {
         g[0] = vwgt[u[0]]-rinfo[u[0]].edegrees[1];
         g[1] = vwgt[u[1]]-rinfo[u[1]].edegrees[0];
 
-        to = (g[0] > g[1] ? 0 : (g[0] < g[1] ? 1 : pass%2)); 
+        to = (g[0] > g[1] ? 0 : (g[0] < g[1] ? 1 : pass%2));
 
-        if (pwgts[to]+vwgt[u[to]] > badmaxpwgt) 
+        if (pwgts[to]+vwgt[u[to]] > badmaxpwgt)
           to = (to+1)%2;
       }
       else if (u[0] == -1 && u[1] == -1) {
@@ -569,7 +569,7 @@ void FM_2WayNodeRefine2SidedP(ctrl_t *ctrl, graph_t *graph,
       higain = rpqGetTop(queues[to]);
 
       /* Delete its matching entry in the other queue */
-      if (moved[higain] == -5) 
+      if (moved[higain] == -5)
         rpqDelete(queues[other], higain);
 
       ASSERT(bndptr[higain] != -1);
@@ -598,7 +598,7 @@ void FM_2WayNodeRefine2SidedP(ctrl_t *ctrl, graph_t *graph,
       pwgts[to] += vwgt[higain];
       where[higain] = to;
       moved[higain] = nswaps;
-      swaps[nswaps] = higain;  
+      swaps[nswaps] = higain;
 
 
       /**********************************************************
@@ -609,7 +609,7 @@ void FM_2WayNodeRefine2SidedP(ctrl_t *ctrl, graph_t *graph,
         if (where[k] == 2) { /* For the in-separator vertices modify their edegree[to] */
           oldgain = vwgt[k]-rinfo[k].edegrees[to];
           rinfo[k].edegrees[to] += vwgt[higain];
-          if (moved[k] == -5 || moved[k] == -(10+other)) 
+          if (moved[k] == -5 || moved[k] == -(10+other))
             rpqUpdate(queues[other], k, oldgain-vwgt[higain]);
         }
         else if (where[k] == other) { /* This vertex is pulled into the separator */
@@ -624,7 +624,7 @@ void FM_2WayNodeRefine2SidedP(ctrl_t *ctrl, graph_t *graph,
           edegrees[0] = edegrees[1] = 0;
           for (jj=xadj[k]; jj<xadj[k+1]; jj++) {
             kk = adjncy[jj];
-            if (where[kk] != 2) 
+            if (where[kk] != 2)
               edegrees[where[kk]] += vwgt[kk];
             else {
               oldgain = vwgt[kk]-rinfo[kk].edegrees[other];
@@ -658,15 +658,15 @@ void FM_2WayNodeRefine2SidedP(ctrl_t *ctrl, graph_t *graph,
 
       IFSET(ctrl->dbglvl, METIS_DBG_MOVEINFO,
             printf("Moved %6"PRIDX" to %3"PRIDX", Gain: %5"PRIDX" [%5"PRIDX"] "
-                   "[%4"PRIDX" %4"PRIDX"] \t[%5"PRIDX" %5"PRIDX" %5"PRIDX"]\n", 
-                   higain, to, g[to], g[other], vwgt[u[to]], vwgt[u[other]], 
+                   "[%4"PRIDX" %4"PRIDX"] \t[%5"PRIDX" %5"PRIDX" %5"PRIDX"]\n",
+                   higain, to, g[to], g[other], vwgt[u[to]], vwgt[u[other]],
                    pwgts[0], pwgts[1], pwgts[2]));
 
     }
 
 
     /****************************************************************
-    * Roll back computation 
+    * Roll back computation
     *****************************************************************/
     for (nswaps--; nswaps>mincutorder; nswaps--) {
       higain = swaps[nswaps];
@@ -683,7 +683,7 @@ void FM_2WayNodeRefine2SidedP(ctrl_t *ctrl, graph_t *graph,
       edegrees[0] = edegrees[1] = 0;
       for (j=xadj[higain]; j<xadj[higain+1]; j++) {
         k = adjncy[j];
-        if (where[k] == 2) 
+        if (where[k] == 2)
           rinfo[k].edegrees[to] -= vwgt[higain];
         else
           edegrees[where[k]] += vwgt[k];
@@ -698,7 +698,7 @@ void FM_2WayNodeRefine2SidedP(ctrl_t *ctrl, graph_t *graph,
         BNDDelete(nbnd, bndind, bndptr, k);
         for (jj=xadj[k]; jj<xadj[k+1]; jj++) {
           kk = adjncy[jj];
-          if (where[kk] == 2) 
+          if (where[kk] == 2)
             rinfo[kk].edegrees[other] += vwgt[k];
         }
       }
@@ -725,12 +725,12 @@ void FM_2WayNodeRefine2SidedP(ctrl_t *ctrl, graph_t *graph,
 
 /*************************************************************************/
 /*! This function computes a cache-friendly permutation of each partition.
-    The resulting permutation is retuned in old2new, which is a vector of 
-    size nvtxs such for vertex i, old2new[i] is its new vertex number. 
+    The resulting permutation is returned in old2new, which is a vector of
+    size nvtxs such for vertex i, old2new[i] is its new vertex number.
 */
 /**************************************************************************/
-int METIS_CacheFriendlyReordering(idx_t nvtxs, idx_t *xadj, idx_t *adjncy, 
-           idx_t *part, idx_t *old2new) 
+int METIS_CacheFriendlyReordering(idx_t nvtxs, idx_t *xadj, idx_t *adjncy,
+           idx_t *part, idx_t *old2new)
 {
   idx_t i, j, k, first, last, lastlevel, maxdegree, nparts;
   idx_t *cot, *pos, *pwgts;
@@ -770,8 +770,8 @@ int METIS_CacheFriendlyReordering(idx_t nvtxs, idx_t *xadj, idx_t *adjncy,
       k = adjncy[j];
       /* if a node has been already been visited, its pos[] will be -1 */
       if (pos[k] >= 0) {
-        /* pos[k] is the location within cot of where k resides (it is in the 'todo' part); 
-           put in that location cot[last] that we are about to overwrite 
+        /* pos[k] is the location within cot of where k resides (it is in the 'todo' part);
+           put in that location cot[last] that we are about to overwrite
            and update pos[cot[last]] to reflect that. */
         cot[pos[k]]    = cot[last];
         pos[cot[last]] = pos[k];
@@ -791,27 +791,26 @@ int METIS_CacheFriendlyReordering(idx_t nvtxs, idx_t *xadj, idx_t *adjncy,
     levels[i].val = i;
     levels[i].key = -pos[i]*maxdegree + xadj[i+1]-xadj[i];
   }
-  ikvsortd(nvtxs, levels); 
+  ikvsortd(nvtxs, levels);
 
   /* figure out the partitions */
   nparts = imax(nvtxs, part, 1)+1;
   pwgts  = ismalloc(nparts+1, 0, "METIS_CacheFriendlyReordering: pwgts");
 
-  for (i=0; i<nvtxs; i++) 
+  for (i=0; i<nvtxs; i++)
     pwgts[part[i]]++;
   MAKECSR(i, nparts, pwgts);
 
-  for (i=0; i<nvtxs; i++) 
+  for (i=0; i<nvtxs; i++)
     old2new[levels[i].val] = pwgts[part[levels[i].val]]++;
 
 #ifdef XXX
   for (i=0; i<nvtxs; i++)
     for (j=xadj[i]; j<xadj[i+1]; j++)
       printf("COO: %d %d\n", (int)old2new[i], (int)old2new[adjncy[j]]);
-#endif 
+#endif
 
   gk_free((void **)&cot, &pos, &levels, &pwgts, LTERM);
 
   return METIS_OK;
 }
-

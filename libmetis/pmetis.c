@@ -1,11 +1,11 @@
 /**
 \file
-\brief This file contains the top level routines for the multilevel recursive bisection 
+\brief This file contains the top level routines for the multilevel recursive bisection
        algorithm PMETIS.
 
 \date   Started 7/24/1997
-\author George  
-\author Copyright 1997-2009, Regents of the University of Minnesota 
+\author George
+\author Copyright 1997-2009, Regents of the University of Minnesota
 \version\verbatim $Id: pmetis.c 10513 2011-07-07 22:06:03Z karypis $ \endverbatim
 */
 
@@ -14,11 +14,11 @@
 
 
 /*************************************************************************/
-/*! \ingroup api 
+/*! \ingroup api
     \brief Recursive partitioning routine.
 
     This function computes a partitioning of a graph based on multilevel
-    recursive bisection. It can be used to partition a graph into \e k 
+    recursive bisection. It can be used to partition a graph into \e k
     parts. The objective of the partitioning is to minimize the edgecut
     subject to one or more balancing constraints.
 
@@ -44,8 +44,8 @@
 
     \param[in] adjwgt is an array of size equal to adjncy, specifying the weight
            for each edge (i.e., adjwgt[j] corresponds to the weight of the
-           edge stored in adjncy[j]). 
-           A NULL value can be passed indicating that all the edges in the 
+           edge stored in adjncy[j]).
+           A NULL value can be passed indicating that all the edges in the
            graph have the same weight.
 
     \param[in] nparts is the number of desired partitions.
@@ -55,15 +55,15 @@
            weight} for the ith part and jth constraint is specified
            at tpwgts[i*ncon+j] (the numbering of i and j starts from 0).
            For each constraint, the sum of the tpwgts[] entries must be
-           1.0 (i.e., \f$ \sum_i tpwgts[i*ncon+j] = 1.0 \f$). 
+           1.0 (i.e., \f$ \sum_i tpwgts[i*ncon+j] = 1.0 \f$).
            A NULL value can be passed indicating that the graph should
            be equally divided among the parts.
 
-    \param[in] ubvec is an array of size ncon that specifies the allowed 
-           load imbalance tolerance for each constraint. 
-           For the ith part and jth constraint the allowed weight is the 
+    \param[in] ubvec is an array of size ncon that specifies the allowed
+           load imbalance tolerance for each constraint.
+           For the ith part and jth constraint the allowed weight is the
            ubvec[j]*tpwgts[i*ncon+j] fraction of the jth's constraint total
-           weight. The load imbalances must be greater than 1.0. 
+           weight. The load imbalances must be greater than 1.0.
            A NULL value can be passed indicating that the load imbalance
            tolerance for each constraint should be 1.001 (for ncon==1)
            or 1.01 (for ncon>1).
@@ -74,23 +74,23 @@
 
     \params[out] edgecut stores the cut of the partitioning.
 
-    \params[out] part is an array of size nvtxs used to store the 
+    \params[out] part is an array of size nvtxs used to store the
            computed partitioning. The partition number for the ith
            vertex is stored in part[i]. Based on the numflag parameter,
            the numbering of the parts starts from either 0 or 1.
 
 
-    \returns 
+    \returns
       \retval METIS_OK  indicates that the function returned normally.
       \retval METIS_ERROR_INPUT indicates an input error.
-      \retval METIS_ERROR_MEMORY indicates that it could not allocate 
+      \retval METIS_ERROR_MEMORY indicates that it could not allocate
               the required memory.
-           
+
 */
 /*************************************************************************/
-int METIS_PartGraphRecursive(idx_t *nvtxs, idx_t *ncon, idx_t *xadj, 
-          idx_t *adjncy, idx_t *vwgt, idx_t *vsize, idx_t *adjwgt, 
-          idx_t *nparts, real_t *tpwgts, real_t *ubvec, idx_t *options, 
+int METIS_PartGraphRecursive(idx_t *nvtxs, idx_t *ncon, idx_t *xadj,
+          idx_t *adjncy, idx_t *vwgt, idx_t *vsize, idx_t *adjwgt,
+          idx_t *nparts, real_t *tpwgts, real_t *ubvec, idx_t *options,
           idx_t *objval, idx_t *part)
 {
   int sigrval=0, renumber=0;
@@ -98,12 +98,12 @@ int METIS_PartGraphRecursive(idx_t *nvtxs, idx_t *ncon, idx_t *xadj,
   ctrl_t *ctrl;
 
   /* set up malloc cleaning code and signal catchers */
-  if (!gk_malloc_init()) 
+  if (!gk_malloc_init())
     return METIS_ERROR_MEMORY;
 
   gk_sigtrap();
 
-  if ((sigrval = gk_sigcatch()) != 0) 
+  if ((sigrval = gk_sigcatch()) != 0)
     goto SIGTHROW;
 
   /* set up the run parameters */
@@ -151,22 +151,20 @@ SIGTHROW:
 
 
 /*************************************************************************/
-/*! This function is the top-level driver of the recursive bisection 
+/*! This function is the top-level driver of the recursive bisection
     routine. */
 /*************************************************************************/
-idx_t MlevelRecursiveBisection(ctrl_t *ctrl, graph_t *graph, idx_t nparts, 
+idx_t MlevelRecursiveBisection(ctrl_t *ctrl, graph_t *graph, idx_t nparts,
           idx_t *part, real_t *tpwgts, idx_t fpart)
 {
   idx_t i, j, nvtxs, ncon, objval;
   idx_t *label, *where;
-  graph_t *lgraph, *rgraph;
+  graph_t *lgraph = NULL, *rgraph = NULL;
   real_t wsum, *tpwgts2;
 
-  if ((nvtxs = graph->nvtxs) == 0) {
-    printf("\t***Cannot bisect a graph with 0 vertices!\n"
-           "\t***You are trying to partition a graph into too many parts!\n");
-    return 0;
-  }
+  if ((nvtxs = graph->nvtxs) == 0)
+    gk_errexit(SIGERR, "***Cannot bisect a graph with 0 vertices!\n"
+                       "***You are trying to partition a graph into too many parts.\n");
 
   ncon = graph->ncon;
 
@@ -189,7 +187,7 @@ idx_t MlevelRecursiveBisection(ctrl_t *ctrl, graph_t *graph, idx_t nparts,
   for (i=0; i<nvtxs; i++)
     part[label[i]] = where[i] + fpart;
 
-  if (nparts > 2) 
+  if (nparts > 2)
     SplitGraphPart(ctrl, graph, &lgraph, &rgraph);
 
   /* Free the memory of the top level graph */
@@ -204,14 +202,14 @@ idx_t MlevelRecursiveBisection(ctrl_t *ctrl, graph_t *graph, idx_t nparts,
 
   /* Do the recursive call */
   if (nparts > 3) {
-    objval += MlevelRecursiveBisection(ctrl, lgraph, (nparts>>1), part, 
+    objval += MlevelRecursiveBisection(ctrl, lgraph, (nparts>>1), part,
                tpwgts, fpart);
-    objval += MlevelRecursiveBisection(ctrl, rgraph, nparts-(nparts>>1), part, 
+    objval += MlevelRecursiveBisection(ctrl, rgraph, nparts-(nparts>>1), part,
                tpwgts+(nparts>>1)*ncon, fpart+(nparts>>1));
   }
   else if (nparts == 3) {
     FreeGraph(&lgraph);
-    objval += MlevelRecursiveBisection(ctrl, rgraph, nparts-(nparts>>1), part, 
+    objval += MlevelRecursiveBisection(ctrl, rgraph, nparts-(nparts>>1), part,
                tpwgts+(nparts>>1)*ncon, fpart+(nparts>>1));
   }
 
@@ -247,8 +245,8 @@ idx_t MultilevelBisect(ctrl_t *ctrl, graph_t *graph, real_t *tpwgts)
     curobj = graph->mincut;
     curbal = ComputeLoadImbalanceDiff(graph, 2, ctrl->pijbm, ctrl->ubfactors);
 
-    if (i == 0  
-        || (curbal <= 0.0005 && bestobj > curobj) 
+    if (i == 0
+        || (curbal <= 0.0005 && bestobj > curobj)
         || (bestbal > 0.0005 && curbal < bestbal)) {
       bestobj = curobj;
       bestbal = curbal;
@@ -277,7 +275,7 @@ idx_t MultilevelBisect(ctrl_t *ctrl, graph_t *graph, real_t *tpwgts)
 /*************************************************************************/
 /*! This function splits a graph into two based on its bisection */
 /*************************************************************************/
-void SplitGraphPart(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph, 
+void SplitGraphPart(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph,
          graph_t **r_rgraph)
 {
   idx_t i, j, k, l, istart, iend, mypart, nvtxs, ncon, snvtxs[2], snedges[2];
@@ -304,7 +302,7 @@ void SplitGraphPart(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph,
   ASSERT(bndptr != NULL);
 
   rename = iwspacemalloc(ctrl, nvtxs);
-  
+
   snvtxs[0] = snvtxs[1] = snedges[0] = snedges[1] = 0;
   for (i=0; i<nvtxs; i++) {
     k = where[i];
@@ -315,15 +313,15 @@ void SplitGraphPart(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph,
   lgraph      = SetupSplitGraph(graph, snvtxs[0], snedges[0]);
   sxadj[0]    = lgraph->xadj;
   svwgt[0]    = lgraph->vwgt;
-  sadjncy[0]  = lgraph->adjncy; 	
-  sadjwgt[0]  = lgraph->adjwgt; 
+  sadjncy[0]  = lgraph->adjncy;
+  sadjwgt[0]  = lgraph->adjwgt;
   slabel[0]   = lgraph->label;
 
   rgraph      = SetupSplitGraph(graph, snvtxs[1], snedges[1]);
   sxadj[1]    = rgraph->xadj;
   svwgt[1]    = rgraph->vwgt;
-  sadjncy[1]  = rgraph->adjncy; 	
-  sadjwgt[1]  = rgraph->adjwgt; 
+  sadjncy[1]  = rgraph->adjncy;
+  sadjwgt[1]  = rgraph->adjwgt;
   slabel[1]   = rgraph->label;
 
   snvtxs[0] = snvtxs[1] = snedges[0] = snedges[1] = 0;
@@ -337,8 +335,8 @@ void SplitGraphPart(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph,
       auxadjncy = sadjncy[mypart] + snedges[mypart] - istart;
       auxadjwgt = sadjwgt[mypart] + snedges[mypart] - istart;
       for(j=istart; j<iend; j++) {
-        auxadjncy[j] = adjncy[j];
-        auxadjwgt[j] = adjwgt[j]; 
+        auxadjncy[j] = rename[adjncy[j]];
+        auxadjwgt[j] = adjwgt[j];
       }
       snedges[mypart] += iend-istart;
     }
@@ -349,8 +347,8 @@ void SplitGraphPart(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph,
       for (j=istart; j<iend; j++) {
         k = adjncy[j];
         if (where[k] == mypart) {
-          auxadjncy[l] = k;
-          auxadjwgt[l++] = adjwgt[j]; 
+          auxadjncy[l] = rename[k];
+          auxadjwgt[l++] = adjwgt[j];
         }
       }
       snedges[mypart] = l;
@@ -364,12 +362,7 @@ void SplitGraphPart(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph,
     sxadj[mypart][++snvtxs[mypart]]  = snedges[mypart];
   }
 
-  for (mypart=0; mypart<2; mypart++) {
-    iend = sxadj[mypart][snvtxs[mypart]];
-    auxadjncy = sadjncy[mypart];
-    for (i=0; i<iend; i++) 
-      auxadjncy[i] = rename[auxadjncy[i]];
-  }
+  /* rename was applied inline during extraction above */
 
   lgraph->nedges = snedges[0];
   rgraph->nedges = snedges[1];
@@ -384,4 +377,3 @@ void SplitGraphPart(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph,
 
   WCOREPOP;
 }
-
