@@ -6,10 +6,17 @@ add_executable(mpmetis mpmetis.c cmdline_mpmetis.c io.c stat.c)
 add_executable(m2gmetis m2gmetis.c cmdline_m2gmetis.c io.c)
 add_executable(graphchk graphchk.c io.c)
 add_executable(cmpfillin cmpfillin.c io.c smbfactor.c)
-foreach(prog IN ITEMS gpmetis ndmetis mpmetis m2gmetis graphchk cmpfillin)
+
+set(metis_programs gpmetis ndmetis mpmetis m2gmetis graphchk cmpfillin)
+foreach(prog IN LISTS metis_programs)
   target_link_libraries(${prog} PRIVATE metis)
   target_include_directories(${prog} PRIVATE ${PROJECT_SOURCE_DIR}/include)
 #  target_link_libraries(${prog} metis profiler)
-endforeach(prog)
+endforeach()
 
-install(TARGETS gpmetis ndmetis mpmetis m2gmetis graphchk cmpfillin)
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 4.1)
+  set_target_properties(${metis_programs} PROPERTIES SPDX_LICENSE "Apache-2.0")
+endif()
+
+
+install(TARGETS ${metis_programs})
