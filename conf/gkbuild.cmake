@@ -27,7 +27,9 @@ if(APPLE)
 endif()
 
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-  list(APPEND GKlib_COPTS -fno-strict-aliasing -Wall -Wno-unused-function -Wno-unused-but-set-variable -Wno-unused-variable -Wno-unknown-pragmas -Wno-unused-label)
+  list(APPEND GKlib_COPTS -fno-strict-aliasing
+  "$<$<CONFIG:Debug>:-Wall;-Wno-unused-function;-Wno-unused-but-set-variable;-Wno-unused-variable;-Wno-unknown-pragmas;-Wno-unused-label>"
+  )
 endif()
 
 if(UNIX)
@@ -70,7 +72,7 @@ endif(HAVE_EXECINFO_H)
 check_function_exists(getline HAVE_GETLINE)
 if(HAVE_GETLINE)
  list(APPEND GKlib_COPTIONS HAVE_GETLINE)
-endif(HAVE_GETLINE)
+endif()
 
 
 # Custom check for TLS.
