@@ -1,5 +1,5 @@
 # Helper modules.
-include(CheckFunctionExists)
+include(CheckSymbolExists)
 include(CheckIncludeFile)
 
 # Setup options.
@@ -69,7 +69,7 @@ if(HAVE_EXECINFO_H)
   list(APPEND GKlib_COPTIONS HAVE_EXECINFO_H)
 endif(HAVE_EXECINFO_H)
 
-check_function_exists(getline HAVE_GETLINE)
+check_symbol_exists(getline "stdio.h" HAVE_GETLINE)
 if(HAVE_GETLINE)
  list(APPEND GKlib_COPTIONS HAVE_GETLINE)
 endif()
@@ -79,9 +79,7 @@ endif()
 if(MSVC)
   if(NOT DEFINED HAVE_THREADLOCALSTORAGE)
     message(CHECK_START "checking for thread-local storage")
-    try_compile(HAVE_THREADLOCALSTORAGE
-      ${CMAKE_BINARY_DIR}
-      ${CMAKE_CURRENT_LIST_DIR}/check_thread_storage.c)
+    try_compile(HAVE_THREADLOCALSTORAGE SOURCES ${CMAKE_CURRENT_LIST_DIR}/check_thread_storage.c)
     if(HAVE_THREADLOCALSTORAGE)
       message(CHECK_PASS "found")
     else()

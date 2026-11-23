@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21...4.3)
+cmake_minimum_required(VERSION 3.25...4.5)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT DEFINED ENV{CMAKE_BUILD_TYPE})
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Debug or Release")

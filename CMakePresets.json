@@ -5,27 +5,45 @@
 {
   "name": "default",
   "binaryDir": "build",
+  "generator": "Ninja",
   "installDir": "${fileDir}/build/local",
   "cacheVariables": {
+    "METIS_BUILD_TESTING": true,
     "CMAKE_BUILD_TYPE": "Release",
     "REALTYPEWIDTH": "32",
     "IDXTYPEWIDTH": "32"
   }
 },
-{ "name": "int64", "inherits": "default",
+{
+  "name": "shared", "inherits": "default",
+  "cacheVariables": {
+    "BUILD_SHARED_LIBS": true
+  }
+},
+{
+  "name": "int64", "inherits": "default",
   "cacheVariables": {
     "IDXTYPEWIDTH": "64"
   }
+},
+{
+  "name": "msvc", "inherits": "default",
+  "generator": "Visual Studio 18 2026",
+  "binaryDir": "build-${presetName}",
+  "installDir": "build-${presetName}/local"
 }
 ],
 "buildPresets": [
-  { "name": "default", "configurePreset": "default" },
-  { "name": "int64", "configurePreset": "int64", "inherits": "default" }
+  { "name": "default", "configurePreset": "default", "configuration": "Release" },
+  { "name": "shared", "configurePreset": "shared", "inherits": "default" },
+  { "name": "int64", "configurePreset": "int64", "inherits": "default" },
+  { "name": "msvc", "configurePreset": "msvc", "inherits": "default", "configuration": "Release" }
 ],
 "testPresets": [
 {
   "name": "default",
   "configurePreset": "default",
+  "configuration": "Release",
   "output": {
     "outputOnFailure": true,
     "verbosity": "verbose"
@@ -35,11 +53,32 @@
     "scheduleRandom": true,
     "stopOnFailure": false
   }
+},
+{ "name": "shared", "configurePreset": "shared", "inherits": "default" },
+{
+  "name": "msvc", "inherits": "default",
+  "configurePreset": "msvc", "configuration": "Release"
 }
 ],
 "workflowPresets": [
   {
     "name": "default",
+    "steps": [
+      { "type": "configure", "name": "default" },
+      { "type": "build", "name": "default" },
+      { "type": "test", "name": "default" }
+    ]
+  },
+  {
+    "name": "shared",
+    "steps": [
+      { "type": "configure", "name": "shared" },
+      { "type": "build", "name": "shared" },
+      { "type": "test", "name": "shared" }
+    ]
+  },
+  {
+    "name": "build",
     "steps": [
       { "type": "configure", "name": "default" },
       { "type": "build", "name": "default" }
@@ -50,6 +89,14 @@
     "steps": [
       { "type": "configure", "name": "int64" },
       { "type": "build", "name": "int64" }
+    ]
+  },
+  {
+    "name": "msvc",
+    "steps": [
+      { "type": "configure", "name": "msvc" },
+      { "type": "build", "name": "msvc" },
+      { "type": "test", "name": "msvc" }
     ]
   }
 ]

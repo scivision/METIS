@@ -19,10 +19,10 @@ concurrency:
 
 jobs:
 
-  unix:
+  core:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
 
     runs-on: ${{ matrix.os }}
     timeout-minutes: 5
@@ -31,7 +31,11 @@ jobs:
     - &checkout
        uses: actions/checkout@v7
 
-    - run: cmake --workflow default
+    - name: Static build
+      run: cmake --workflow default
+
+    - name: Shared build
+      run: cmake --workflow shared
 
 
   int64:
@@ -41,14 +45,16 @@ jobs:
     steps:
     - *checkout
 
-    - run: cmake --workflow int64
+    - name: Int64 build
+      run: cmake --workflow int64
 
 
-  windows_mingw:
+  msvc:
     runs-on: windows-latest
     timeout-minutes: 5
 
     steps:
     - *checkout
 
-    - run: cmake --workflow default
+    - name: MSVC build
+      run: cmake --workflow msvc
