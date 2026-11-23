@@ -30,14 +30,16 @@
   "name": "msvc", "inherits": "default",
   "generator": "Visual Studio 18 2026",
   "binaryDir": "build-${presetName}",
-  "installDir": "build-${presetName}/local"
-}
+  "installDir": "${fileDir}/build-${presetName}/local"
+},
+{ "name": "msvc-shared", "inherits": "msvc", "cacheVariables": { "BUILD_SHARED_LIBS": true } }
 ],
 "buildPresets": [
   { "name": "default", "configurePreset": "default", "configuration": "Release" },
   { "name": "shared", "configurePreset": "shared", "inherits": "default" },
   { "name": "int64", "configurePreset": "int64", "inherits": "default" },
-  { "name": "msvc", "configurePreset": "msvc", "inherits": "default", "configuration": "Release" }
+  { "name": "msvc", "configurePreset": "msvc", "inherits": "default", "configuration": "Release" },
+  { "name": "msvc-shared", "configurePreset": "msvc-shared", "inherits": "default", "configuration": "Release" }
 ],
 "testPresets": [
 {
@@ -49,16 +51,16 @@
     "verbosity": "verbose"
   },
   "execution": {
+    "interactiveDebugging": false,
     "noTestsAction": "error",
     "scheduleRandom": true,
-    "stopOnFailure": false
+    "stopOnFailure": false,
+    "timeout": 15
   }
 },
 { "name": "shared", "configurePreset": "shared", "inherits": "default" },
-{
-  "name": "msvc", "inherits": "default",
-  "configurePreset": "msvc", "configuration": "Release"
-}
+{ "name": "msvc", "inherits": "default", "configurePreset": "msvc", "configuration": "Release" },
+{ "name": "msvc-shared", "inherits": "msvc", "configurePreset": "msvc-shared" }
 ],
 "workflowPresets": [
   {
@@ -97,6 +99,14 @@
       { "type": "configure", "name": "msvc" },
       { "type": "build", "name": "msvc" },
       { "type": "test", "name": "msvc" }
+    ]
+  },
+  {
+    "name": "msvc-shared",
+    "steps": [
+      { "type": "configure", "name": "msvc-shared" },
+      { "type": "build", "name": "msvc-shared" },
+      { "type": "test", "name": "msvc-shared" }
     ]
   }
 ]

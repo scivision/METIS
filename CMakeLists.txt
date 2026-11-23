@@ -50,6 +50,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/metis.h TYPE INCLUDE)
 
 # Build libmetis.
 add_library(metis)
+set_target_properties(metis PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
 add_subdirectory(libmetis)
 target_include_directories(metis PUBLIC
 "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libmetis;${CMAKE_CURRENT_BINARY_DIR}>"
@@ -70,6 +71,12 @@ if(METIS_BUILD_TESTING)
   enable_testing()
 
   add_test(NAME GraphCheck COMMAND $<TARGET_FILE:graphchk> ${CMAKE_CURRENT_SOURCE_DIR}/test/tiny_01.graph)
+  if(WIN32 AND BUILD_SHARED_LIBS)
+    set_tests_properties(GraphCheck PROPERTIES
+      ENVIRONMENT_MODIFICATION
+        "PATH=path_list_prepend:$<TARGET_FILE_DIR:metis>;PATH=path_list_prepend:$<TARGET_FILE_DIR:GKlib::GKlib>"
+    )
+  endif()
 endif()
 
 include(cmake/install.cmake)
